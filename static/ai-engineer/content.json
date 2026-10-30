@@ -1,0 +1,3520 @@
+{
+ "meta": {
+  "title": "AI Engineer Learning Plan",
+  "source": "https://docs.google.com/spreadsheets/d/13Uas6xLXTMv8DOUk7n_Qj0kojgvikr5bYPz9d8Ahy5U/edit",
+  "generatedAt": "2026-10-13 10:37 UTC"
+ },
+ "overview": {
+  "title": "Agentic AI Course - 10 weeks, about 5 hours a week",
+  "rules": [
+   "Week 0: set up and take the skills check. Pick a capstone project on the Project Options tab.",
+   "Each week has 5 Required days, one deliverable each, ending in a pass/fail gate. Stretch and Optional steps are extras.",
+   "Weeks 1-2 are done by hand, without an AI assistant. From Week 3 assistants are allowed.",
+   "Use only public or synthetic data. Never put real customer data, keys or secrets in the capstone repo.",
+   "Model API spend for Weeks 3-10 is roughly USD 10-25 per person. Use an API key with a spend limit."
+  ],
+  "routing": {
+   "title": "Skills check routing (Week 0 Day 2)",
+   "fast": "5/5 easy CodingBat Python problems (Warmup-1, String-1, List-1) in 30 minutes without AI: fast-track. Week 1 Days 1-4 become Stretch; you still must pass the Week 1 gate.",
+   "full": "Fewer than 5/5: full track. Do every Week 1 and Week 2 Required day; use the Week 1 Stretch steps for extra practice.",
+   "links": [
+    {
+     "url": "https://codingbat.com/python",
+     "label": "CodingBat Python problems (skills check and Week 1 gate; no account needed to solve)"
+    },
+    {
+     "url": "https://futurecoder.io/",
+     "label": "futurecoder.io: free in-browser Python course with hints (extra practice for the full track)"
+    }
+   ]
+  },
+  "courses": [
+   {
+    "n": 1,
+    "name": "AI Fluency: Framework & Foundations (Anthropic Academy)",
+    "week": "0",
+    "path": "Optional",
+    "url": "https://anthropic.skilljar.com/ai-fluency-framework-foundations"
+   },
+   {
+    "n": 2,
+    "name": "Building with the Claude API (Anthropic Academy)",
+    "week": "3",
+    "path": "Required",
+    "url": "https://anthropic.skilljar.com/claude-with-the-anthropic-api"
+   },
+   {
+    "n": 3,
+    "name": "Prompt engineering interactive tutorial (GitHub)",
+    "week": "3",
+    "path": "Required",
+    "url": "https://github.com/anthropics/prompt-eng-interactive-tutorial"
+   },
+   {
+    "n": 4,
+    "name": "Anthropic API fundamentals (GitHub courses)",
+    "week": "3",
+    "path": "Stretch",
+    "url": "https://github.com/anthropics/courses/tree/master/anthropic_api_fundamentals"
+   },
+   {
+    "n": 5,
+    "name": "Real world prompting (GitHub courses)",
+    "week": "3",
+    "path": "Stretch",
+    "url": "https://github.com/anthropics/courses/tree/master/real_world_prompting"
+   },
+   {
+    "n": 6,
+    "name": "Tool use (GitHub courses)",
+    "week": "3",
+    "path": "Stretch",
+    "url": "https://github.com/anthropics/courses/tree/master/tool_use"
+   },
+   {
+    "n": 7,
+    "name": "Claude Platform 101 (Anthropic Academy)",
+    "week": "4",
+    "path": "Stretch",
+    "url": "https://anthropic.skilljar.com/claude-platform-101"
+   },
+   {
+    "n": 8,
+    "name": "Context engineering: \"Context management\" lesson (Claude Academy, Claude Platform 101)",
+    "week": "4",
+    "path": "Stretch",
+    "url": "https://academy.claude.com/courses/claude-platform-101/context-management"
+   },
+   {
+    "n": 9,
+    "name": "Introduction to Model Context Protocol (Anthropic Academy)",
+    "week": "5",
+    "path": "Required",
+    "url": "https://anthropic.skilljar.com/introduction-to-model-context-protocol"
+   },
+   {
+    "n": 10,
+    "name": "Model Context Protocol: Advanced Topics (Anthropic Academy)",
+    "week": "5",
+    "path": "Stretch",
+    "url": "https://anthropic.skilljar.com/model-context-protocol-advanced-topics"
+   },
+   {
+    "n": 11,
+    "name": "Claude Code 101 (Anthropic Academy)",
+    "week": "5",
+    "path": "Stretch",
+    "url": "https://anthropic.skilljar.com/claude-code-101"
+   },
+   {
+    "n": 12,
+    "name": "Claude Code in Action (Anthropic Academy)",
+    "week": "5",
+    "path": "Stretch",
+    "url": "https://anthropic.skilljar.com/claude-code-in-action"
+   },
+   {
+    "n": 13,
+    "name": "Prompt evaluations (GitHub courses)",
+    "week": "6",
+    "path": "Stretch",
+    "url": "https://github.com/anthropics/courses/tree/master/prompt_evaluations"
+   },
+   {
+    "n": 14,
+    "name": "Context engineering: \"Effective context engineering for AI agents\" (Anthropic guide, listed by Claude Academy)",
+    "week": "6",
+    "path": "Required",
+    "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+   },
+   {
+    "n": 15,
+    "name": "Introduction to subagents (Anthropic Academy)",
+    "week": "7",
+    "path": "Stretch",
+    "url": "https://anthropic.skilljar.com/introduction-to-subagents"
+   },
+   {
+    "n": 16,
+    "name": "Introduction to agent skills (Anthropic Academy)",
+    "week": "7",
+    "path": "Stretch",
+    "url": "https://anthropic.skilljar.com/introduction-to-agent-skills"
+   },
+   {
+    "n": 17,
+    "name": "Claude cookbooks: agent patterns notebooks (GitHub)",
+    "week": "7",
+    "path": "Stretch",
+    "url": "https://github.com/anthropics/claude-cookbooks/tree/main/patterns/agents"
+   },
+   {
+    "n": 18,
+    "name": "Resilience: \"Claude API errors\" - retries with backoff, 429/529/504, request IDs (Anthropic docs)",
+    "week": "8",
+    "path": "Required",
+    "url": "https://platform.claude.com/docs/en/api/errors"
+   },
+   {
+    "n": 19,
+    "name": "Resilience: \"Rate limits\" - limits, retry-after, spend limits (Anthropic docs)",
+    "week": "8",
+    "path": "Required",
+    "url": "https://platform.claude.com/docs/en/api/rate-limits"
+   },
+   {
+    "n": 20,
+    "name": "Observability: \"Observability with OpenTelemetry\" - traces, metrics, logs for agents (Claude Agent SDK docs)",
+    "week": "9",
+    "path": "Required",
+    "url": "https://code.claude.com/docs/en/agent-sdk/observability"
+   },
+   {
+    "n": 21,
+    "name": "Observability: \"Track cost and usage\" (Claude Agent SDK docs)",
+    "week": "9",
+    "path": "Stretch",
+    "url": "https://code.claude.com/docs/en/agent-sdk/cost-tracking"
+   },
+   {
+    "n": 22,
+    "name": "Observability: \"Monitoring\" reference - every metric and event (Claude Code docs)",
+    "week": "9",
+    "path": "Stretch",
+    "url": "https://code.claude.com/docs/en/monitoring-usage"
+   },
+   {
+    "n": 23,
+    "name": "Resilience in production: \"Hosting the Agent SDK\" (Claude Agent SDK docs)",
+    "week": "9",
+    "path": "Stretch",
+    "url": "https://code.claude.com/docs/en/agent-sdk/hosting"
+   },
+   {
+    "n": 24,
+    "name": "AI Fluency for Builders (Anthropic Academy)",
+    "week": "10",
+    "path": "Optional",
+    "url": "https://anthropic.skilljar.com/ai-fluency-for-builders"
+   }
+  ],
+  "courseNotes": [
+   {
+    "text": "Claude Academy (formerly Anthropic Academy) course catalog",
+    "link": {
+     "url": "https://academy.claude.com/courses",
+     "label": "academy.claude.com"
+    }
+   },
+   {
+    "text": "Claude Academy has no dedicated courses on context engineering, observability or resilience (checked 2026-10-06), so those steps use Anthropic's official guides and docs.",
+    "link": null
+   }
+  ],
+  "worth": [
+   {
+    "text": "Kleppmann's Designing Data-Intensive Applications (2nd ed., 2026) is a paid book. Its chapters are Optional steps; the free Cambridge lecture series and notes are the Required path.",
+    "link": {
+     "url": "https://www.youtube.com/playlist?list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB",
+     "label": "source"
+    }
+   },
+   {
+    "text": "Model API spend: plan about USD 10-25 per person and use a sandbox API key with a spend limit.",
+    "link": {
+     "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+     "label": "source"
+    }
+   },
+   {
+    "text": "Practice data: every option uses a public or synthetic dataset. The ticket dataset is CC BY-NC 4.0 (non-commercial learning use).",
+    "link": {
+     "url": "https://huggingface.co/datasets/Tobi-Bueck/customer-support-tickets",
+     "label": "source"
+    }
+   },
+   {
+    "text": "Python in 2 weeks is the riskiest part for limited coders; the skills check plus Stretch steps cover the gap.",
+    "link": {
+     "url": "https://greenteapress.com/wp/think-python-3rd-edition/",
+     "label": "source"
+    }
+   },
+   {
+    "text": "Google's managed agent hosting is now documented as Gemini Enterprise Agent Platform (formerly Vertex AI Agent Engine).",
+    "link": {
+     "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale",
+     "label": "source"
+    }
+   },
+   {
+    "text": "The original DataRobot agent templates repo is deprecated; this plan uses its successor, the DataRobot Agent Application template.",
+    "link": {
+     "url": "https://github.com/datarobot-community/datarobot-agent-application",
+     "label": "source"
+    }
+   }
+  ]
+ },
+ "planIntro": [
+  "Required = the weekly core. Stretch = free extras for faster learners. Optional = paid book, platform account, or an alternative."
+ ],
+ "weeks": [
+  {
+   "week": "0",
+   "theme": "Setup and skills check",
+   "items": [
+    {
+     "id": "w0.b5494b",
+     "day": "1",
+     "type": "Setup",
+     "path": "Required",
+     "title": "Install Python 3.12+ and uv, open the project in VS Code",
+     "url": "https://docs.astral.sh/uv/getting-started/installation/",
+     "doneWhen": "`uv run python --version` prints 3.12 or newer and VS Code runs a hello.py file.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w0.2b02b6",
+     "day": "1",
+     "type": "Setup",
+     "path": "Required",
+     "title": "Create your personal capstone repository on GitHub (Hello World guide)",
+     "url": "https://docs.github.com/en/get-started/using-github/hello-world",
+     "doneWhen": "`git log --oneline` shows at least 1 commit and the repo is visible on GitHub.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w0.d77ef3",
+     "day": "2",
+     "type": "Check",
+     "path": "Required",
+     "title": "Skills check: solve 5 easy CodingBat Python problems (Warmup-1, String-1, List-1) in 30 minutes, no AI assistant",
+     "url": "https://codingbat.com/python",
+     "doneWhen": "5/5 solved in 30 min = fast-track (Week 1 Days 1-4 become Stretch; still pass the Week 1 gate). Fewer = full track.",
+     "notes": "Full track: practice on futurecoder.io (free, runs in the browser, no account) before the Week 1 gate: https://futurecoder.io/",
+     "gate": false
+    },
+    {
+     "id": "w0.703d15",
+     "day": "3",
+     "type": "Setup",
+     "path": "Required",
+     "title": "Pick a capstone option (Project Options tab) and note it in your capstone README",
+     "url": "https://huggingface.co/datasets/Tobi-Bueck/customer-support-tickets",
+     "doneWhen": "Your capstone README names the option you picked and links its dataset.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w0.ddebcc",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Optional",
+     "title": "Anthropic Academy: AI Fluency: Framework & Foundations (Anthropic course 1 of the ordered list)",
+     "url": "https://anthropic.skilljar.com/ai-fluency-framework-foundations",
+     "doneWhen": "Course marked complete in Anthropic Academy.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w0.33114d",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: Python Tutorial for Beginners 1 - Install and Setup",
+     "url": "https://www.youtube.com/watch?v=YYXdXT2l-Gg",
+     "doneWhen": "Python runs from your terminal and from VS Code.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "1",
+   "theme": "Python core by hand (no AI assistant)",
+   "items": [
+    {
+     "id": "w1.198dae",
+     "day": "1",
+     "type": "Read",
+     "path": "Required",
+     "title": "Think Python 3e, chapters 1-3 (programming as a way of thinking, variables, functions)",
+     "url": "https://allendowney.github.io/ThinkPython/chap01.html",
+     "doneWhen": "6 end-of-chapter exercises run without error, saved as wk1/day1.py and committed.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.d09042",
+     "day": "2",
+     "type": "Course",
+     "path": "Required",
+     "title": "CS50P Week 0 (Functions, Variables) lecture and problem set",
+     "url": "https://cs50.harvard.edu/python/weeks/0/",
+     "doneWhen": "3 of the Week 0 problems pass check50 (or your own 3 tests pass).",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.926324",
+     "day": "3",
+     "type": "Course",
+     "path": "Required",
+     "title": "CS50P Week 2 (Loops) plus Week 1 conditionals as needed",
+     "url": "https://cs50.harvard.edu/python/weeks/2/",
+     "doneWhen": "3 loop problems pass check50 (or your own tests).",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.efb577",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Think Python ch. 9-11 (lists, dicts, tuples): build a word-frequency counter for ticket text",
+     "url": "https://allendowney.github.io/ThinkPython/chap10.html",
+     "doneWhen": "Prints the top 10 words of a 20-line text file; 3 counts match a hand count.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.58d415",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "15 hand-written CodingBat Python problems pass their tests, zero AI assistant use",
+     "url": "https://codingbat.com/python",
+     "doneWhen": "PASS = 15/15 problems all green on CodingBat and a 30-min demo to the group.",
+     "notes": "Stuck on a concept? Work through the matching futurecoder.io chapter first: https://futurecoder.io/",
+     "gate": true
+    },
+    {
+     "id": "w1.9f05b3",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: Python Tutorials playlist (strings, lists, dicts, loops, functions)",
+     "url": "https://www.youtube.com/playlist?list=PL-osiE80TeTt2d9bfVyTiXJA-UTHn6WwU",
+     "doneWhen": "Videos 2-8 watched and each example retyped once.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.7659d2",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: Strings - Working with Textual Data",
+     "url": "https://www.youtube.com/watch?v=k9TUPpGqYTo",
+     "doneWhen": "10 string methods tried in the REPL.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.088721",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: Lists, Tuples, and Sets",
+     "url": "https://www.youtube.com/watch?v=W8KRzm-HUcc",
+     "doneWhen": "5 list and set operations tried in the REPL.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.6d2a53",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: Loops and Iterations",
+     "url": "https://www.youtube.com/watch?v=6iF8Xb7Z3wQ",
+     "doneWhen": "for/while/break/continue each used in one script.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.002329",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "freeCodeCamp: Harvard CS50P full course video",
+     "url": "https://www.youtube.com/watch?v=nLRL_NcnK-4",
+     "doneWhen": "Any 2 additional CS50P weeks completed.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.c0695e",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Kaggle Learn: Python (7 short lessons with exercises)",
+     "url": "https://www.kaggle.com/learn/python",
+     "doneWhen": "Kaggle course certificate shows complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.83d382",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "The official Python tutorial, sections 3-5",
+     "url": "https://docs.python.org/3/tutorial/",
+     "doneWhen": "Every code sample in sections 3-5 retyped and run.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w1.dd1330",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Think Python 3e home page (Green Tea Press, free online book)",
+     "url": "https://greenteapress.com/wp/think-python-3rd-edition/",
+     "doneWhen": "Chapters 5-8 exercises done.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "2",
+   "theme": "Applied Python and Git: APIs, JSON/CSV, venvs, errors, pytest, async, Docker",
+   "items": [
+    {
+     "id": "w2.5a5f31",
+     "day": "1",
+     "type": "Build",
+     "path": "Required",
+     "title": "uv project + Git branching: pyproject, .gitignore, a feature branch merged by pull request",
+     "url": "https://docs.astral.sh/uv/guides/projects/",
+     "doneWhen": "Repo has pyproject.toml and .gitignore; 1 pull request merged; Learn Git Branching levels 1-4 done.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.113a5e",
+     "day": "2",
+     "type": "Build",
+     "path": "Required",
+     "title": "JSON/CSV: load 100 English tickets from the public dataset into dataclasses",
+     "url": "https://docs.python.org/3/library/csv.html",
+     "doneWhen": "Script prints a count per queue; the counts sum to exactly 100; tickets also saved as JSON.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.bd478b",
+     "day": "3",
+     "type": "Build",
+     "path": "Required",
+     "title": "HTTP APIs, error handling and async: fetch 20 URLs with httpx, sync and async",
+     "url": "https://www.python-httpx.org/async/",
+     "doneWhen": "Timeout, 404 and bad-JSON cases each logged without a traceback; async run is at least 3x faster than sync for 20 requests.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.d5e343",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "pytest: 10 tests for the ingest code using parametrize",
+     "url": "https://docs.pytest.org/en/stable/how-to/parametrize.html",
+     "doneWhen": "`pytest -q` reports 10 passed, 0 failed.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.4a4a90",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Ingest CLI runs in Docker",
+     "url": "https://docs.docker.com/guides/python/",
+     "doneWhen": "PASS = `docker run` ingests 100 tickets, 10 tests green inside the container, and the image builds from a clean clone.",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w2.59a3e4",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Learn Git Branching (interactive)",
+     "url": "https://learngitbranching.js.org/",
+     "doneWhen": "Main levels 1-8 complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.678b50",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Pro Git book, chapters 2-3",
+     "url": "https://git-scm.com/book/en/v2",
+     "doneWhen": "You can rebase a branch and resolve 1 conflict on your own.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.ac9b7e",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "freeCodeCamp: Git and GitHub for Beginners crash course",
+     "url": "https://www.youtube.com/watch?v=RGOj5yH7evk",
+     "doneWhen": "Every command in the video used once in your repo.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.0f32ea",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: CSV Module",
+     "url": "https://www.youtube.com/watch?v=q5uM4VKywbA",
+     "doneWhen": "DictReader and DictWriter both used in your ingest.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.5f97c8",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: Working with JSON Data",
+     "url": "https://www.youtube.com/watch?v=9N6a-VLBa2I",
+     "doneWhen": "json.load and json.dump round-trip 100 tickets.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.bd8645",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: Python Requests Tutorial",
+     "url": "https://www.youtube.com/watch?v=tb8gHvYlCFs",
+     "doneWhen": "3 request types (GET, POST, JSON) tried.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.a19d32",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: VENV (Mac and Linux)",
+     "url": "https://www.youtube.com/watch?v=Kg1Yvry_Ydk",
+     "doneWhen": "You can create, activate and delete a venv.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.4f12dc",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: UV - all-in-one package manager",
+     "url": "https://www.youtube.com/watch?v=AMdG7IjgSPM",
+     "doneWhen": "Project uses `uv add` and `uv run` only.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.6a72a6",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Corey Schafer: AsyncIO - Complete Guide with Animations",
+     "url": "https://www.youtube.com/watch?v=oAkLSJNr5zY",
+     "doneWhen": "You can explain coroutine vs task in 3 sentences in the repo README.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.91b1fe",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "freeCodeCamp: Pytest Tutorial",
+     "url": "https://www.youtube.com/watch?v=cHYq1MRoyI0",
+     "doneWhen": "Fixtures and monkeypatch used in 2 tests.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.367a56",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Programming with Mosh: Docker Tutorial for Beginners",
+     "url": "https://www.youtube.com/watch?v=pTFZFxd4hOI",
+     "doneWhen": "You can explain image vs container and write a Dockerfile.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.1452f2",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Real Python: Async IO in Python walkthrough",
+     "url": "https://realpython.com/async-io-python/",
+     "doneWhen": "asyncio.gather and a semaphore both used once.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.6a1514",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Python tutorial: Errors and Exceptions",
+     "url": "https://docs.python.org/3/tutorial/errors.html",
+     "doneWhen": "One custom exception class added to the ingest.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w2.4da91e",
+     "day": "Extra",
+     "type": "Build",
+     "path": "Stretch",
+     "title": "GitHub Actions: run pytest on every push",
+     "url": "https://docs.github.com/en/actions/tutorials/build-and-test-code/python",
+     "doneWhen": "A green Actions run is visible on the repo.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "3",
+   "theme": "LLM fundamentals: model APIs, prompting, structured output, tool calling",
+   "items": [
+    {
+     "id": "w3.7520dc",
+     "day": "1",
+     "type": "Course",
+     "path": "Required",
+     "title": "Anthropic Academy: Building with the Claude API (first modules: requests, multi-turn, system prompts)",
+     "url": "https://anthropic.skilljar.com/claude-with-the-anthropic-api",
+     "doneWhen": "A script sends 1 ticket to Claude and logs input and output token counts.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.2e7382",
+     "day": "2",
+     "type": "Course",
+     "path": "Required",
+     "title": "Anthropic prompt engineering interactive tutorial, chapters 1-6",
+     "url": "https://github.com/anthropics/prompt-eng-interactive-tutorial",
+     "doneWhen": "Classifier system prompt v1 with 5 few-shot examples committed.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.85fdf2",
+     "day": "3",
+     "type": "Build",
+     "path": "Required",
+     "title": "Structured output: classifier returns JSON {queue, priority, type} validated with Pydantic",
+     "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+     "doneWhen": "50/50 outputs parse into the Pydantic model.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.1af564",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Tool calling: add 2 tools (get_ticket, lookup_history) to the classifier",
+     "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+     "doneWhen": "5/5 scripted prompts call the correct tool with valid arguments.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.469087",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Classifier eval on 50 labeled tickets, metrics row filled",
+     "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+     "doneWhen": "PASS = 50/50 valid JSON, label accuracy >= 70%, cost per ticket and p50/p95 latency recorded in your capstone README (Week 3).",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w3.5f4537",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Anthropic: Prompting 101 (Code w/ Claude)",
+     "url": "https://www.youtube.com/watch?v=ysPbXH0LpIE",
+     "doneWhen": "1 prompt change from the talk applied and measured on 50 tickets.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.790751",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Andrej Karpathy: Intro to Large Language Models (1 hr)",
+     "url": "https://www.youtube.com/watch?v=zjkBMFhNj_g",
+     "doneWhen": "You can explain tokens, context window and sampling in the README.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.85b715",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "3Blue1Brown: Transformers, the tech behind LLMs",
+     "url": "https://www.youtube.com/watch?v=wjZofJX0v4M",
+     "doneWhen": "You can sketch attention on one page.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.8ac1fa",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic courses (GitHub): Anthropic API fundamentals",
+     "url": "https://github.com/anthropics/courses/tree/master/anthropic_api_fundamentals",
+     "doneWhen": "All notebooks run end to end.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.01719d",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic courses (GitHub): Real world prompting",
+     "url": "https://github.com/anthropics/courses/tree/master/real_world_prompting",
+     "doneWhen": "1 technique applied to the classifier.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.46cc69",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic courses (GitHub): Tool use",
+     "url": "https://github.com/anthropics/courses/tree/master/tool_use",
+     "doneWhen": "Tool-use notebooks 1-4 complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.3bbca7",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Claude docs: Prompt engineering overview",
+     "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview",
+     "doneWhen": "3 techniques tried, results logged.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.4bb9aa",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Claude docs: Pricing (for cost per ticket)",
+     "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+     "doneWhen": "Cost formula in code matches the price table.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.b84063",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: ChatGPT Prompt Engineering for Developers (provider-neutral ideas)",
+     "url": "https://www.deeplearning.ai/courses/chatgpt-prompt-eng",
+     "doneWhen": "Course complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w3.9b1a2c",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Hugging Face dataset card: customer-support-tickets (fields, license, languages)",
+     "url": "https://huggingface.co/datasets/Tobi-Bueck/customer-support-tickets",
+     "doneWhen": "License and label fields noted in the README.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "4",
+   "theme": "RAG: embeddings, vector store, chunking, retrieval quality",
+   "items": [
+    {
+     "id": "w4.38e3ae",
+     "day": "1",
+     "type": "Watch",
+     "path": "Required",
+     "title": "IBM: What is RAG? + AssemblyAI: Vector databases simply explained",
+     "url": "https://www.youtube.com/watch?v=T-D1OfcDW1M",
+     "doneWhen": "README defines embedding, chunk, top-k and recall@k in your own words (4 definitions).",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.15023a",
+     "day": "2",
+     "type": "Build",
+     "path": "Required",
+     "title": "Embed your option's knowledge base with sentence-transformers into Chroma",
+     "url": "https://docs.trychroma.com/docs/overview/getting-started",
+     "doneWhen": "Collection count equals your chunk count; a query returns 5 results in under 500 ms.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.74f0d0",
+     "day": "3",
+     "type": "Build",
+     "path": "Required",
+     "title": "Chunking experiment: 3 chunk sizes on 20 labeled questions",
+     "url": "https://www.pinecone.io/learn/chunking-strategies/",
+     "doneWhen": "Table of recall@5 for 3 chunk sizes committed; best size chosen by number.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.39c67a",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Wire retrieval into the agent with source citations",
+     "url": "https://www.anthropic.com/engineering/contextual-retrieval",
+     "doneWhen": "10/10 answers cite at least 1 chunk id that exists in the store.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.57c6c1",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Retrieval quality on 20 labeled questions",
+     "url": "https://www.pinecone.io/learn/offline-evaluation/",
+     "doneWhen": "PASS = recall@5 >= 0.70 on 20 questions and the Week 4 metrics row is filled.",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w4.f3bf05",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "AssemblyAI: Vector Databases simply explained",
+     "url": "https://www.youtube.com/watch?v=dN0lsF2cvm4",
+     "doneWhen": "Notes added to the README.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.2b5e99",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "freeCodeCamp: Learn RAG From Scratch",
+     "url": "https://www.youtube.com/watch?v=sVcwVQRHIc8",
+     "doneWhen": "Query rewriting tried; recall@5 change recorded.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.4f06af",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Building Applications with Vector Databases",
+     "url": "https://www.deeplearning.ai/courses/building-applications-vector-databases",
+     "doneWhen": "Course complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.d95b52",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Advanced Retrieval for AI with Chroma",
+     "url": "https://www.deeplearning.ai/courses/advanced-retrieval-for-ai",
+     "doneWhen": "Re-ranking tried; recall@5 change recorded.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.2b466e",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Retrieval Augmented Generation (RAG) course",
+     "url": "https://www.deeplearning.ai/courses/retrieval-augmented-generation",
+     "doneWhen": "Modules 1-2 complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.302706",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Sentence-Transformers quickstart",
+     "url": "https://www.sbert.net/docs/quickstart.html",
+     "doneWhen": "2 embedding models compared on recall@5.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.a819f0",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Ragas: context recall metric",
+     "url": "https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/context_recall/",
+     "doneWhen": "Ragas context recall computed once.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w4.6a328a",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic Academy: Claude Platform 101 (agent loop, context window, tools)",
+     "url": "https://anthropic.skilljar.com/claude-platform-101",
+     "doneWhen": "Course marked complete.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "5",
+   "theme": "Agent frameworks and MCP: MCP server with real tools",
+   "items": [
+    {
+     "id": "w5.165a21",
+     "day": "1",
+     "type": "Read",
+     "path": "Required",
+     "title": "Anthropic: Building effective agents, then DataRobot video: Introduction to Agentic Templates",
+     "url": "https://www.anthropic.com/engineering/building-effective-agents",
+     "doneWhen": "1-page diagram committed: workflow vs agent for your capstone, mapped to 5 agent-template components.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.ef926d",
+     "day": "2",
+     "type": "Course",
+     "path": "Required",
+     "title": "Anthropic Academy: Introduction to Model Context Protocol",
+     "url": "https://anthropic.skilljar.com/introduction-to-model-context-protocol",
+     "doneWhen": "Course marked complete; you can name the 3 MCP primitives.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.ba61ba",
+     "day": "3",
+     "type": "Build",
+     "path": "Required",
+     "title": "Build an MCP server with 3 real tools (search_kb, get_record, create_escalation in SQLite)",
+     "url": "https://modelcontextprotocol.io/docs/2026-07-28/develop/build-server",
+     "doneWhen": "MCP Inspector lists 3 tools and each tool returns a valid result once from the Inspector.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.6fd794",
+     "day": "4",
+     "type": "Read",
+     "path": "Required",
+     "title": "Spec-driven development: explore OpenSpec and GitHub Spec Kit (write the spec first, then let the coding agent build from it)",
+     "url": "https://github.com/Fission-AI/OpenSpec",
+     "doneWhen": "README has 3-5 bullets comparing the two (artifacts each produces, workflow steps, when you would pick each) and names the one you will use for the rest of the course.",
+     "notes": "Also: Spec Kit overview at https://github.com/github/spec-kit and the GitHub blog intro to spec-driven development. Free, open source.",
+     "gate": false
+    },
+    {
+     "id": "w5.eda22f",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Claude Code introduced, spec first: write the tests for your MCP tools as one spec change (OpenSpec or Spec Kit), then have Claude Code implement it",
+     "url": "https://code.claude.com/docs/en/overview",
+     "doneWhen": "The change has a proposal, spec and task list, and validates (`openspec validate --strict` or Spec Kit's /speckit-analyze); 5 new tests pass; the commit says the tests were AI-assisted and you reviewed each one.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.581256",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Agent loop uses your MCP tools to complete scripted tasks",
+     "url": "https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector",
+     "doneWhen": "PASS = 8/10 scripted tool tasks complete correctly and the Week 5 metrics row is filled.",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w5.9f11d6",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Required",
+     "title": "DataRobot: Chapter 2.1 Introduction to Agentic Templates with DataRobot and CrewAI",
+     "url": "https://www.youtube.com/watch?v=WQE2ulIalag",
+     "doneWhen": "Template components listed in your Day 1 diagram.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.fa7cbe",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Required",
+     "title": "DataRobot: Chapter 2.2 Building with DataRobot Agent Templates",
+     "url": "https://www.youtube.com/watch?v=jsmKfSf-9as",
+     "doneWhen": "Build steps mapped to your repo layout.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.5622de",
+     "day": "Extra",
+     "type": "Build",
+     "path": "Optional",
+     "title": "DataRobot Agent Application template: run locally and connect your MCP server (needs a DataRobot account)",
+     "url": "https://github.com/datarobot-community/datarobot-agent-application",
+     "doneWhen": "Template answers 1 ticket using 1 of your tools.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.da5ce4",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: Integrate tools using an MCP server",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-mcp/agentic-tools-mcp.html",
+     "doneWhen": "Differences from your own server noted (3 bullets).",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.78a001",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot MCP template (GitHub)",
+     "url": "https://github.com/datarobot-community/datarobot-mcp-template",
+     "doneWhen": "Tool registration pattern compared with yours.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.b90030",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Barry Zhang (Anthropic): How We Build Effective Agents",
+     "url": "https://www.youtube.com/watch?v=D7_ipDqhtwk",
+     "doneWhen": "Agent-or-workflow checklist applied to your capstone.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.7e212e",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Anthropic: The Model Context Protocol (MCP)",
+     "url": "https://www.youtube.com/watch?v=CQywdSdi5iA",
+     "doneWhen": "Notes in README.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.d2e437",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Building Agents with MCP: full workshop (Mahesh Murag, Anthropic)",
+     "url": "https://www.youtube.com/watch?v=kQmXtrmQ5Zg",
+     "doneWhen": "1 resource or prompt primitive added to your server.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.f8338f",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic Academy: Model Context Protocol: Advanced Topics",
+     "url": "https://anthropic.skilljar.com/model-context-protocol-advanced-topics",
+     "doneWhen": "Course marked complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.268063",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic Academy: Claude Code 101",
+     "url": "https://anthropic.skilljar.com/claude-code-101",
+     "doneWhen": "Course marked complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.c74062",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic Academy: Claude Code in Action",
+     "url": "https://anthropic.skilljar.com/claude-code-in-action",
+     "doneWhen": "Course marked complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.e2ab6e",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Claude Code: connect Claude Code to tools via MCP",
+     "url": "https://code.claude.com/docs/en/mcp",
+     "doneWhen": "Your MCP server added to Claude Code and called once.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.f8efe9",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: MCP: Build Rich-Context AI Apps with Anthropic",
+     "url": "https://www.deeplearning.ai/courses/mcp-build-rich-context-ai-apps-with-anthropic",
+     "doneWhen": "Course complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.78e637",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Hugging Face MCP Course",
+     "url": "https://huggingface.co/learn/mcp-course/unit0/introduction",
+     "doneWhen": "Unit 1 complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.e8a9bb",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Hugging Face AI Agents Course",
+     "url": "https://huggingface.co/learn/agents-course/unit0/introduction",
+     "doneWhen": "Unit 1 complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.73fe46",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Anthropic cookbook: customer service agent with tool use",
+     "url": "https://github.com/anthropics/claude-cookbooks/blob/main/tool_use/customer_service_agent.ipynb",
+     "doneWhen": "Notebook runs end to end.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.857df8",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Anthropic: Writing effective tools for agents",
+     "url": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+     "doneWhen": "Tool descriptions rewritten; tool-task score change recorded.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w5.c0d7fa",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Functions, Tools and Agents with LangChain",
+     "url": "https://www.deeplearning.ai/courses/functions-tools-agents-langchain",
+     "doneWhen": "Course complete.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "6",
+   "theme": "LangGraph, agent memory and evals: measured baseline",
+   "items": [
+    {
+     "id": "w6.02667d",
+     "day": "1",
+     "type": "Course",
+     "path": "Required",
+     "title": "DeepLearning.AI: AI Agents in LangGraph, lessons 1-3; rebuild your agent as a graph",
+     "url": "https://www.deeplearning.ai/courses/ai-agents-in-langgraph",
+     "doneWhen": "A LangGraph graph with at least 3 nodes (classify, retrieve, decide) runs on 5 inputs.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.8bf6ae",
+     "day": "2",
+     "type": "Build",
+     "path": "Required",
+     "title": "Agent memory: thread persistence with a checkpointer plus a long-term store",
+     "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+     "doneWhen": "A test proves the second turn in the same thread recalls the record id from turn 1.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.cb64b3",
+     "day": "3",
+     "type": "Watch",
+     "path": "Required",
+     "title": "Evals: Hamel Husain on AI evals; write a 30-case eval set",
+     "url": "https://www.youtube.com/watch?v=uiza7wp1KrE",
+     "doneWhen": "evals/cases.jsonl has 30 cases with gold label, expected tool and should_escalate.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.e1dbf7",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Eval harness: one command computes 5 metrics",
+     "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+     "doneWhen": "`uv run eval` prints accuracy, cost per task, p50, p95 and escalation rate and writes a CSV.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.37a3cf",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Measured baseline",
+     "url": "https://hamel.dev/blog/posts/evals-faq/",
+     "doneWhen": "PASS = 30-case suite runs in one command in < 10 min, 2 runs agree within 5 points on accuracy, and the Baseline row is filled.",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w6.25fbb6",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Long-Term Agentic Memory with LangGraph",
+     "url": "https://www.deeplearning.ai/courses/long-term-agentic-memory-with-langgraph",
+     "doneWhen": "Semantic memory added; 1 test proves recall.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.265567",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Evaluating AI Agents",
+     "url": "https://www.deeplearning.ai/courses/evaluating-ai-agents",
+     "doneWhen": "Course complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.01a676",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "freeCodeCamp: LangGraph Complete Course for Beginners",
+     "url": "https://www.youtube.com/watch?v=jGg_1h0qzaM",
+     "doneWhen": "1 extra agent pattern from the course added.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.0c90fb",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "LangChain Academy: Introduction to LangGraph",
+     "url": "https://academy.langchain.com/courses/intro-to-langgraph",
+     "doneWhen": "Modules 1-2 complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.876c11",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic courses (GitHub): Prompt evaluations",
+     "url": "https://github.com/anthropics/courses/tree/master/prompt_evaluations",
+     "doneWhen": "1 model-graded eval added to the harness.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.65b241",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Anthropic: Demystifying evals for AI agents",
+     "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+     "doneWhen": "1 idea applied to your eval set.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.67f16d",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: Evaluate metrics for agentic workflows",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-eval/agentic-evaluation-tools.html",
+     "doneWhen": "Your 5 metrics mapped to the platform's metrics.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.598f4a",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: Agentic memory service",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-memory-service.html",
+     "doneWhen": "Compared with your checkpointer in 3 bullets.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.b9fd17",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "DataRobot: Chapter 2.3 Introduction to the agentic playground",
+     "url": "https://www.youtube.com/watch?v=qo7iUOk-5Gs",
+     "doneWhen": "Playground comparison idea noted for Week 7.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.27236e",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "LangGraph memory overview",
+     "url": "https://docs.langchain.com/oss/python/concepts/memory",
+     "doneWhen": "Short-term vs long-term memory explained in README.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.a7189e",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Inspect (UK AISI) eval framework",
+     "url": "https://inspect.aisi.org.uk/",
+     "doneWhen": "Your 30 cases run once under Inspect.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w6.82c055",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Optional",
+     "title": "Designing Data-Intensive Applications 2e, ch. 2 Defining Nonfunctional Requirements (percentiles; paid book)",
+     "url": "https://dataintensive.net/",
+     "doneWhen": "You can explain why p95 matters more than the mean.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "7",
+   "theme": "Multi-agent systems: supervisor, hierarchical, handoff, parallel",
+   "items": [
+    {
+     "id": "w7.fcda98",
+     "day": "1",
+     "type": "Read",
+     "path": "Required",
+     "title": "Anthropic: How we built our multi-agent research system + LangChain multi-agent patterns",
+     "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+     "doneWhen": "Table of 4 patterns (supervisor, hierarchical, handoff, parallel) with 1 capstone use each.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.66063c",
+     "day": "2",
+     "type": "Build",
+     "path": "Required",
+     "title": "Supervisor pattern: supervisor routes to classify, retrieve and escalate sub-agents",
+     "url": "https://github.com/langchain-ai/langgraph-supervisor-py",
+     "doneWhen": "The 30-case eval suite runs end to end on the supervisor version with 0 crashes.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.5ca029",
+     "day": "3",
+     "type": "Build",
+     "path": "Required",
+     "title": "Handoff and parallel variants (swarm handoff or parallel fan-out retrieval)",
+     "url": "https://docs.langchain.com/oss/python/langchain/multi-agent",
+     "doneWhen": "Both variants run the 30 cases with 0 crashes; results CSV per variant.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.1d6e23",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Single-agent vs multi-agent comparison, 2 runs each",
+     "url": "https://www.anthropic.com/engineering/building-effective-agents",
+     "doneWhen": "Table of accuracy, cost per task, p50 and p95 for single and the best multi variant.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.ce90e3",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Honest single vs multi verdict",
+     "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+     "doneWhen": "PASS = table has 4 metrics x 2 architectures, the rule 'multi only if accuracy +5 points or more at <= 2x cost' is applied, and the Week 7 row is filled.",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w7.28e4aa",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "LangChain: Hierarchical multi-agent systems with LangGraph",
+     "url": "https://www.youtube.com/watch?v=B_0TNuYi56w",
+     "doneWhen": "Hierarchical variant added and run on 30 cases.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.fc020a",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "LangGraph swarm (handoff) library",
+     "url": "https://github.com/langchain-ai/langgraph-swarm-py",
+     "doneWhen": "Handoff variant built on it.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.09bb15",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "OpenAI Agents SDK: handoffs (provider-neutral pattern reference)",
+     "url": "https://openai.github.io/openai-agents-python/handoffs/",
+     "doneWhen": "Handoff pattern compared with LangGraph in 3 bullets.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.26102f",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Multi AI Agent Systems with crewAI",
+     "url": "https://www.deeplearning.ai/courses/multi-ai-agent-systems-with-crewai",
+     "doneWhen": "Course complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.36ae5b",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic Academy: Introduction to subagents",
+     "url": "https://anthropic.skilljar.com/introduction-to-subagents",
+     "doneWhen": "Course marked complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.8c9453",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "Anthropic Academy: Introduction to agent skills",
+     "url": "https://anthropic.skilljar.com/introduction-to-agent-skills",
+     "doneWhen": "Course marked complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.5d90cc",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Anthropic cookbook: agent patterns notebooks",
+     "url": "https://github.com/anthropics/claude-cookbooks/tree/main/patterns/agents",
+     "doneWhen": "Orchestrator-workers notebook runs.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.f43cec",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Agentic AI (Andrew Ng; free to audit)",
+     "url": "https://www.deeplearning.ai/courses/agentic-ai",
+     "doneWhen": "Modules 1 and 5 complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.1564c4",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: agent components",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-overview.html",
+     "doneWhen": "Your multi-agent design mapped to the components.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.dc511c",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Anthropic: Tips for building AI agents",
+     "url": "https://www.youtube.com/watch?v=LP5OCa20Zpg",
+     "doneWhen": "1 tip applied and measured.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w7.c43cd1",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Anthropic: Effective context engineering for AI agents",
+     "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+     "doneWhen": "Context budget per sub-agent written down.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "8",
+   "theme": "Distributed systems for agents: timeouts, retries, breakers, idempotency, queues, load",
+   "items": [
+    {
+     "id": "w8.1ee3ed",
+     "day": "1",
+     "type": "Watch",
+     "path": "Required",
+     "title": "Kleppmann Cambridge Distributed Systems lectures 1-2 (RPC, system models, faults)",
+     "url": "https://www.youtube.com/playlist?list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB",
+     "doneWhen": "List of 5 failure modes your agent hits, each mapped to a mitigation.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.515212",
+     "day": "2",
+     "type": "Build",
+     "path": "Required",
+     "title": "Timeouts, retries with exponential backoff and jitter, and a circuit breaker",
+     "url": "https://builder.aws.com/content/3EumjoZascWd1oZiEgL8ORlv3qE/timeouts-retries-and-backoff-with-jitter",
+     "doneWhen": "With 30% injected errors and timeouts, 30/30 cases finish or fail fast within the timeout; a test shows the breaker opens after 5 failures.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.ad6f80",
+     "day": "3",
+     "type": "Build",
+     "path": "Required",
+     "title": "Idempotency, queue and dead-letter queue (Redis Streams or RQ worker)",
+     "url": "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/",
+     "doneWhen": "Replaying the same 50 messages twice creates 0 duplicate escalations; 3 poison messages land in the DLQ after 3 attempts.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.6e25f1",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Shared state, 2 worker replicas and a rate limit (token bucket in Redis)",
+     "url": "https://learn.microsoft.com/en-us/azure/architecture/patterns/rate-limiting-pattern",
+     "doneWhen": "2 replicas process 100 tasks with 0 duplicates and never exceed your configured requests per minute.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.0b7c6d",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Load test with Locust",
+     "url": "https://docs.locust.io/en/stable/quickstart.html",
+     "doneWhen": "PASS = 50 simulated users for 5 min, error rate < 1%, 0 duplicate actions, p95 recorded in the Week 8 metrics row.",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w8.1384a4",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Kleppmann lecture notes PDF (sections 1-2 and 5 Replication)",
+     "url": "https://www.cl.cam.ac.uk/teaching/2122/ConcDisSys/dist-sys-notes.pdf",
+     "doneWhen": "Exercises at the end of sections 2 and 5 attempted.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.82c055",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Optional",
+     "title": "Designing Data-Intensive Applications 2e, ch. 9 The Trouble with Distributed Systems (paid book)",
+     "url": "https://dataintensive.net/",
+     "doneWhen": "3 failure stories mapped to your agent.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.603d41",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Optional",
+     "title": "DDIA 2e, ch. 6 Replication and ch. 8 Transactions (paid book)",
+     "url": "https://dataintensive.net/",
+     "doneWhen": "You can explain why your replicas need idempotency keys.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.12f89f",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Optional",
+     "title": "DDIA 2e, ch. 12 Stream Processing (queues, redelivery; paid book)",
+     "url": "https://martin.kleppmann.com/2026/03/24/designing-data-intensive-applications-2e.html",
+     "doneWhen": "Your DLQ design checked against the chapter.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.faed9e",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Martin Fowler: Circuit Breaker",
+     "url": "https://martinfowler.com/bliki/CircuitBreaker.html",
+     "doneWhen": "Half-open state implemented.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.f18b27",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "AWS: Static Stability Using a Circuit Breaker Pattern",
+     "url": "https://www.youtube.com/watch?v=gy1RITZ7N7s",
+     "doneWhen": "Notes in README.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.0913fe",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Alex Hyett: Idempotency - what it is and how to implement it",
+     "url": "https://www.youtube.com/watch?v=XAccGbtl3Z8",
+     "doneWhen": "Idempotency key scheme written down.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.d3ca7d",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Python tenacity (retry library) docs",
+     "url": "https://tenacity.readthedocs.io/en/latest/",
+     "doneWhen": "Retries use tenacity with jitter.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.9e3c9d",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "pybreaker circuit breaker (GitHub)",
+     "url": "https://github.com/danielfm/pybreaker",
+     "doneWhen": "Breaker state exposed as a metric.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.ec4294",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Redis Streams docs (consumer groups, pending entries)",
+     "url": "https://redis.io/docs/latest/develop/data-types/streams/",
+     "doneWhen": "Pending entries reclaimed after a worker crash.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.6c4edb",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Amazon SQS dead-letter queues (concepts)",
+     "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html",
+     "doneWhen": "maxReceiveCount equivalent configured.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.aaaa4e",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Google SRE book: Handling Overload",
+     "url": "https://sre.google/sre-book/handling-overload/",
+     "doneWhen": "Load-shedding rule added.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.182db2",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Google SRE book: Addressing Cascading Failures",
+     "url": "https://sre.google/sre-book/addressing-cascading-failures/",
+     "doneWhen": "Retry budget added.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.32189d",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Claude API rate limits and errors",
+     "url": "https://platform.claude.com/docs/en/api/rate-limits",
+     "doneWhen": "429 and 529 handled differently in code.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w8.2d42a3",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: Configure LLM provider fallback",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-llm-fallback.html",
+     "doneWhen": "Fallback compared with your breaker in 3 bullets.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "9",
+   "theme": "Observability and scaling: OpenTelemetry, dashboards, alarms, runbooks, cost, hosting",
+   "items": [
+    {
+     "id": "w9.5ce731",
+     "day": "1",
+     "type": "Read",
+     "path": "Required",
+     "title": "OpenTelemetry: Python getting started",
+     "url": "https://opentelemetry.io/docs/languages/python/getting-started/",
+     "doneWhen": "One run exports traces to the console with at least 1 span per tool call.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.f1898b",
+     "day": "2",
+     "type": "Build",
+     "path": "Required",
+     "title": "Instrument with OpenTelemetry GenAI conventions: spans, metrics and correlated logs",
+     "url": "https://opentelemetry.io/docs/specs/semconv/gen-ai/",
+     "doneWhen": "In Jaeger, Phoenix or Langfuse, 1 task's trace shows 100% of its tool and model calls as spans with gen_ai attributes.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.597c81",
+     "day": "3",
+     "type": "Build",
+     "path": "Required",
+     "title": "Dashboard and alarm: Prometheus + Grafana for p95 latency, error rate and cost per hour",
+     "url": "https://grafana.com/docs/grafana/latest/alerting/",
+     "doneWhen": "Dashboard has 3 panels; an alert on p95 fires within 5 min when you inject a 5 s delay.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.73123e",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Runbook for the top 3 alerts and daily cost tracking",
+     "url": "https://response.pagerduty.com/",
+     "doneWhen": "Runbook covers 3 alerts with diagnosis and mitigation steps; computed cost is within 10% of the provider console.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.29553a",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Observability proof and managed hosting comparison (DataRobot, AWS, Google, Microsoft)",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-otel-metrics.html",
+     "doneWhen": "PASS = trace shows every tool call, alarm fired in a test, and a 4 platform x 8 criteria table is complete with a doc link per cell. Week 9 row filled.",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w9.96d362",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "AWS Bedrock AgentCore: overview (hosting comparison input)",
+     "url": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html",
+     "doneWhen": "AgentCore column of the comparison filled.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.fa3173",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "AWS Bedrock AgentCore: observability",
+     "url": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/observability.html",
+     "doneWhen": "Tracing criterion filled for AWS.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.ff2eba",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Google Cloud: Gemini Enterprise Agent Platform, scale your agents (successor to Vertex AI Agent Engine)",
+     "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale",
+     "doneWhen": "Google column filled.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.196e34",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Microsoft Foundry Agent Service overview",
+     "url": "https://learn.microsoft.com/en-us/azure/foundry/agents/overview",
+     "doneWhen": "Microsoft column filled.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.e0eae3",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Microsoft Foundry: agent tracing overview",
+     "url": "https://learn.microsoft.com/en-us/azure/foundry/observability/concepts/trace-agent-concept",
+     "doneWhen": "Tracing criterion filled for Microsoft.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.62f092",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: Implement tracing in agent code",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-tracing-code.html",
+     "doneWhen": "DataRobot tracing criterion filled.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.79f4d6",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: OpenTelemetry logs and service health",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-otel-logs.html",
+     "doneWhen": "Logs criterion filled.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.afc408",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: Deploy agentic workflows",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-deploy/agentic-workflow-deploy.html",
+     "doneWhen": "Deploy-model criterion filled.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.72840b",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot OpenTelemetry integration (GitHub)",
+     "url": "https://github.com/datarobot-community/datarobot-opentelemetry-integration",
+     "doneWhen": "Semantic conventions compared with GenAI semconv.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.c86d2d",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "DataRobot: Custom Metrics for MLOps and LLMOps Monitoring",
+     "url": "https://www.youtube.com/watch?v=awJ6YYE2zOU",
+     "doneWhen": "Cost per task defined as a custom metric.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.60322e",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "DataRobot: Chapter 2.4 Agentic model management",
+     "url": "https://www.youtube.com/watch?v=kWH2l2LqqHM",
+     "doneWhen": "Notes in README.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.e630bc",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "freeCodeCamp: OpenTelemetry Course",
+     "url": "https://www.youtube.com/watch?v=r8UvWSX3KA8",
+     "doneWhen": "Collector added between app and backend.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.49d3da",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Google SRE book: Monitoring Distributed Systems (four golden signals)",
+     "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+     "doneWhen": "Dashboard covers all 4 golden signals.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.8ef2a2",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Google SRE workbook: Alerting on SLOs",
+     "url": "https://sre.google/workbook/alerting-on-slos/",
+     "doneWhen": "1 burn-rate alert added.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.f02956",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Prometheus: histograms and summaries (for p95)",
+     "url": "https://prometheus.io/docs/practices/histograms/",
+     "doneWhen": "p95 computed with histogram_quantile.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.4a4395",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Arize Phoenix (open-source LLM tracing)",
+     "url": "https://arize.com/docs/phoenix",
+     "doneWhen": "Traces viewed in Phoenix.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.472af8",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Langfuse docs (open-source LLM observability)",
+     "url": "https://langfuse.com/docs",
+     "doneWhen": "Cost per trace shown in Langfuse.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w9.ac7807",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Claude docs: token counting and prompt caching (cost control)",
+     "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+     "doneWhen": "Caching enabled; cost change recorded.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  },
+  {
+   "week": "10",
+   "theme": "Security hardening and capstone write-up",
+   "items": [
+    {
+     "id": "w10.0e638d",
+     "day": "1",
+     "type": "Read",
+     "path": "Required",
+     "title": "OWASP Top 10 for LLM Applications and the OWASP Top 10 for Agentic Applications",
+     "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+     "doneWhen": "Threat model lists at least 8 risks that apply to your agent, each with a mitigation.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.ffccc3",
+     "day": "2",
+     "type": "Build",
+     "path": "Required",
+     "title": "Prompt-injection red team with promptfoo (direct and indirect via ticket or document text)",
+     "url": "https://www.promptfoo.dev/docs/red-team/quickstart/",
+     "doneWhen": "At least 20 attempts run; results table committed; successes counted.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.674604",
+     "day": "3",
+     "type": "Build",
+     "path": "Required",
+     "title": "Least privilege and guardrails: read-only tools, allowlisted escalation, secrets out of code",
+     "url": "https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html",
+     "doneWhen": "0 tools have write access beyond create_escalation; 0 secrets in git history; red team re-run done.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.a0b7fe",
+     "day": "4",
+     "type": "Build",
+     "path": "Required",
+     "title": "Audit log: append-only JSON log of every tool call with trace id",
+     "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html",
+     "doneWhen": "In a 30-case run, audit-log entries equal tool calls in traces (count match, 100%).",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.844a1e",
+     "day": "5",
+     "type": "Gate",
+     "path": "Required",
+     "title": "Security result and capstone write-up with metrics vs baseline",
+     "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+     "doneWhen": "PASS = >= 20 injection attempts with <= 1 success, Week 10 row filled with deltas vs baseline, write-up <= 4 pages with a 10-item production checklist all ticked, 10-min demo.",
+     "notes": "",
+     "gate": true
+    },
+    {
+     "id": "w10.5b1d39",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "Simon Willison: Prompt Injection, explained",
+     "url": "https://www.youtube.com/watch?v=FgxwCaL6UTA",
+     "doneWhen": "3 indirect-injection cases added to the red team.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.38e999",
+     "day": "Extra",
+     "type": "Watch",
+     "path": "Stretch",
+     "title": "IBM: Explained - The OWASP Top 10 for LLM Applications",
+     "url": "https://www.youtube.com/watch?v=cYuesqIKf9A",
+     "doneWhen": "Notes in README.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.0eb119",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "OWASP GenAI: LLM Top 10 index",
+     "url": "https://genai.owasp.org/llm-top-10/",
+     "doneWhen": "Each of the 10 risks marked applies / does not apply.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.b33573",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "OWASP GenAI: Agentic AI threats and mitigations",
+     "url": "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/",
+     "doneWhen": "2 more mitigations added.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.4ad5ea",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Simon Willison: The lethal trifecta for AI agents",
+     "url": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/",
+     "doneWhen": "You can show which leg of the trifecta your design removes.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.56bb3c",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "MCP: security best practices",
+     "url": "https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices",
+     "doneWhen": "MCP server checked against the list.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.94b264",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "Claude docs: Mitigate jailbreaks and prompt injections",
+     "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks",
+     "doneWhen": "1 harmlessness screen added.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.890365",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "OWASP Secrets Management Cheat Sheet",
+     "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+     "doneWhen": "Secrets loaded from env or a vault only.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.c01d37",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Red Teaming LLM Applications",
+     "url": "https://www.deeplearning.ai/courses/red-teaming-llm-applications",
+     "doneWhen": "Course complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.d34fca",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Stretch",
+     "title": "DeepLearning.AI: Quality and Safety for LLM Applications",
+     "url": "https://www.deeplearning.ai/courses/quality-safety-llm-applications",
+     "doneWhen": "Course complete.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.a9b01c",
+     "day": "Extra",
+     "type": "Build",
+     "path": "Stretch",
+     "title": "NVIDIA garak LLM vulnerability scanner",
+     "url": "https://github.com/NVIDIA/garak",
+     "doneWhen": "1 garak probe run against your agent.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.b7d9bb",
+     "day": "Extra",
+     "type": "Build",
+     "path": "Stretch",
+     "title": "Lakera Agent Breaker (prompt-injection practice game)",
+     "url": "https://play.lakera.ai/agent-breaker",
+     "doneWhen": "3 levels beaten; 1 technique added to your red team.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.20bff2",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "MITRE ATLAS (adversarial threat landscape for AI)",
+     "url": "https://atlas.mitre.org/",
+     "doneWhen": "2 ATLAS techniques mapped to your threat model.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.ad84df",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot docs: Configure evaluation and moderation for agentic workflows",
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/agentic-deploy/agentic-configure-evaluation-moderation.html",
+     "doneWhen": "Platform guardrails compared with yours.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.9d7bce",
+     "day": "Extra",
+     "type": "Read",
+     "path": "Stretch",
+     "title": "DataRobot Guarded RAG Assistant template (GitHub)",
+     "url": "https://github.com/datarobot-community/guarded-rag-assistant",
+     "doneWhen": "1 guardrail idea adopted.",
+     "notes": "",
+     "gate": false
+    },
+    {
+     "id": "w10.38da4e",
+     "day": "Extra",
+     "type": "Course",
+     "path": "Optional",
+     "title": "Anthropic Academy: AI Fluency for Builders",
+     "url": "https://anthropic.skilljar.com/ai-fluency-for-builders",
+     "doneWhen": "Course marked complete.",
+     "notes": "",
+     "gate": false
+    }
+   ]
+  }
+ ],
+ "anyWeek": [
+  {
+   "week": "Any",
+   "theme": "Alternative to CodingBat: Exercism offline",
+   "items": [
+    {
+     "id": "wany.ae849f",
+     "day": "Alternative",
+     "type": "Setup",
+     "path": "Optional",
+     "title": "Run Exercism's Python exercises locally from GitHub (no Exercism account needed); can replace CodingBat for the skills check and the Week 1 gate",
+     "url": "https://github.com/exercism/python",
+     "doneWhen": "Each exercise's tests pass locally with `python -m pytest <exercise>_test.py`.",
+     "notes": "Steps: `git clone https://github.com/exercism/python`, then `uv venv && uv pip install pytest` (or `pip install pytest`). Exercises are in exercises/practice/<name>/: read .docs/instructions.md, edit <name>.py, run <name>_test.py. Testing guide: https://exercism.org/docs/tracks/python/tests",
+     "gate": false
+    }
+   ]
+  }
+ ],
+ "options": {
+  "title": "Capstone project options",
+  "intro": "Pick one in Week 0. Every option runs through the same weekly gates. Option A is the default if unsure.",
+  "options": [
+   {
+    "key": "A",
+    "name": "Ticket Triage Agent",
+    "recommended": true,
+    "description": "Reads a support ticket, classifies queue/priority/type, retrieves similar resolved tickets, uses MCP tools, and answers or escalates.",
+    "data": "Hugging Face customer-support-tickets (synthetic; filter language = en; CC BY-NC 4.0)",
+    "dataLink": {
+     "url": "https://huggingface.co/datasets/Tobi-Bueck/customer-support-tickets",
+     "label": "dataset"
+    },
+    "template": {
+     "url": "https://github.com/datarobot-community/datarobot-agent-application",
+     "label": "template (GitHub)"
+    },
+    "video": {
+     "url": "https://www.youtube.com/watch?v=yLxztWe5UZw",
+     "label": "DataRobot: Build & Deploy AI Agents in Minutes"
+    },
+    "accuracy": "Queue label matches the dataset label",
+    "escalation": "Agent routes to a human instead of answering",
+    "gates": {
+     "3": "Classify queue, priority, type as JSON",
+     "4": "Retrieve similar resolved tickets (KB = ticket answers)",
+     "5": "MCP tools: search_kb, get_ticket, create_escalation",
+     "6": "30 labeled tickets baseline",
+     "7": "Supervisor: classifier, retriever, escalation agents",
+     "8": "Queue of incoming tickets, idempotent escalation",
+     "9": "Trace per ticket; p95 and cost per ticket alarms",
+     "10": "Injection via ticket body; audit escalations"
+    }
+   },
+   {
+    "key": "B",
+    "name": "Docs Q&A Agent (talk to my docs)",
+    "recommended": false,
+    "description": "Answers questions about a public documentation set with citations, and hands off when the docs do not cover the question.",
+    "data": "Kubernetes documentation source (kubernetes/website, CC BY 4.0) plus 30 hand-written questions",
+    "dataLink": {
+     "url": "https://github.com/kubernetes/website",
+     "label": "dataset"
+    },
+    "template": {
+     "url": "https://github.com/datarobot-community/talk-to-my-docs-agents",
+     "label": "template (GitHub)"
+    },
+    "video": {
+     "url": "https://www.youtube.com/watch?v=jsmKfSf-9as",
+     "label": "DataRobot: Chapter 2.2 Building with DataRobot Agent Templates"
+    },
+    "accuracy": "Answer judged correct and cites the gold page",
+    "escalation": "Agent says the docs do not cover it and hands off",
+    "gates": {
+     "3": "Classify question topic (concepts, tasks, reference) as JSON",
+     "4": "RAG over doc pages with citations",
+     "5": "MCP tools: search_docs, get_page, open_doc_issue",
+     "6": "30 Q&A pairs baseline",
+     "7": "Supervisor: router, retriever, answer-checker agents",
+     "8": "Rate-limited batch question queue",
+     "9": "Trace per question; latency and cost alarms",
+     "10": "Injection planted in a doc page; audit lookups"
+    }
+   },
+   {
+    "key": "C",
+    "name": "Log Incident Triage Agent",
+    "recommended": false,
+    "description": "Reads a log excerpt, classifies the event and severity, retrieves a runbook section, and opens or skips an incident.",
+    "data": "Loghub labeled system logs (HDFS, BGL; free for research and academic use, cite Loghub) plus Google SRE book chapters as runbook KB",
+    "dataLink": {
+     "url": "https://github.com/logpai/loghub",
+     "label": "dataset"
+    },
+    "template": {
+     "url": "https://github.com/datarobot-community/agent-build-clinic",
+     "label": "template (GitHub)"
+    },
+    "video": {
+     "url": "https://www.youtube.com/watch?v=w9jocCUIcDA",
+     "label": "DataRobot: This Agent Writes Its Own Tools - Context Agents"
+    },
+    "accuracy": "Anomaly / event-template label matches Loghub label",
+    "escalation": "Agent opens an incident for a human",
+    "gates": {
+     "3": "Classify log excerpt (normal / anomaly + component) as JSON",
+     "4": "RAG over runbook chapters",
+     "5": "MCP tools: grep_logs, get_runbook, open_incident",
+     "6": "30 labeled log excerpts baseline",
+     "7": "Parallel: log analyser + runbook retriever + supervisor",
+     "8": "Log stream queue, idempotent incidents, DLQ",
+     "9": "Trace per excerpt; incident-rate alarm",
+     "10": "Injection hidden in a log line; audit incidents"
+    }
+   },
+   {
+    "key": "D",
+    "name": "Data Analyst Agent (talk to my data)",
+    "recommended": false,
+    "description": "Answers business questions over a public SQLite database by writing and running read-only SQL, with a chart-ready summary.",
+    "data": "Chinook sample database (SQLite; MIT license) plus 30 questions with gold result sets",
+    "dataLink": {
+     "url": "https://github.com/lerocha/chinook-database",
+     "label": "dataset"
+    },
+    "template": {
+     "url": "https://github.com/datarobot-community/talk-to-my-data-agent",
+     "label": "template (GitHub)"
+    },
+    "video": {
+     "url": "https://www.youtube.com/watch?v=qo7iUOk-5Gs",
+     "label": "DataRobot: Chapter 2.3 Introduction to the agentic playground"
+    },
+    "accuracy": "Query result matches the gold result set",
+    "escalation": "Agent asks a clarifying question or declines",
+    "gates": {
+     "3": "Classify question intent (lookup, aggregate, trend) as JSON",
+     "4": "RAG over schema docs and example queries",
+     "5": "MCP tools: list_tables, describe_table, run_sql (read-only)",
+     "6": "30 questions with gold results baseline",
+     "7": "Handoff: SQL writer to SQL checker to summariser",
+     "8": "Query timeouts, retries, result cache, rate limit",
+     "9": "Trace per question; slow-query alarm",
+     "10": "SQL-injection and prompt-injection tests; audit every query"
+    }
+   },
+   {
+    "key": "E",
+    "name": "Agent Operations Monitor (trust and governance)",
+    "recommended": false,
+    "description": "Watches agent and service telemetry, spots failures and policy violations (who may run which tool), and pages a human with evidence.",
+    "data": "OpenTelemetry Demo (Astronomy Shop, Apache-2.0) with its built-in fault-injection feature flags, plus your own capstone traces",
+    "dataLink": {
+     "url": "https://github.com/open-telemetry/opentelemetry-demo",
+     "label": "dataset"
+    },
+    "template": {
+     "url": "https://github.com/datarobot-community/datarobot-opentelemetry-integration",
+     "label": "template (GitHub)"
+    },
+    "video": {
+     "url": "https://www.youtube.com/watch?v=NLdc9yntNZE",
+     "label": "OpenTelemetry Demo: The Game (full walkthrough)"
+    },
+    "accuracy": "Injected fault (flag and service) correctly identified",
+    "escalation": "Agent pages a human",
+    "gates": {
+     "3": "Classify an alert (fault type, severity, service) as JSON",
+     "4": "RAG over demo docs and your runbooks",
+     "5": "MCP tools: query_traces, get_metrics, check_policy, page_human",
+     "6": "30 injected-fault scenarios baseline",
+     "7": "Supervisor over trace analyst, metrics analyst, policy checker",
+     "8": "Alert stream queue, de-duplicated (idempotent) pages, DLQ",
+     "9": "Monitor the monitor: its own traces, cost and alarm",
+     "10": "Role-based tool permissions; audit every page"
+    }
+   },
+   {
+    "key": "F",
+    "name": "Cloud Cost Analyzer",
+    "recommended": false,
+    "description": "Answers cloud cost questions over standard billing data, finds the biggest savings opportunities, and proposes (never applies) changes.",
+    "data": "FOCUS sample cloud billing data (FinOps open cost and usage specification; CC BY 4.0)",
+    "dataLink": {
+     "url": "https://github.com/FinOps-Open-Cost-and-Usage-Spec/FOCUS-Sample-Data",
+     "label": "dataset"
+    },
+    "template": {
+     "url": "https://github.com/datarobot-community/talk-to-my-data-agent",
+     "label": "template (GitHub)"
+    },
+    "video": {
+     "url": "https://www.youtube.com/watch?v=Q3xBqhXImRE",
+     "label": "FinOps: What is FOCUS (open cost and usage standard)"
+    },
+    "accuracy": "Answer matches the gold value computed with SQL",
+    "escalation": "Savings proposal routed to a human for approval",
+    "gates": {
+     "3": "Classify cost question intent (breakdown, trend, anomaly, saving) as JSON",
+     "4": "RAG over FOCUS column definitions",
+     "5": "MCP tools: run_cost_query (read-only), get_column_def, propose_saving",
+     "6": "30 questions with gold answers baseline",
+     "7": "Supervisor over analyst, recommender, checker",
+     "8": "Large-file batch: timeouts, cached aggregates, rate limit",
+     "9": "Agent's own cost per answer vs savings found, with alarm",
+     "10": "Injection hidden in tag values; audit every proposal"
+    }
+   },
+   {
+    "key": "G",
+    "name": "Docs Gap-Analysis Agent",
+    "recommended": false,
+    "description": "Compares a public specification with an SDK's documentation and lists the requirements the docs do not cover, with evidence.",
+    "data": "Model Context Protocol specification (Apache-2.0 / CC BY 4.0) vs the MCP Python SDK docs (MIT), plus 30 hand-labeled requirements",
+    "dataLink": {
+     "url": "https://github.com/modelcontextprotocol/modelcontextprotocol",
+     "label": "dataset"
+    },
+    "template": {
+     "url": "https://github.com/datarobot-community/talk-to-my-docs-agents",
+     "label": "template (GitHub)"
+    },
+    "video": {
+     "url": "https://www.youtube.com/watch?v=HNzH5Us1Rvg",
+     "label": "Anthropic: MCP 201 (Code w/ Claude)"
+    },
+    "accuracy": "Covered / gap label matches the hand label",
+    "escalation": "Low-confidence item flagged for human review",
+    "gates": {
+     "3": "Extract requirements from a spec section as a JSON list",
+     "4": "RAG over SDK docs to find evidence per requirement",
+     "5": "MCP tools: get_spec_section, search_sdk_docs, file_gap_report",
+     "6": "30 labeled requirements baseline",
+     "7": "Parallel per-section workers plus a reviewer agent",
+     "8": "Batch over all sections: retries, idempotent reports",
+     "9": "Trace per requirement; cost per report",
+     "10": "Injection planted in a doc page; audit every report"
+    }
+   }
+  ],
+  "refs": [
+   {
+    "text": "DeepLearning.AI: Building Your Own Database Agent (for option D)",
+    "link": {
+     "url": "https://www.deeplearning.ai/courses/building-your-own-database-agent",
+     "label": "open"
+    }
+   },
+   {
+    "text": "Google SRE book table of contents (runbook KB for option C)",
+    "link": {
+     "url": "https://sre.google/sre-book/table-of-contents/",
+     "label": "open"
+    }
+   },
+   {
+    "text": "DataRobot docs: Agentic AI overview (all options)",
+    "link": {
+     "url": "https://docs.datarobot.com/en/docs/agentic-ai/index.html",
+     "label": "open"
+    }
+   },
+   {
+    "text": "DataRobot Guarded RAG Assistant template (option B variant)",
+    "link": {
+     "url": "https://github.com/datarobot-community/guarded-rag-assistant",
+     "label": "open"
+    }
+   },
+   {
+    "text": "freeCodeCamp: LangGraph Complete Course (all options)",
+    "link": {
+     "url": "https://www.youtube.com/watch?v=jGg_1h0qzaM",
+     "label": "open"
+    }
+   },
+   {
+    "text": "DataRobot: Build a Digital Twin AI Agent in an Hour (Guardrails Included)",
+    "link": {
+     "url": "https://www.youtube.com/watch?v=JVxVrv8kaYQ",
+     "label": "open"
+    }
+   },
+   {
+    "text": "DataRobot: Build, Test and Deploy an AI Agent Inside Cursor (DataRobot Skills)",
+    "link": {
+     "url": "https://www.youtube.com/watch?v=opAqpoOKlT8",
+     "label": "open"
+    }
+   },
+   {
+    "text": "OpenTelemetry Demo docs: fault-injection feature flags (for option E)",
+    "link": {
+     "url": "https://opentelemetry.io/docs/demo/feature-flags/",
+     "label": "open"
+    }
+   },
+   {
+    "text": "IBM: Rogue AI Agents - how AI observability builds autonomous trust (for option E)",
+    "link": {
+     "url": "https://www.youtube.com/watch?v=UjQBgwTcvng",
+     "label": "open"
+    }
+   },
+   {
+    "text": "FOCUS specification site (column definitions for option F)",
+    "link": {
+     "url": "https://focus.finops.org/",
+     "label": "open"
+    }
+   },
+   {
+    "text": "MCP Python SDK (docs side of option G)",
+    "link": {
+     "url": "https://github.com/modelcontextprotocol/python-sdk",
+     "label": "open"
+    }
+   }
+  ]
+ },
+ "roadmap": {
+  "title": "Project roadmap: turning each week's learning into project progress",
+  "intro": "Each week, what you learn becomes one step of your capstone. The Project Options tab shows what each step looks like for your chosen option. By week 10 you have one working, measured, hardened agent - not 10 separate exercises.",
+  "weeks": {
+   "0": {
+    "phase": "1. Foundations",
+    "learn": "Tooling: Python, uv, VS Code, Git, GitHub",
+    "apply": "Create the project repo. Pick an option. Write the 1-page spec (Project Planning tab, step 1).",
+    "state": "A repo with a README, the spec and a link to the dataset",
+    "doneWhen": "README names the option; spec has all 8 sections filled",
+    "ref": {
+     "url": "https://www.industrialempathy.com/posts/design-docs-at-google/",
+     "label": "Design docs at Google"
+    }
+   },
+   "1": {
+    "phase": "1. Foundations",
+    "learn": "Python core: functions, loops, lists, dicts, files",
+    "apply": "Write plain-Python helpers you will reuse: load a record, count labels, clean text.",
+    "state": "A small library of tested helper functions in the repo",
+    "doneWhen": "Helpers run on 20 real records from your dataset",
+    "ref": {
+     "url": "https://greenteapress.com/wp/think-python-3rd-edition/",
+     "label": "Think Python 3e"
+    }
+   },
+   "2": {
+    "phase": "1. Foundations",
+    "learn": "Applied Python: JSON/CSV, HTTP, errors, pytest, async, Docker, Git branches",
+    "apply": "Build the ingest step: load your dataset into typed records, with tests, in Docker. Work on a branch and merge by pull request.",
+    "state": "Phase 1 done: data flows in reliably",
+    "doneWhen": "`docker run` ingests 100 records; 10 tests green; 1 PR merged",
+    "ref": {
+     "url": "https://docs.pytest.org/en/stable/getting-started.html",
+     "label": "pytest getting started"
+    }
+   },
+   "3": {
+    "phase": "2. Model core",
+    "learn": "LLM APIs, prompting, structured output, tool calling",
+    "apply": "Add the first model step: classify or extract with JSON output, plus 2 tools. Record first metrics in the README.",
+    "state": "The project makes its first useful decision",
+    "doneWhen": "50/50 valid JSON, accuracy >= 70%, cost and latency in README",
+    "ref": {
+     "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+     "label": "Structured outputs"
+    }
+   },
+   "4": {
+    "phase": "2. Model core",
+    "learn": "RAG: embeddings, vector store, chunking, recall@k",
+    "apply": "Give the project knowledge: index your option's documents, retrieve with citations.",
+    "state": "Answers are grounded in your own data",
+    "doneWhen": "recall@5 >= 0.70 on 20 questions; answers cite chunk ids",
+    "ref": {
+     "url": "https://docs.trychroma.com/docs/overview/getting-started",
+     "label": "Chroma getting started"
+    }
+   },
+   "5": {
+    "phase": "3. Agent",
+    "learn": "Agent design, MCP servers, Claude Code, spec-driven development (OpenSpec, Spec Kit)",
+    "apply": "Wrap your capabilities as 3 MCP tools; let an agent loop choose them. Start using Claude Code with plan-then-code. From now on, every feature starts as a spec change that the coding agent builds from.",
+    "state": "A real agent that uses your tools",
+    "doneWhen": "8/10 scripted tool tasks succeed",
+    "ref": {
+     "url": "https://modelcontextprotocol.io/",
+     "label": "Model Context Protocol"
+    }
+   },
+   "6": {
+    "phase": "3. Agent",
+    "learn": "LangGraph, memory, evals",
+    "apply": "Rebuild the agent as a graph with memory. Write 30 eval cases and one command that scores them.",
+    "state": "Phase 3 done: a measured baseline",
+    "doneWhen": "Eval runs in one command; baseline numbers recorded",
+    "ref": {
+     "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+     "label": "Context engineering guide"
+    }
+   },
+   "7": {
+    "phase": "4. Architecture choice",
+    "learn": "Multi-agent patterns: supervisor, handoff, parallel",
+    "apply": "Try a multi-agent version against the same evals. Keep it only if the numbers justify it. Record the decision.",
+    "state": "An evidence-based architecture decision",
+    "doneWhen": "Comparison table + decision record (ADR) committed",
+    "ref": {
+     "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+     "label": "Anthropic multi-agent system"
+    }
+   },
+   "8": {
+    "phase": "5. Production hardening",
+    "learn": "Timeouts, retries, circuit breakers, idempotency, queues, rate limits, load tests",
+    "apply": "Make the agent survive failures: retry safely, never act twice, queue work, load-test it.",
+    "state": "The agent keeps working when things fail",
+    "doneWhen": "50-user load test: < 1% errors, 0 duplicate actions",
+    "ref": {
+     "url": "https://platform.claude.com/docs/en/api/errors",
+     "label": "Claude API errors"
+    }
+   },
+   "9": {
+    "phase": "5. Production hardening",
+    "learn": "OpenTelemetry, dashboards, alarms, runbooks, cost; managed hosting",
+    "apply": "Instrument every model and tool call; add a dashboard, an alarm and a runbook. Compare hosting platforms for your project.",
+    "state": "You can see, and get alerted on, what the agent does",
+    "doneWhen": "Trace shows every tool call; alarm fires in a test; runbook covers 3 alerts",
+    "ref": {
+     "url": "https://code.claude.com/docs/en/agent-sdk/observability",
+     "label": "Agent observability"
+    }
+   },
+   "10": {
+    "phase": "6. Secure and ship",
+    "learn": "OWASP agentic risks, prompt-injection red team, least privilege, audit logs",
+    "apply": "Threat-model the project, red-team it, cut tool permissions, add an audit log. Write the final report vs baseline.",
+    "state": "Phase 6 done: a secured, measured agent with a write-up",
+    "doneWhen": "<= 1 of 20+ injections succeeds; final report with metrics vs baseline",
+    "ref": {
+     "url": "https://genai.owasp.org/",
+     "label": "OWASP GenAI Security Project"
+    }
+   }
+  }
+ },
+ "planning": {
+  "title": "Project planning: from specification to phases to code",
+  "intro": [
+   "A simple, repeatable way to plan the capstone: write a short spec, split it into phases, then build each phase in small tested steps. Keep the spec and plan in your repo and update them as you learn.",
+   "Plan progressively. In weeks 0-2 you cannot plan the whole project, and you are not expected to. Start with a rough spec v0, plan only the next phase in detail, and add metrics, targets, risks and decisions as each week teaches you enough to decide them. The \"Example - Data Analyst Agent\" tab shows what to plan in each week (green column)."
+  ],
+  "steps": [
+   {
+    "title": "Step 1 - Write a 1-page specification (Week 0, update weekly)",
+    "header": [
+     "Section",
+     "What to write",
+     "Example (Ticket Triage Agent)"
+    ],
+    "rows": [
+     [
+      {
+       "text": "Problem"
+      },
+      {
+       "text": "Who has the problem and what it costs them today."
+      },
+      {
+       "text": "Support engineers spend time routing tickets; misroutes delay answers."
+      }
+     ],
+     [
+      {
+       "text": "Users"
+      },
+      {
+       "text": "Who uses the agent and how they interact with it."
+      },
+      {
+       "text": "A support engineer reviews the agent's suggestion in a queue."
+      }
+     ],
+     [
+      {
+       "text": "Inputs and outputs"
+      },
+      {
+       "text": "What goes in, what comes out, in what format."
+      },
+      {
+       "text": "In: ticket text. Out: JSON {queue, priority, answer or escalate, citations}."
+      }
+     ],
+     [
+      {
+       "text": "Success metrics"
+      },
+      {
+       "text": "The 5 numbers you will measure, with targets."
+      },
+      {
+       "text": "Accuracy >= 80%, cost/ticket <= $0.01, p95 <= 8 s, escalation 10-25%, 0 duplicate actions."
+      }
+     ],
+     [
+      {
+       "text": "Non-goals"
+      },
+      {
+       "text": "What you will deliberately NOT build."
+      },
+      {
+       "text": "No auto-reply to customers; no access to real customer data."
+      }
+     ],
+     [
+      {
+       "text": "Data"
+      },
+      {
+       "text": "Which public dataset, its license, how you split it."
+      },
+      {
+       "text": "HF customer-support-tickets (CC BY-NC), English only; 30 cases held out for evals."
+      }
+     ],
+     [
+      {
+       "text": "Risks and unknowns"
+      },
+      {
+       "text": "What could go wrong and how you will find out early."
+      },
+      {
+       "text": "Labels may be noisy - check 20 by hand in week 3."
+      }
+     ],
+     [
+      {
+       "text": "Phases"
+      },
+      {
+       "text": "The phase list from step 2, with dates."
+      },
+      {
+       "text": "Phases 1-6 below, one row per phase."
+      }
+     ]
+    ],
+    "refs": [
+     {
+      "url": "https://www.industrialempathy.com/posts/design-docs-at-google/",
+      "label": "Design docs at Google"
+     },
+     {
+      "url": "https://github.com/github/spec-kit",
+      "label": "GitHub Spec Kit (spec-driven development)"
+     },
+     {
+      "url": "https://github.com/Fission-AI/OpenSpec",
+      "label": "OpenSpec (spec-driven development)"
+     }
+    ]
+   },
+   {
+    "title": "Step 2 - Split the spec into phases (each phase ends at a weekly gate)",
+    "header": [
+     "Phase",
+     "Weeks",
+     "Goal",
+     "Exit criteria (from the gates)",
+     "Write down before you start"
+    ],
+    "rows": [
+     [
+      {
+       "text": "1. Foundations"
+      },
+      {
+       "text": "0-2"
+      },
+      {
+       "text": "Data flows in reliably, tested and containerized."
+      },
+      {
+       "text": "Week 2 gate passed."
+      },
+      {
+       "text": "Data model and folder layout."
+      }
+     ],
+     [
+      {
+       "text": "2. Model core"
+      },
+      {
+       "text": "3-4"
+      },
+      {
+       "text": "The model makes a useful, grounded decision."
+      },
+      {
+       "text": "Week 3 and 4 gates passed."
+      },
+      {
+       "text": "Prompt and output schema; chunking choice."
+      }
+     ],
+     [
+      {
+       "text": "3. Agent"
+      },
+      {
+       "text": "5-6"
+      },
+      {
+       "text": "An agent uses your tools, with a measured baseline."
+      },
+      {
+       "text": "Week 5 and 6 gates passed; baseline recorded."
+      },
+      {
+       "text": "Tool list and eval set design."
+      }
+     ],
+     [
+      {
+       "text": "4. Architecture choice"
+      },
+      {
+       "text": "7"
+      },
+      {
+       "text": "Single vs multi-agent, decided by numbers."
+      },
+      {
+       "text": "Week 7 gate passed; decision record written."
+      },
+      {
+       "text": "The comparison method and the decision rule."
+      }
+     ],
+     [
+      {
+       "text": "5. Production hardening"
+      },
+      {
+       "text": "8-9"
+      },
+      {
+       "text": "Survives failures and is observable."
+      },
+      {
+       "text": "Week 8 and 9 gates passed."
+      },
+      {
+       "text": "Failure modes list; alerts and runbook outline."
+      }
+     ],
+     [
+      {
+       "text": "6. Secure and ship"
+      },
+      {
+       "text": "10"
+      },
+      {
+       "text": "Secured, audited, written up."
+      },
+      {
+       "text": "Week 10 gate passed; final report."
+      },
+      {
+       "text": "Threat model."
+      }
+     ]
+    ],
+    "refs": [
+     {
+      "url": "https://basecamp.com/shapeup",
+      "label": "Shape Up (free book on shaping work)"
+     },
+     {
+      "url": "https://adr.github.io/",
+      "label": "Architecture decision records"
+     }
+    ]
+   },
+   {
+    "title": "Step 3 - Build each phase in small steps (the same loop every week)",
+    "header": [
+     "#",
+     "Step",
+     "What to do",
+     "Done when",
+     "Reference"
+    ],
+    "rows": [
+     [
+      {
+       "text": "1"
+      },
+      {
+       "text": "Break down"
+      },
+      {
+       "text": "Turn the phase into 3-6 GitHub issues, each finishable in one sitting."
+      },
+      {
+       "text": "Every issue has a clear \"done when\"."
+      },
+      {
+       "link": {
+        "url": "https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects",
+        "label": "GitHub Projects"
+       }
+      }
+     ],
+     [
+      {
+       "text": "2"
+      },
+      {
+       "text": "Design note"
+      },
+      {
+       "text": "For anything non-trivial, write 5-10 lines: approach, alternatives, why."
+      },
+      {
+       "text": "Note is in the issue or a docs/ file."
+      },
+      {
+       "link": {
+        "url": "https://adr.github.io/",
+        "label": "ADR examples"
+       }
+      }
+     ],
+     [
+      {
+       "text": "3"
+      },
+      {
+       "text": "Test first"
+      },
+      {
+       "text": "Write the test or eval case that proves the issue is done."
+      },
+      {
+       "text": "The test fails for the right reason."
+      },
+      {
+       "link": {
+        "url": "https://docs.pytest.org/en/stable/getting-started.html",
+        "label": "pytest"
+       }
+      }
+     ],
+     [
+      {
+       "text": "4"
+      },
+      {
+       "text": "Code"
+      },
+      {
+       "text": "Make the test pass with the simplest code. From week 5, write the issue as a spec change first (OpenSpec or Spec Kit), then have Claude Code build from it: explore, plan, then code."
+      },
+      {
+       "text": "Tests pass locally and in Docker."
+      },
+      {
+       "link": {
+        "url": "https://code.claude.com/docs/en/best-practices",
+        "label": "Claude Code best practices"
+       }
+      }
+     ],
+     [
+      {
+       "text": "5"
+      },
+      {
+       "text": "Review and merge"
+      },
+      {
+       "text": "Open a pull request, read your own diff, get one peer review."
+      },
+      {
+       "text": "PR merged to main."
+      },
+      {
+       "link": {
+        "url": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests",
+        "label": "About pull requests"
+       }
+      }
+     ],
+     [
+      {
+       "text": "6"
+      },
+      {
+       "text": "Measure and update"
+      },
+      {
+       "text": "Run the evals, update the README metrics table, the spec and the decision log."
+      },
+      {
+       "text": "README numbers match the latest eval run."
+      },
+      {
+       "link": {
+        "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+        "label": "Building evaluations"
+       }
+      }
+     ],
+     [
+      {
+       "text": "7"
+      },
+      {
+       "text": "Demo"
+      },
+      {
+       "text": "Show the week's progress in the 30-minute group demo."
+      },
+      {
+       "text": "Gate result shown with numbers."
+      },
+      {
+       "text": ""
+      }
+     ]
+    ],
+    "refs": []
+   }
+  ],
+  "tip": "Tip: keep three living files in the repo - SPEC.md (step 1), PLAN.md (step 2 with issue links) and DECISIONS.md (one entry per design choice). Claude Code reads them as context, so they also make the AI assistant more useful."
+ },
+ "example": {
+  "title": "Worked example: execution roadmap for the Data Analyst Agent (talk to my data)",
+  "intro": [
+   "The agent answers business questions over the public Chinook music-store database (SQLite) by writing and running read-only SQL, then returns a short, chart-ready summary.",
+   "This tab shows what can realistically be built each week with what the course has taught so far. Nobody can plan the whole project in weeks 0-2, so the green column shows the planning you do each week: the spec and plan grow as your skills grow.",
+   "Use it as a model: copy this tab, then rewrite each row for your own option, keeping the same rhythm."
+  ],
+  "rows": [
+   {
+    "week": "0",
+    "phase": "1. Foundations",
+    "learn": "Setup: Python, uv, Git, GitHub",
+    "build": "Create the repo. Download Chinook (SQLite). Open it with the sqlite3 command line and look at the 11 tables.",
+    "deliverable": "Repo with README and chinook.db instructions",
+    "doneWhen": "README lists the 11 tables and 3 questions you would like to ask the data",
+    "planning": "Spec v0 - only what you know today: problem, users, data source and license, 3 example questions. Leave metrics and phases blank.",
+    "ref": {
+     "url": "https://github.com/lerocha/chinook-database",
+     "label": "Chinook database"
+    }
+   },
+   {
+    "week": "1",
+    "phase": "1. Foundations",
+    "learn": "Python core: functions, loops, lists, dicts",
+    "build": "Use Python's sqlite3 module to run 5 hand-written SQL queries and print the results as lists of dicts.",
+    "deliverable": "queries.py with 5 working functions, one per question",
+    "doneWhen": "5 functions run and their results match running the same SQL in the sqlite3 shell",
+    "planning": "Grow the question list to 10 plain-English questions. For each, note the tables and the hand-written SQL that answers it - these become your first gold answers.",
+    "ref": {
+     "url": "https://docs.python.org/3/library/sqlite3.html",
+     "label": "Python sqlite3 docs"
+    }
+   },
+   {
+    "week": "2",
+    "phase": "1. Foundations",
+    "learn": "JSON/CSV, errors, pytest, Docker, Git branches",
+    "build": "Package the query layer: a CLI that takes SQL, runs it read-only, returns JSON. Bad SQL and empty results return clear errors, not tracebacks. Tests and Docker.",
+    "deliverable": "Phase 1 done: a safe, tested, containerized query runner",
+    "doneWhen": "Write statements are refused (read-only mode); 10 tests green in Docker; work merged by pull request",
+    "planning": "Spec v1: fix the input/output format (question in, JSON answer out). Break Phase 2 into 3-5 GitHub issues. Only plan the next phase in detail.",
+    "ref": {
+     "url": "https://www.sqlite.org/pragma.html",
+     "label": "SQLite PRAGMA query_only"
+    }
+   },
+   {
+    "week": "3",
+    "phase": "2. Model core",
+    "learn": "LLM API, prompting, structured output, tool calling",
+    "build": "First AI step: send the question plus the table list to Claude and get back JSON {intent, tables, sql}. Run the SQL with your Week 2 runner.",
+    "deliverable": "Natural-language question to SQL, end to end",
+    "doneWhen": "20/20 outputs are valid JSON; at least 12/20 queries return the gold result; cost and latency in the README",
+    "planning": "Add success metrics with your first real numbers (accuracy, cost per question, latency). Note what fails - these failures shape Week 4.",
+    "ref": {
+     "url": "https://github.com/anthropics/claude-cookbooks/tree/main/capabilities/text_to_sql",
+     "label": "Anthropic text-to-SQL cookbook"
+    }
+   },
+   {
+    "week": "4",
+    "phase": "2. Model core",
+    "learn": "RAG: embeddings, vector store, chunking",
+    "build": "Give the model knowledge: index the schema (one chunk per table with column descriptions) and 20 example question-SQL pairs; retrieve the relevant ones for each question.",
+    "deliverable": "Schema-aware SQL generation",
+    "doneWhen": "Retrieval puts the right tables in the top 5 for at least 16/20 questions; gold-result matches improve on Week 3",
+    "planning": "Add risks you have now seen: ambiguous questions, wrong joins, large results. Draft Phase 3 issues (tools and agent loop).",
+    "ref": {
+     "url": "https://docs.trychroma.com/docs/overview/getting-started",
+     "label": "Chroma getting started"
+    }
+   },
+   {
+    "week": "5",
+    "phase": "3. Agent",
+    "learn": "Agent design, MCP, Claude Code, spec-driven development",
+    "build": "Build an MCP server with 3 tools: list_tables, describe_table, run_sql (read-only). Let an agent loop decide which to call. Write the tool tests as a spec change (OpenSpec or Spec Kit) and have Claude Code build them.",
+    "deliverable": "A real agent that explores the schema before writing SQL",
+    "doneWhen": "MCP Inspector lists 3 tools; 8/10 scripted questions answered correctly through the tools",
+    "planning": "Write your first decision record: why an agent loop (or a fixed workflow) for this project. Plan Phase 3 week 6: the eval set.",
+    "ref": {
+     "url": "https://modelcontextprotocol.io/docs/develop/build-server",
+     "label": "Build an MCP server"
+    }
+   },
+   {
+    "week": "6",
+    "phase": "3. Agent",
+    "learn": "LangGraph, memory, evals",
+    "build": "Rebuild as a graph: understand question, explore schema, write SQL, run, summarize. Add memory so follow-ups work (\"and for 2012?\"). Build 30 eval questions with gold result sets and one eval command.",
+    "deliverable": "Phase 3 done: a measured baseline",
+    "doneWhen": "Eval runs 30 questions in one command; accuracy, cost, p50/p95 latency and clarification rate recorded",
+    "planning": "Now you know enough to set real targets: spec v2 with target numbers based on the baseline. Plan Phase 4.",
+    "ref": {
+     "url": "https://docs.langchain.com/oss/python/langgraph/sql-agent",
+     "label": "LangGraph SQL agent tutorial"
+    }
+   },
+   {
+    "week": "7",
+    "phase": "4. Architecture choice",
+    "learn": "Multi-agent patterns",
+    "build": "Try a handoff version: SQL writer, then SQL checker (validates against the schema and runs EXPLAIN), then summariser. Run the same 30 evals.",
+    "deliverable": "An evidence-based architecture decision",
+    "doneWhen": "Table of accuracy, cost, p50, p95 for single vs multi; keep multi only if +5 points at no more than 2x cost",
+    "planning": "Decision record: single or multi, with the numbers. Update the plan if the architecture changed.",
+    "ref": {
+     "url": "https://www.sqlite.org/lang_explain.html",
+     "label": "SQLite EXPLAIN"
+    }
+   },
+   {
+    "week": "8",
+    "phase": "5. Production hardening",
+    "learn": "Timeouts, retries, idempotency, queues, rate limits, load tests",
+    "build": "Add a query timeout, retries with backoff for model calls, a result cache keyed by normalized SQL, and a rate limit. Load-test with 50 simulated users.",
+    "deliverable": "An agent that stays up under load and failure",
+    "doneWhen": "50-user load test: under 1% errors; slow queries stopped at the timeout; repeated questions served from cache",
+    "planning": "Add a failure-modes list to the spec (slow query, model overload, huge result). Plan Phase 5 week 9.",
+    "ref": {
+     "url": "https://platform.claude.com/docs/en/api/errors",
+     "label": "Claude API errors and retries"
+    }
+   },
+   {
+    "week": "9",
+    "phase": "5. Production hardening",
+    "learn": "OpenTelemetry, dashboards, alarms, runbooks, cost",
+    "build": "Trace each question: model calls, tool calls, SQL run time, rows returned. Dashboard plus a slow-query alarm. Runbook for the top 3 alerts. Compare hosting options.",
+    "deliverable": "You can see and get alerted on what the agent does",
+    "doneWhen": "One trace shows every model and tool call; the slow-query alarm fires in a test; runbook covers 3 alerts",
+    "planning": "Decision record: where you would host it and why. Draft the final-report outline.",
+    "ref": {
+     "url": "https://code.claude.com/docs/en/agent-sdk/observability",
+     "label": "Agent observability"
+    }
+   },
+   {
+    "week": "10",
+    "phase": "6. Secure and ship",
+    "learn": "OWASP agentic risks, red team, least privilege, audit logs",
+    "build": "Red-team it: prompt injection in questions, attempts to make it write or drop data, SQL injection. Database user is read-only; every query goes to an audit log.",
+    "deliverable": "Phase 6 done: a secured, measured agent and a final report",
+    "doneWhen": "At least 20 attack attempts with at most 1 success; 0 write queries ever executed; audit-log count equals queries run",
+    "planning": "Final report: spec vs reality, metrics vs baseline, decisions, what you would do next.",
+    "ref": {
+     "url": "https://owasp.org/www-community/attacks/SQL_Injection",
+     "label": "OWASP SQL injection"
+    }
+   }
+  ],
+  "starter": {
+   "url": "https://github.com/datarobot-community/talk-to-my-data-agent",
+   "label": "DataRobot talk-to-my-data template (optional, needs an account)"
+  }
+ },
+ "certs": {
+  "title": "Optional certifications - none are required",
+  "intro": "Costs and formats were read from each official page on 2026-10-05; prices change, so re-check before booking.",
+  "rows": [
+   {
+    "id": "cert.0dff4c",
+    "name": "PCEP - Certified Entry-Level Python Programmer (PCEP-30-02)",
+    "provider": "OpenEDG Python Institute",
+    "link": {
+     "url": "https://pythoninstitute.org/pcep",
+     "label": "official page"
+    },
+    "timing": "After Week 2 (Python core done)",
+    "cost": "From USD 69 (exam only); USD 86 with retake",
+    "format": "Online proctored (TestNow); 30 items in 40 min; pass 70%; single/multi-select, drag-and-drop, code fill.",
+    "extra": null
+   },
+   {
+    "id": "cert.753646",
+    "name": "PCAP - Certified Associate Python Programmer (PCAP-31-03)",
+    "provider": "OpenEDG Python Institute",
+    "link": {
+     "url": "https://pythoninstitute.org/pcap",
+     "label": "official page"
+    },
+    "timing": "After the program, if Python became a strength",
+    "cost": "From USD 295 (exam only)",
+    "format": "Online proctored; 40 items in 65 min; pass 70%; single/multi-select and scenario items.",
+    "extra": null
+   },
+   {
+    "id": "cert.b95f53",
+    "name": "GitHub Foundations (GH-900)",
+    "provider": "GitHub (delivered via Microsoft Learn / Pearson VUE)",
+    "link": {
+     "url": "https://learn.microsoft.com/en-us/credentials/certifications/github-foundations/",
+     "label": "official page"
+    },
+    "timing": "After Week 2 (Git done)",
+    "cost": "Priced by country (shown at booking)",
+    "format": "Proctored; 100 minutes; Git basics, repositories, collaboration, project management, security. No renewal needed.",
+    "extra": null
+   },
+   {
+    "id": "cert.eb0c09",
+    "name": "AWS Certified AI Practitioner (AIF-C01)",
+    "provider": "Amazon Web Services",
+    "link": {
+     "url": "https://aws.amazon.com/certification/certified-ai-practitioner/",
+     "label": "official page"
+    },
+    "timing": "After Week 4 (LLM + RAG)",
+    "cost": "USD 100",
+    "format": "Pearson VUE test center or online proctored; 65 questions in 90 min; foundational AI/ML/GenAI on AWS.",
+    "extra": null
+   },
+   {
+    "id": "cert.3bd6f9",
+    "name": "Google Cloud Generative AI Leader",
+    "provider": "Google Cloud",
+    "link": {
+     "url": "https://cloud.google.com/learn/certification/generative-ai-leader",
+     "label": "official page"
+    },
+    "timing": "After Week 4",
+    "cost": "USD 99 (+ tax)",
+    "format": "Online or onsite proctored; 50-60 multiple-choice questions in 90 min; valid 3 years.",
+    "extra": null
+   },
+   {
+    "id": "cert.7d02b1",
+    "name": "Microsoft Certified: Azure AI Apps and Agents Developer Associate (AI-103)",
+    "provider": "Microsoft",
+    "link": {
+     "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-apps-and-agents-developer-associate/",
+     "label": "official page"
+    },
+    "timing": "After Week 9 (hosting comparison)",
+    "cost": "Priced by country (shown at booking)",
+    "format": "Proctored; 120 min; generative AI and agentic solutions on Microsoft Foundry with Python. Replaces the retired AI-102.",
+    "extra": null
+   },
+   {
+    "id": "cert.a236b0",
+    "name": "OpenTelemetry Certified Associate (OTCA)",
+    "provider": "Linux Foundation / CNCF",
+    "link": {
+     "url": "https://training.linuxfoundation.org/certification/opentelemetry-certified-associate-otca/",
+     "label": "official page"
+    },
+    "timing": "After Week 9 (observability)",
+    "cost": "USD 250 (exam only; 2 attempts)",
+    "format": "Online proctored multiple choice; 90 min; API/SDK 46%, Collector 26%, fundamentals 18%, debugging pipelines 10%.",
+    "extra": null
+   },
+   {
+    "id": "cert.bf1069",
+    "name": "Agent Build Clinic credential",
+    "provider": "DataRobot",
+    "link": {
+     "url": "https://credentials.datarobot.com/credentials/a31b3016-2c68-45af-b98f-25e301ef0be5",
+     "label": "official page"
+    },
+    "timing": "Weeks 5-9 (alongside the DataRobot steps)",
+    "cost": "Not stated on the credential page; notebooks are public on GitHub",
+    "format": "Introductory online credential: build 4 levels of an agent (LLM chat, MCP tool data analysis, predictive tool, production deployment with monitoring) from 6 notebooks.",
+    "extra": {
+     "url": "https://github.com/datarobot-community/agent-build-clinic",
+     "label": "context"
+    }
+   },
+   {
+    "id": "cert.444588",
+    "name": "Claude Certified Architect - Foundations",
+    "provider": "Anthropic",
+    "link": {
+     "url": "https://anthropic-partners.skilljar.com/claude-certified-architect-foundations-certification",
+     "label": "official page"
+    },
+    "timing": "After Week 10, only if eligible",
+    "cost": "USD 125",
+    "format": "Proctored technical exam on Claude Code, Agent SDK, Claude API and MCP. Currently offered to Claude Partner Network organizations only.",
+    "extra": {
+     "url": "https://www.anthropic.com/news/claude-partner-network",
+     "label": "context"
+    }
+   }
+  ],
+  "notes": [
+   "Not included: Microsoft AI-102 (retired 2026-06-30; replaced by AI-103 above)."
+  ]
+ }
+}

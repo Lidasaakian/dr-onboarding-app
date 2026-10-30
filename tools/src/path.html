@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Learning path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=DM+Mono:wght@400;500&display=swap">
+<!--BRAND_CSS-->
+<style>
+/* Paths created in the app: same field-manual system as the other paths. */
+[hidden]{display:none!important}
+[data-page] > *{min-width:0}
+.backlink{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.backlink:hover{color:var(--ink)}
+.meter-extra{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.meter-extra b{font-weight:500;color:var(--ink)}
+.rightcol{display:grid;gap:14px;min-width:min(100%,420px)}
+.top-row{align-items:flex-start}
+.rightcol .onb-mascot{max-width:none}
+.blurb{color:var(--muted);font-size:17px;max-width:62ch}
+.daylist{display:grid;gap:12px}
+.dayhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;margin-top:8px}
+.dayhead h3{font-size:22px}
+.item{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;align-items:start;scroll-margin-top:70px}
+.item.is-done{background:var(--panel)}
+.item.is-done .ititle{color:var(--muted)}
+.item .ib{display:grid;gap:8px;min-width:0}
+.item .ihead{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.item .ititle{font-size:18px;line-height:1.3}
+.item .ititle a{color:inherit;text-decoration-color:var(--link)}
+.item .ititle a:hover{color:var(--link)}
+.item .dt{font-size:15px;max-width:72ch;white-space:pre-line}
+.item .src{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--panel);border-radius:3px;padding:2px 6px;justify-self:start}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);white-space:nowrap}
+.tag.req{border-color:var(--ink);color:var(--ink)}
+.item.gate{border:1.5px solid var(--green)}
+.item.gate .tag.gate{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.item.editing{background:color-mix(in srgb,var(--yellow) 14%,var(--bg))}
+.ed{display:inline-block;min-width:2ch}
+.ed:empty::before{content:attr(data-ph);color:var(--muted)}
+.edblock{display:block;min-height:1.4em}
+.addrow{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px dashed var(--muted);border-radius:var(--r);padding:8px 12px;cursor:pointer;justify-self:start}
+.addrow:hover{border-color:var(--ink)}
+.spark{font:inherit;font-size:15px;line-height:1;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:4px;padding:3px 7px;cursor:pointer;vertical-align:middle}
+.spark:hover,.spark[aria-pressed="true"]{border-color:var(--ink);background:var(--yellow);color:#0B0B0B}
+.ask{border:1px solid var(--ink);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.ask textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;min-height:64px;width:100%;resize:vertical}
+.ask .row,.proposal .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ask .sp,.proposal .sp{flex:1}
+.ask .small,.small{font-size:14px;color:var(--muted)}
+.proposal{background:var(--panel);border-radius:var(--r);padding:12px 14px;display:grid;gap:6px}
+.chg{font-size:15px;padding:6px 10px;border-radius:4px;background:var(--bg);border-left:3px solid var(--blue)}
+.chg.add{border-left-color:var(--green)}.chg.del{border-left-color:#B00020}
+.chg .from{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:8px}
+.steps{display:grid;gap:6px}
+.st{font-size:15px;padding-left:24px;position:relative}
+.st.done::before{content:"✓";position:absolute;left:0;width:17px;height:17px;border-radius:50%;background:var(--green);color:#0B0B0B;font-size:11px;display:grid;place-items:center;top:2px}
+.st.now::before{content:"";position:absolute;left:0;top:3px;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.notice{background:var(--yellow);color:#0B0B0B;border-radius:var(--r);padding:10px 12px;font-size:15px}
+.grphead{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grphead h2{flex:1 1 auto}
+.settings{display:grid;gap:12px}
+.settings .field input,.settings .field textarea,.settings select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;width:100%}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.onb-dialog.wide2{max-width:640px;max-height:90vh;overflow:auto}
+.team-detail td{background:var(--panel)}
+@media (max-width:520px){
+  .item{padding:12px;grid-template-columns:24px minmax(0,1fr);gap:10px}
+  .item .ititle{font-size:17px}
+}
+</style>
+<link rel="stylesheet" href="../assets/common.css">
+<script src="../assets/common.js"></script>
+</head>
+<body>
+<div class="onb-editbar" id="editbar" hidden>
+  <div class="wrap">
+    <b id="eb-title">Draft</b><span id="eb-note">Only owners and admins can see it.</span>
+    <span style="flex:1"></span>
+    <button class="btn" id="eb-settings" type="button">Settings</button>
+    <button class="btn" id="eb-preview" type="button">Preview as learner</button>
+    <button class="btn" id="eb-undo" type="button" disabled>Undo</button>
+    <a class="btn" id="eb-xlsx" href="#">Download as .xlsx</a>
+    <button class="btn" id="eb-discard" type="button" hidden>Discard changes</button>
+    <button class="btn primary" id="eb-publish" type="button">Publish</button>
+  </div>
+</div>
+<div class="onb-editbar" id="previewbar" hidden>
+  <div class="wrap"><b>Preview as learner.</b><span>Ticks aren't saved.</span><span style="flex:1"></span><button class="btn primary" id="pv-back" type="button">Back to editing</button></div>
+</div>
+<header class="top">
+  <div class="wrap">
+    <a class="backlink" id="hub-link" href="../">&larr; All learning paths</a>
+    <div class="top-row" style="margin-top:10px">
+      <div class="title-block">
+        <span class="eyebrow" id="doc-length"></span>
+        <h1 id="doc-title">Learning path</h1>
+        <p class="blurb" id="doc-blurb" hidden></p>
+        <div class="who"><span id="who-name"></span><span class="save-state" id="save-state" data-s="init">Loading</span></div>
+        <div class="onb-pace" id="pace"></div>
+        <div id="badge" hidden></div>
+      </div>
+      <div class="rightcol">
+        <div id="mascot"></div>
+        <div class="meter" aria-label="Overall progress">
+          <div class="meter-figs"><span class="meter-pct" id="pct">0%</span><span class="meter-sub" id="pct-sub">0 of 0 steps</span></div>
+          <div class="meter-extra"><span>Required <b id="req-sub">0/0</b></span><span id="gate-wrap">Gates passed <b id="gate-sub">0/0</b></span></div>
+          <nav class="daybricks" id="bricks" aria-label="Sections"></nav>
+        </div>
+      </div>
+    </div>
+    <div class="top-actions" id="top-actions">
+      <button class="btn primary" id="btn-resume" type="button">Continue where I left off</button>
+    </div>
+  </div>
+</header>
+<div class="wrap frame">
+  <nav class="side" id="side" aria-label="Learning path"></nav>
+  <main id="main"><div class="empty">Loading…</div></main>
+</div>
+<!--PATH_JSON-->
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var BASE = location.pathname.replace(/\/?$/, "/");
+  var API = BASE + "api/";
+  var ROOT = BASE + "../";
+  $("#hub-link").href = ROOT;
+  var DATA = {};
+  try { DATA = JSON.parse(($("#path-data") || {}).textContent || "{}"); } catch (e) { DATA = {}; }
+  var PID = DATA.id || BASE.split("/").filter(Boolean).pop();
+  var CACHE_KEY = "dr-onb-path-" + PID;
+
+  function blank() { return { v: 1, done: {}, stars: {}, startedAt: null, updatedAt: null, last: null }; }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  var S = blank(), store = null, earlyEdits = false;
+  var C = null;            // content shown (live for learners, draft while editing)
+  var LIVE = null, INFO = null, ME = null;
+  var EDIT = false, PREVIEW = false, canEdit = false;
+
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v == null || v === false) return;
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else if (k.slice(0, 2) === "on") el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : v);
+    });
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function add(el, c) {
+    if (c == null || c === false) return;
+    if (Array.isArray(c)) { c.forEach(function (x) { add(el, x); }); return; }
+    el.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  }
+  function a(url, label) { return h("a", { href: url, target: "_blank", rel: "noopener" }, label || url); }
+  function rich(s) {
+    var frag = document.createDocumentFragment();
+    if (!s) return frag;
+    String(s).split(/(`[^`]+`)/).forEach(function (part) {
+      if (/^`[^`]+`$/.test(part)) { frag.appendChild(h("code", null, part.slice(1, -1))); return; }
+      part.split(/(https?:\/\/[^\s)]+[^\s).,;:])/).forEach(function (p) {
+        if (/^https?:\/\//.test(p)) frag.appendChild(a(p)); else if (p) frag.appendChild(document.createTextNode(p));
+      });
+    });
+    return frag;
+  }
+  function api(path, opts) {
+    return fetch(path, opts).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.detail || ("Request failed (" + r.status + ")")); return j; });
+    });
+  }
+  function jsonOpts(method, body) { return { method: method, headers: { "content-type": "application/json" }, body: JSON.stringify(body) }; }
+  function newId(p) { return p + Math.random().toString(16).slice(2, 10); }
+
+  /* ---------------------------------------------------------------- model helpers */
+  var items = [], byId = {}, pages = {}, pageOrder = [], navItems = {}, boxes = {}, current = null;
+  function lvl() { return (C && C.level) || "Week"; }
+  function gLabel(gi) { return lvl() + " " + (gi + 1); }
+  function where(it) { return gLabel(it.gi) + (C.useDays ? " · Day " + (it.di + 1) : ""); }
+  function indexItems() {
+    items = []; byId = {};
+    C.groups.forEach(function (g, gi) { g.days.forEach(function (d, di) { d.steps.forEach(function (st) { var it = { st: st, id: st.id, gi: gi, di: di, g: g, d: d }; items.push(it); byId[st.id] = it; }); }); });
+  }
+
+  /* ---------------------------------------------------------------- editing helpers */
+  var history_ = [], editDirty = false, saveTimer = null;
+  function snapshot() { history_.push(JSON.stringify(C)); if (history_.length > 60) history_.shift(); $("#eb-undo").disabled = false; }
+  function changed(rebuildNow) { editDirty = true; scheduleSave(); if (rebuildNow) rebuild(); }
+  function E(obj, key, o) {
+    o = o || {};
+    var v = obj ? obj[key] : "";
+    if (!EDIT) return o.plain ? document.createTextNode(v == null ? "" : String(v)) : rich(v);
+    var sp = h("span", { contenteditable: "plaintext-only", class: "ed" + (o.block ? " edblock" : ""), spellcheck: "true", "data-ph": o.ph || "(empty)" });
+    sp.textContent = v == null ? "" : String(v);
+    var first = true;
+    sp.addEventListener("input", function () { if (first) { snapshot(); first = false; } obj[key] = sp.textContent; changed(false); });
+    sp.addEventListener("blur", function () { first = true; });
+    if (!o.block) sp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); sp.blur(); } });
+    ["click", "mousedown"].forEach(function (ev) { sp.addEventListener(ev, function (e) { e.stopPropagation(); }); });
+    return sp;
+  }
+
+  /* ---------------------------------------------------------------- checkboxes */
+  function tick(it) {
+    var cb = h("input", { type: "checkbox", class: "tick", "aria-label": "Done: " + it.st.title.slice(0, 90), disabled: EDIT || PREVIEW || !LIVE ? true : null });
+    cb.addEventListener("change", function () {
+      if (cb.checked && window.DROnb && !DROnb.isEnrolled()) { cb.checked = false; DROnb.ensureEnrolled().then(function (ok) { if (ok) setDone(it.id, true); }); return; }
+      setDone(it.id, cb.checked);
+    });
+    (boxes[it.id] = boxes[it.id] || []).push(cb);
+    return cb;
+  }
+  function setDone(id, on) {
+    if (on) S.done[id] = Date.now(); else delete S.done[id];
+    S.last = id; if (!S.startedAt) S.startedAt = Date.now();
+    if (!store) earlyEdits = true;
+    renderProgress(); save();
+  }
+
+  /* ---------------------------------------------------------------- one step */
+  var SPARK = "✦";
+  var scope = { type: "path", id: null };
+  function sparkBtn(type, id, label) {
+    var b = h("button", { type: "button", class: "spark", title: "Change " + label + " with the LLM", "aria-label": "Change " + label + " with the LLM", "aria-pressed": String(scope.type === type && scope.id === id) }, SPARK);
+    b.addEventListener("click", function (e) { e.stopPropagation(); setScope(type, id, label); });
+    return b;
+  }
+  function stepRow(it) {
+    var st = it.st;
+    var tags = [];
+    if (st.gate) tags.push(h("span", { class: "tag gate" }, "Gate"));
+    tags.push(h("span", { class: "tag" + (st.type === "Required" ? " req" : "") }, st.type));
+    var title = EDIT ? E(st, "title", { plain: true, ph: "Step title" }) : st.link && st.link.url ? a(st.link.url, st.title) : document.createTextNode(st.title);
+    var body = h("div", { class: "ib" },
+      h("div", { class: "ihead" }, tags),
+      h("p", { class: "ititle" }, title),
+      EDIT ? h("p", { class: "dt" }, E(st, "details", { block: true, ph: "Details: how to do it and how you know it's done" })) : st.details ? h("p", { class: "dt" }, rich(st.details)) : null,
+      EDIT ? stepTools(it) : null,
+      EDIT && st.source ? h("span", { class: "src" }, "From: " + st.source) : null,
+      !EDIT && window.DROnb ? h("div", { class: "onb-rowtools" }, DROnb.starButton(it.id, st.title),
+        DROnb.reportButton({ itemId: it.id, label: where(it) + ": " + st.title, anchor: "s-" + it.id, text: st.title + "\n" + (st.details || "") })) : null);
+    return h("div", { class: "item" + (st.gate ? " gate" : "") + (EDIT ? " editing" : ""), id: "s-" + it.id, "data-id": it.id }, tick(it), body);
+  }
+  function stepTools(it) {
+    var st = it.st, d = it.d;
+    function sel(opts, val, onc, label) {
+      var s = h("select", { "aria-label": label }, opts.map(function (o) { return h("option", { value: o[0], selected: String(o[0]) === String(val) }, o[1]); }));
+      s.addEventListener("change", function () { snapshot(); onc(s.value); changed(true); });
+      return s;
+    }
+    var link = h("input", { placeholder: "https://… (empty = no link)", value: (st.link && st.link.url) || "", "aria-label": "Link" });
+    var lfirst = true;
+    link.addEventListener("input", function () { if (lfirst) { snapshot(); lfirst = false; } var u = link.value.trim(); st.link = u ? { url: u, label: "" } : null; changed(false); });
+    link.addEventListener("blur", function () { lfirst = true; });
+    var gate = h("input", { type: "checkbox", checked: st.gate });
+    gate.addEventListener("change", function () { snapshot(); st.gate = gate.checked; changed(true); });
+    var days = [];
+    C.groups.forEach(function (g, gi) { g.days.forEach(function (dd, di) { days.push([gi + ":" + di, gLabel(gi) + (C.useDays ? " · Day " + (di + 1) : "")]); }); });
+    var up = h("button", { type: "button", title: "Move up" }, "↑"), down = h("button", { type: "button", title: "Move down" }, "↓");
+    function mv(dir) { var i = d.steps.indexOf(st), j = i + dir; if (j < 0 || j >= d.steps.length) return; snapshot(); d.steps.splice(i, 1); d.steps.splice(j, 0, st); changed(true); focusStep(st.id); }
+    up.addEventListener("click", function () { mv(-1); }); down.addEventListener("click", function () { mv(1); });
+    var del = h("button", { type: "button", class: "danger" }, "Delete step");
+    del.addEventListener("click", function () { snapshot(); d.steps.splice(d.steps.indexOf(st), 1); changed(true); });
+    return h("div", { class: "onb-edittools" },
+      h("label", null, C.useDays ? "Day" : lvl(), sel(days, it.gi + ":" + it.di, function (v) {
+        var p = v.split(":"), to = C.groups[+p[0]].days[+p[1]];
+        d.steps.splice(d.steps.indexOf(st), 1); to.steps.push(st);
+      }, C.useDays ? "Day" : lvl())),
+      h("label", null, "Type", sel([["Required", "Required"], ["Stretch", "Stretch"], ["Optional", "Optional"]], st.type, function (v) { st.type = v; }, "Type")),
+      h("label", null, gate, "Gate"),
+      h("label", { class: "grow" }, "Link", link),
+      h("span", { class: "grp" }, up, down),
+      sparkBtn("step", st.id, "this step"),
+      del);
+  }
+  function addStepBtn(d) {
+    var b = h("button", { type: "button", class: "addrow" }, "+ Add a step");
+    b.addEventListener("click", function () { snapshot(); var st = { id: newId("s"), title: "", details: "", link: null, type: "Required", gate: false, source: "" }; d.steps.push(st); changed(true); focusStep(st.id, true); });
+    return b;
+  }
+
+  /* ---------------------------------------------------------------- pages */
+  function page(id, title, navLabel) {
+    var sec = h("section", { "data-page": id, "data-title": title, hidden: true });
+    pages[id] = sec; pageOrder.push(id); sec._nav = navLabel;
+    $("#main").appendChild(sec);
+    return sec;
+  }
+  function buildGroup(g, gi) {
+    var sec = page("g" + gi, g.title || gLabel(gi), gLabel(gi));
+    var head = h("div", { class: "page-head" },
+      h("div", { class: "grphead" }, h("span", { class: "eyebrow" }, gLabel(gi)), h("span", { class: "label", "data-gcount": gi }), EDIT ? sparkBtn("group", g.id, gLabel(gi)) : null, EDIT ? groupMenu(gi) : null),
+      h("h2", null, EDIT ? E(g, "title", { plain: true, ph: "Title for " + gLabel(gi) }) : (g.title || gLabel(gi))));
+    add(sec, head);
+    if (EDIT) add(sec, askBox());
+    g.days.forEach(function (d, di) {
+      var list = h("div", { class: "daylist" }, d.steps.map(function (st) { return stepRow(byId[st.id]); }), EDIT ? addStepBtn(d) : null);
+      if (C.useDays) {
+        add(sec, h("div", { class: "sec", style: "margin-top:20px" },
+          h("div", { class: "dayhead" }, h("span", { class: "eyebrow" }, "Day " + (di + 1)), h("h3", null, EDIT ? E(d, "title", { plain: true, ph: "Day title (optional)" }) : (d.title || "")),
+            EDIT ? sparkBtn("day", d.id, gLabel(gi) + " · Day " + (di + 1)) : null, EDIT && g.days.length > 1 ? dayDelete(g, d) : null),
+          list));
+      } else add(sec, h("div", { class: "sec", style: "margin-top:20px" }, list));
+    });
+    if (EDIT && C.useDays) {
+      var ad = h("button", { type: "button", class: "addrow", style: "margin-top:12px" }, "+ Add a day");
+      ad.addEventListener("click", function () { snapshot(); g.days.push({ id: newId("d"), title: "", steps: [] }); changed(true); });
+      add(sec, ad);
+    }
+  }
+  function dayDelete(g, d) {
+    var b = h("button", { type: "button", class: "spark", title: "Delete this day" }, "Delete day");
+    b.addEventListener("click", function () { if (d.steps.length && !confirm("Delete this day and its " + d.steps.length + " steps?")) return; snapshot(); g.days.splice(g.days.indexOf(d), 1); changed(true); });
+    return b;
+  }
+  function groupMenu(gi) {
+    var wrap = h("span", { class: "grp", style: "display:inline-flex;gap:4px" });
+    var up = h("button", { type: "button", class: "spark", title: "Move earlier" }, "↑"), dn = h("button", { type: "button", class: "spark", title: "Move later" }, "↓");
+    var del = h("button", { type: "button", class: "spark", title: "Delete " + gLabel(gi) }, "Delete");
+    function mv(dir) { var j = gi + dir; if (j < 0 || j >= C.groups.length) return; snapshot(); var g = C.groups.splice(gi, 1)[0]; C.groups.splice(j, 0, g); changed(true); show("g" + j); }
+    up.addEventListener("click", function () { mv(-1); }); dn.addEventListener("click", function () { mv(1); });
+    del.addEventListener("click", function () {
+      var n = C.groups[gi].days.reduce(function (t, d) { return t + d.steps.length; }, 0);
+      if (C.groups.length === 1) { alert("A path needs at least one " + lvl().toLowerCase() + "."); return; }
+      if (n && !confirm("Delete " + gLabel(gi) + " and its " + n + " steps?")) return;
+      snapshot(); C.groups.splice(gi, 1); changed(true); show("g" + Math.max(0, gi - 1));
+    });
+    add(wrap, [up, dn, del]);
+    return wrap;
+  }
+
+  /* ---------------------------------------------------------------- ask the LLM */
+  var askEls = [], proposal = null, askText = "";
+  function scopeLabel() {
+    if (scope.type === "path") return "the whole path";
+    return scope.label || scope.type;
+  }
+  function setScope(type, id, label) {
+    scope = scope.type === type && scope.id === id ? { type: "path", id: null } : { type: type, id: id, label: label };
+    $$(".spark[aria-pressed]").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+    renderAsk();
+    var box = pages[current] && pages[current].querySelector(".ask textarea");
+    if (box) { box.scrollIntoView({ block: "center" }); box.focus(); }
+  }
+  function askBox() {
+    var el = h("div", { class: "ask" });
+    askEls.push(el);
+    return el;
+  }
+  function renderAsk() {
+    askEls = askEls.filter(function (x) { return x.isConnected; });
+    askEls.forEach(function (el) {
+      el.textContent = "";
+      var ta = h("textarea", { placeholder: "For example: Day 2 is too long. Split it in two and add a lab on setting up a cost alert." });
+      ta.value = askText;
+      ta.addEventListener("input", function () { askText = ta.value; });
+      var go = h("button", { type: "button", class: "btn primary" }, "Suggest changes");
+      var err = h("p", { class: "err", hidden: true });
+      var prog = h("div", { class: "steps", hidden: true });
+      var clear = scope.type !== "path" ? h("button", { type: "button", class: "onb-linkbtn" }, "Use the whole path") : null;
+      if (clear) clear.addEventListener("click", function () { setScope(scope.type, scope.id); });
+      add(el, [h("span", { class: "label" }, "Ask the LLM to change the draft"), ta,
+        h("div", { class: "row" }, h("span", { class: "small" }, "Applies to: ", h("b", null, scopeLabel()), " ", clear), h("span", { class: "sp" }), go), prog, err]);
+      if (INFO && INFO.llm === false) { go.disabled = true; err.textContent = "The LLM Gateway isn't available to the app."; err.hidden = false; }
+      go.addEventListener("click", function () {
+        var ins = ta.value.trim();
+        if (!ins) { ta.focus(); return; }
+        go.disabled = true; err.hidden = true; prog.hidden = false; prog.textContent = "";
+        api(ROOT + "api/admin/paths/" + PID + "/llm-edit", jsonOpts("POST", { instruction: ins, scope: { type: scope.type, id: scope.id }, content: C }))
+          .then(function (j) { return poll(j.job, function (job) { drawProgress(prog, job); }); })
+          .then(function (job) { go.disabled = false; prog.hidden = true; proposal = job.result; renderProposal(el); },
+            function (e) { go.disabled = false; prog.hidden = true; err.textContent = e.message; err.hidden = false; });
+      });
+      if (proposal && el === askEls[0]) renderProposal(el);
+    });
+  }
+  function renderProposal(el) {
+    var old = el.parentNode && el.parentNode.querySelector(".proposal"); if (old) old.remove();
+    if (!proposal) return;
+    var apply = h("button", { type: "button", class: "btn primary" }, "Apply"), discard = h("button", { type: "button", class: "btn ghost" }, "Discard");
+    var box = h("div", { class: "proposal" }, h("div", { class: "row" }, h("b", null, "Suggested changes"), h("span", { class: "sp" }), discard, apply),
+      proposal.changes.map(function (c) { return h("div", { class: "chg " + c.kind }, ({ add: "+ ", del: "− ", mov: "↷ ", upd: "~ " })[c.kind] || "", c.text, c.source ? h("span", { class: "from" }, "From: " + c.source) : null); }));
+    el.parentNode.insertBefore(box, el.nextSibling);
+    discard.addEventListener("click", function () { proposal = null; box.remove(); });
+    apply.addEventListener("click", function () { snapshot(); C = proposal.content; proposal = null; askText = ""; scope = { type: "path", id: null }; changed(true); });
+  }
+  function poll(jid, onProgress) {
+    return new Promise(function (resolve, reject) {
+      function tickJob() {
+        api(ROOT + "api/admin/jobs/" + jid).then(function (j) {
+          if (onProgress) onProgress(j);
+          if (j.status === "done") resolve(j); else if (j.status === "error") reject(new Error(j.error || "Something went wrong.")); else setTimeout(tickJob, 1500);
+        }, reject);
+      }
+      tickJob();
+    });
+  }
+  function drawProgress(el, job) {
+    el.textContent = "";
+    (job.progress || []).forEach(function (p) { el.appendChild(h("div", { class: "st " + (p.done ? "done" : "now") }, p.text)); });
+  }
+
+  /* ---------------------------------------------------------------- starred and team */
+  function buildStarred() {
+    var sec = page("starred", "Starred", "Your list");
+    add(sec, [h("div", { class: "page-head" }, h("span", { class: "eyebrow" }, "Your list"), h("h2", null, "Starred"),
+      h("p", { class: "lede" }, "Steps you starred, newest first.")), h("div", { id: "starred-out", class: "onb-starred" })]);
+  }
+  function renderStarred() {
+    var out = $("#starred-out"); if (!out) return;
+    out.textContent = "";
+    var ids = Object.keys(S.stars || {}).filter(function (id) { return byId[id]; }).sort(function (x, y) { return S.stars[y] - S.stars[x]; });
+    if (!ids.length) out.appendChild(h("div", { class: "empty" }, "Nothing starred yet. Use the ☆ Star button under any step to keep it here."));
+    ids.forEach(function (id) {
+      var it = byId[id];
+      var link = h("a", { href: "#s-" + id }, h("span", { class: "s" }, where(it) + (S.done[id] ? " · done" : "")), h("span", null, it.st.title));
+      link.addEventListener("click", function (e) { e.preventDefault(); goTo(it); });
+      out.appendChild(link);
+    });
+    if (navItems.starred) navItems.starred.nc.textContent = ids.length ? String(ids.length) : "";
+  }
+  function toggleStar(id) { S.stars = S.stars || {}; if (S.stars[id]) delete S.stars[id]; else S.stars[id] = Date.now(); if (!store) earlyEdits = true; renderStarred(); save(); }
+  function buildTeam() {
+    var sec = page("team", "Team progress", "Owners");
+    add(sec, [h("div", { class: "page-head" }, h("span", { class: "eyebrow" }, "Owners and admins"), h("h2", null, "Team progress")), h("div", { id: "team-out" }, h("div", { class: "empty" }, "Loading progress…"))]);
+  }
+  function rel(ts) {
+    if (!ts) return "—";
+    var diff = (ts - Date.now()) / 1000, ab = Math.abs(diff), f = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+    if (ab < 3600) return f.format(Math.round(diff / 60), "minute");
+    if (ab < 86400) return f.format(Math.round(diff / 3600), "hour");
+    return f.format(Math.round(diff / 86400), "day");
+  }
+  function fmtDay(iso) { return iso ? new Date(iso + "T12:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "—"; }
+  function renderTeam(j) {
+    var out = $("#team-out"); if (!out) return;
+    out.textContent = "";
+    var all = (j && j.learners) || [];
+    if (!all.length) { out.appendChild(h("div", { class: "empty" }, "No one has enrolled yet.")); return; }
+    all.sort(function (x, y) { return ((y.state || {}).updatedAt || 0) - ((x.state || {}).updatedAt || 0); });
+    var tb = h("tbody");
+    all.forEach(function (l) {
+      var st = Object.assign(blank(), l.state || {}), s = stats(st), m = l.meta || {};
+      var fo = firstOpen(st);
+      tb.appendChild(h("tr", null,
+        h("td", { title: l.email || "" }, (l.name || l.email || "Someone") + (ME && l.id === ME.id ? " (you)" : "")),
+        h("td", { style: "white-space:nowrap" }, fmtDay(m.start)),
+        h("td", { style: "white-space:nowrap" }, m.cohort || "—"),
+        h("td", null, m.pace ? h("span", { class: "onb-chip", "data-s": m.pace.status }, m.pace.label) : "—"),
+        h("td", { style: "white-space:nowrap;font-variant-numeric:tabular-nums" }, pct(s.all) + "% · " + s.all[0] + "/" + s.all[1]),
+        h("td", { style: "white-space:nowrap;font-variant-numeric:tabular-nums" }, s.req[0] + "/" + s.req[1]),
+        h("td", { style: "white-space:nowrap", title: fo ? fo.st.title : "" }, fo ? where(fo) : "Finished"),
+        h("td", { style: "white-space:nowrap" }, m.inactiveDays ? h("span", { class: "onb-chip", "data-s": "inactive" }, m.inactiveDays + " days idle") : rel(st.updatedAt))));
+    });
+    out.appendChild(h("div", { class: "tbl" }, h("table", null, h("thead", null, h("tr", null, ["Learner", "Start date", "Cohort", "Pace", "Progress", "Required", "Now on", "Last active"].map(function (t) { return h("th", null, t); }))), tb)));
+  }
+
+  /* ---------------------------------------------------------------- navigation */
+  var side = $("#side");
+  function navItem(pid) {
+    var p = pages[pid];
+    var nc = h("span", { class: "nc" });
+    var el = h("a", { class: "nav-item", href: "#" + pid, "data-nav": pid }, h("div", { class: "nh" }, h("span", { class: "label" }, p._nav), nc), h("span", { class: "nt" }, p.dataset.title));
+    navItems[pid] = { a: el, nc: nc };
+    return el;
+  }
+  function sep() { return h("div", { class: "sep" }); }
+  function show(pid, target) {
+    if (!pages[pid]) pid = "g0";
+    current = pid;
+    pageOrder.forEach(function (k) { pages[k].hidden = k !== pid; });
+    Object.keys(navItems).forEach(function (k) { if (k === pid) navItems[k].a.setAttribute("aria-current", "page"); else navItems[k].a.removeAttribute("aria-current"); });
+    $$(".daybrick").forEach(function (b) { b.setAttribute("aria-current", b.dataset.page === pid ? "true" : "false"); });
+    if (target) target.scrollIntoView({ block: "center" });
+    else { var top = $(".frame"); if (top && window.scrollY > top.offsetTop) window.scrollTo(0, top.offsetTop - 8); }
+  }
+  function route() {
+    var hsh = decodeURIComponent(location.hash.slice(1));
+    if (!hsh || hsh === "edit") return false;
+    if (pages[hsh]) { show(hsh); return true; }
+    var el = document.getElementById(hsh);
+    if (el && el.closest("[data-page]")) { show(el.closest("[data-page]").dataset.page, el); return true; }
+    return false;
+  }
+  function goTo(it) {
+    if (!it) { show("g" + (C.groups.length - 1)); return; }
+    var el = document.getElementById("s-" + it.id);
+    history.replaceState(null, "", "#g" + it.gi);
+    show("g" + it.gi, el);
+    if (el) { el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); var cb = el.querySelector(".tick"); if (cb) cb.focus({ preventScroll: true }); }
+  }
+  function focusStep(id, title) {
+    var it = byId[id]; if (!it) return;
+    show("g" + it.gi, document.getElementById("s-" + id));
+    if (title) { var t = $("#s-" + id + " .ititle .ed"); if (t) t.focus(); }
+  }
+
+  /* ---------------------------------------------------------------- progress */
+  function firstOpen(st) {
+    var done = st.done || {};
+    var req = items.filter(function (it) { return it.st.type === "Required"; });
+    for (var i = 0; i < req.length; i++) if (!done[req[i].id]) return req[i];
+    for (var j = 0; j < items.length; j++) if (!done[items[j].id]) return items[j];
+    return null;
+  }
+  function stats(st) {
+    var done = st.done || {}, all = [0, items.length], req = [0, 0], gates = [0, 0], groups = C.groups.map(function () { return [0, 0]; });
+    items.forEach(function (it) {
+      var on = !!done[it.id];
+      if (on) all[0]++;
+      if (it.st.type === "Required") { req[1]++; if (on) req[0]++; }
+      if (it.st.gate) { gates[1]++; if (on) gates[0]++; }
+      groups[it.gi][1]++; if (on) groups[it.gi][0]++;
+    });
+    return { all: all, req: req, gates: gates, groups: groups };
+  }
+  function pct(p) { return p[1] ? Math.round(100 * p[0] / p[1]) : 0; }
+  function renderProgress() {
+    Object.keys(boxes).forEach(function (id) { var on = !!S.done[id]; boxes[id].forEach(function (cb) { cb.checked = on; var el = cb.closest(".item"); if (el) el.classList.toggle("is-done", on); }); });
+    var s = stats(S);
+    $("#pct").textContent = pct(s.all) + "%";
+    $("#pct-sub").textContent = s.all[0] + " of " + s.all[1] + " steps";
+    $("#req-sub").textContent = s.req[0] + "/" + s.req[1];
+    $("#gate-sub").textContent = s.gates[0] + "/" + s.gates[1];
+    $("#gate-wrap").hidden = !s.gates[1];
+    C.groups.forEach(function (g, gi) {
+      var c = s.groups[gi];
+      var b = $('.daybrick[data-page="g' + gi + '"] i'); if (b) b.style.width = pct(c) + "%";
+      var ni = navItems["g" + gi]; if (ni) ni.nc.textContent = c[0] + "/" + c[1];
+      var gc = $('[data-gcount="' + gi + '"]'); if (gc) gc.textContent = c[0] + " of " + c[1] + " done";
+    });
+  }
+
+  /* ---------------------------------------------------------------- saving progress (same contract as the other paths) */
+  var stateEl = $("#save-state");
+  var STATE_TEXT = { init: "Loading", saving: "Saving…", server: "Saved", local: "Saved in this browser only", draft: "Draft saved", drafting: "Saving draft…" };
+  function setState(s, text) { stateEl.dataset.s = s === "draft" ? "server" : s === "drafting" ? "saving" : s; stateEl.textContent = text || STATE_TEXT[s] || s; }
+  var timer = null, busy = false, dirty = false;
+  function save(delay) {
+    if (EDIT || PREVIEW || !LIVE) return;
+    dirty = true;
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ }
+    if (!store) return;
+    setState("saving"); clearTimeout(timer); timer = setTimeout(flush, delay || 500);
+  }
+  function flush() {
+    if (busy || !dirty || !store) return;
+    busy = true; dirty = false; S.updatedAt = Date.now();
+    store.save(clone(S)).then(function () { setState(store.kind, store.stateText); }, function (e) {
+      console.warn("Progress save failed", e);
+      if (store.kind !== "local") { store = localStore("Couldn't reach the server: saved in this browser only"); store.save(clone(S)); setState("local", store.stateText); }
+    }).then(function () { busy = false; if (dirty) flush(); });
+  }
+  function readCache() { try { var raw = localStorage.getItem(CACHE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+  function localStore(text) {
+    return { kind: "local", stateText: text, me: { id: null, name: "" },
+      load: function () { return Promise.resolve(readCache()); },
+      save: function (st) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(st)); } catch (e) {} return Promise.resolve(); } };
+  }
+  function serverStore(me) {
+    return { kind: "server", me: me,
+      load: function () { return api(API + "progress").then(function (j) { return j && j.state ? j.state : null; }); },
+      save: function (st) { return api(API + "progress", jsonOpts("PUT", { state: st })).then(function (j) { if (window.DROnb) DROnb.onSaved(j); }); },
+      team: function () { return api(API + "team"); } };
+  }
+
+  /* ---------------------------------------------------------------- saving the draft */
+  function scheduleSave() {
+    setState("drafting");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveDraft, 1200);
+  }
+  var savingDraft = null;
+  function saveDraft() {
+    if (savingDraft) { savingDraft.then(function () { scheduleSave(); }); return savingDraft; }
+    savingDraft = api(ROOT + "api/admin/paths/" + PID + "/draft", jsonOpts("PUT", { content: C })).then(function (j) {
+      editDirty = false; INFO.draft = j.draft; setState("draft"); updateBar();
+    }, function (e) { setState("local", "Draft not saved: " + e.message); }).then(function () { savingDraft = null; });
+    return savingDraft;
+  }
+  function updateBar() {
+    var published = INFO && INFO.status === "published";
+    $("#eb-title").textContent = published ? "Editing" : "Draft";
+    $("#eb-note").textContent = published ? "Learners see the published version until you publish." : "Only owners and admins can see it.";
+    $("#eb-discard").hidden = !published;
+    $("#eb-xlsx").href = ROOT + "api/admin/paths/" + PID + "/export.xlsx";
+  }
+
+  /* ---------------------------------------------------------------- settings */
+  function settingsDialog() {
+    var c = C;
+    var title = h("input", { value: c.title || "" }), blurb = h("textarea", { rows: 2 }), length = h("input", { value: c.length || "", placeholder: "For example 1 week" });
+    blurb.value = c.blurb || "";
+    function seg(opts, val) {
+      var box = h("div", { class: "seg" }); box._v = val;
+      opts.forEach(function (o) { var b = h("button", { type: "button", "aria-pressed": String(o[0] === val) }, o[1]); b.addEventListener("click", function () { box._v = o[0]; $$("button", box).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); if (box._on) box._on(o[0]); }); box.appendChild(b); });
+      return box;
+    }
+    var pace = seg([["weeks", "Calendar weeks"], ["days", "Working days"]], c.pace);
+    var std = ["Week", "Module", "Phase", "Day"];
+    var level = seg([["Week", "Week"], ["Module", "Module"], ["Phase", "Phase"], ["Day", "Day"], ["custom", "Custom…"]], std.indexOf(c.level) >= 0 ? c.level : "custom");
+    var custom = h("input", { value: std.indexOf(c.level) >= 0 ? "" : c.level, placeholder: "Name for the top level", hidden: std.indexOf(c.level) >= 0 });
+    level._on = function (v) { custom.hidden = v !== "custom"; if (v === "custom") custom.focus(); };
+    var days = seg([["yes", "Yes"], ["no", "No"]], c.useDays ? "yes" : "no");
+    var skill = seg([["now", "Add now"], ["later", "Decide later"]], c.skill && c.skill.enabled ? "now" : "later");
+    var skillName = h("input", { value: (c.skill && c.skill.name) || "", placeholder: "Skill name, for example agent monitoring", hidden: !(c.skill && c.skill.enabled) });
+    skill._on = function (v) { skillName.hidden = v !== "now"; };
+    var owners = h("input", { value: (INFO.owners || []).join(", ") });
+    var err = h("p", { class: "err", hidden: true });
+    var saveB = h("button", { type: "button", class: "btn primary" }, "Save"), cancel = h("button", { type: "button", class: "btn ghost" }, "Cancel");
+    var del = INFO.status !== "published" ? h("button", { type: "button", class: "btn ghost", style: "margin-right:auto;color:#B00020" }, "Delete draft") : null;
+    var dlg = h("div", { class: "onb-dialog wide2 settings", role: "dialog", "aria-modal": "true", "aria-label": "Path settings" },
+      h("h2", null, "Settings"),
+      h("label", { class: "field" }, h("span", { class: "label" }, "Path name"), title),
+      h("label", { class: "field" }, h("span", { class: "label" }, "Who it's for"), blurb),
+      h("label", { class: "field" }, h("span", { class: "label" }, "Length"), length),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Pace"), pace),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Top level is called"), level, custom),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Days inside each " + (lvl() === "Day" ? "group" : lvl().toLowerCase())), days),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Skill growth"), skill, skillName),
+      h("label", { class: "field" }, h("span", { class: "label" }, "Owners: they see this path's progress and problems"), owners),
+      err, h("div", { class: "row" }, del, cancel, saveB));
+    var m = modalOpen(dlg);
+    cancel.addEventListener("click", m.close);
+    if (del) del.addEventListener("click", function () {
+      if (!confirm("Delete this draft? This can't be undone.")) return;
+      api(ROOT + "api/admin/paths/" + PID, { method: "DELETE" }).then(function () { location.href = ROOT + "admin/#content"; }, function (e) { err.textContent = e.message; err.hidden = false; });
+    });
+    saveB.addEventListener("click", function () {
+      snapshot();
+      C.title = title.value.trim() || C.title; C.blurb = blurb.value.trim(); C.length = length.value.trim(); C.pace = pace._v;
+      C.level = level._v === "custom" ? (custom.value.trim() || "Section") : level._v;
+      var ud = days._v === "yes";
+      if (C.useDays && !ud) C.groups.forEach(function (g) { var all = []; g.days.forEach(function (d) { all = all.concat(d.steps); }); g.days = [{ id: g.days[0].id, title: "", steps: all }]; });
+      C.useDays = ud;
+      C.skill = { enabled: skill._v === "now", name: skillName.value.trim() };
+      saveB.disabled = true;
+      api(ROOT + "api/admin/paths/" + PID + "/draft", jsonOpts("PUT", { content: C, owners: owners.value })).then(function (j) {
+        INFO.owners = j.owners; C = j.draft; editDirty = false; m.close(); rebuild(); setState("draft");
+      }, function (e) { saveB.disabled = false; err.textContent = e.message; err.hidden = false; });
+    });
+  }
+  function modalOpen(dialog) {
+    var wrap = h("div", { class: "onb-modal" }, dialog);
+    function close() { wrap.remove(); document.removeEventListener("keydown", esc); }
+    function esc(e) { if (e.key === "Escape") close(); }
+    wrap.addEventListener("click", function (e) { if (e.target === wrap) close(); });
+    document.addEventListener("keydown", esc);
+    document.body.appendChild(wrap);
+    return { close: close };
+  }
+  function publishFlow() {
+    var btn = $("#eb-publish");
+    var go = function () {
+      btn.disabled = true; btn.textContent = "Publishing…";
+      (savingDraft || Promise.resolve()).then(function () { clearTimeout(saveTimer); return api(ROOT + "api/admin/paths/" + PID + "/draft", jsonOpts("PUT", { content: C })); })
+        .then(function () { return api(ROOT + "api/admin/paths/" + PID + "/publish", { method: "POST" }); })
+        .then(function () { location.hash = "g0"; location.reload(); }, function (e) { btn.disabled = false; btn.textContent = "Publish"; alert("Couldn't publish: " + e.message); });
+    };
+    var n = items.length;
+    var ok = h("button", { type: "button", class: "btn primary" }, "Publish now"), back = h("button", { type: "button", class: "btn ghost" }, "Keep editing");
+    var m = modalOpen(h("div", { class: "onb-dialog", role: "dialog", "aria-modal": "true" },
+      h("h2", null, INFO.status === "published" ? "Publish your changes?" : "Publish this path?"),
+      h("p", null, C.title + ": " + C.groups.length + " " + lvl().toLowerCase() + (C.groups.length === 1 ? "" : "s") + ", " + n + " steps." + (INFO.status === "published" ? "" : " It appears on the hub for everyone.")),
+      h("div", { class: "row" }, back, ok)));
+    back.addEventListener("click", m.close);
+    ok.addEventListener("click", function () { m.close(); go(); });
+  }
+
+  /* ---------------------------------------------------------------- search and report context */
+  function searchEntries() {
+    return items.map(function (it) { return { title: it.st.title, text: [it.st.details, it.st.type].join(" "), where: where(it), go: function () { goTo(it); } }; });
+  }
+  function reportContext() { var p = pages[current]; return { label: p ? (/^g\d+$/.test(current) ? gLabel(+current.slice(1)) + ": " : "") + p.dataset.title : "", anchor: current || "" }; }
+
+  /* ---------------------------------------------------------------- build */
+  function buildAll() {
+    pages = {}; pageOrder = []; navItems = {}; boxes = {}; askEls = [];
+    if (window.DROnb) DROnb.resetSearch();
+    $("#main").textContent = ""; side.textContent = ""; $("#bricks").textContent = "";
+    indexItems();
+    document.title = C.title;
+    $("#doc-title").textContent = "";
+    $("#doc-title").appendChild(EDIT ? E(C, "title", { plain: true, ph: "Path name" }) : document.createTextNode(C.title));
+    $("#doc-blurb").hidden = !C.blurb && !EDIT;
+    $("#doc-blurb").textContent = ""; $("#doc-blurb").appendChild(EDIT ? E(C, "blurb", { plain: true, ph: "Who it's for (one sentence)" }) : document.createTextNode(C.blurb || ""));
+    var units = C.groups.length;
+    $("#doc-length").textContent = C.length || (units + " " + lvl().toLowerCase() + (units === 1 ? "" : "s"));
+    C.groups.forEach(buildGroup);
+    if (EDIT) {
+      var addG = h("button", { type: "button", class: "addrow", style: "margin-top:14px" }, "+ Add a " + lvl().toLowerCase());
+      addG.addEventListener("click", function () { snapshot(); C.groups.push({ id: newId("g"), title: "", days: [{ id: newId("d"), title: "", steps: [] }] }); changed(true); show("g" + (C.groups.length - 1)); });
+      pages["g" + (C.groups.length - 1)].appendChild(addG);
+    }
+    if (!EDIT) buildStarred();
+    if (canEdit && LIVE && !EDIT && !PREVIEW) buildTeam();
+    C.groups.forEach(function (g, gi) { side.appendChild(navItem("g" + gi)); });
+    if (pages.starred) { side.appendChild(sep()); side.appendChild(navItem("starred")); }
+    if (pages.team) { side.appendChild(sep()); side.appendChild(navItem("team")); }
+    var wb = $("#bricks");
+    wb.style.gridTemplateColumns = "repeat(" + Math.min(Math.max(C.groups.length, 1), 14) + ",1fr)";
+    C.groups.forEach(function (g, gi) { wb.appendChild(h("a", { class: "daybrick", href: "#g" + gi, "data-page": "g" + gi, "aria-label": gLabel(gi) + (g.title ? ": " + g.title : "") }, h("div", { class: "b" }, h("i")), h("span", null, lvl().charAt(0) + (gi + 1)))); });
+    renderAsk();
+  }
+  function renderAll() { renderProgress(); renderStarred(); if (window.DROnb) DROnb.refreshStars(); if (teamData) renderTeam(teamData); }
+  var teamData = null;
+  function rebuild() { var keep = current, y = window.scrollY; buildAll(); renderAll(); show(keep || "g0"); window.scrollTo(0, y); }
+
+  function setMode(mode) {
+    EDIT = mode === "edit"; PREVIEW = mode === "preview";
+    document.body.classList.toggle("onb-editing", EDIT);
+    $("#editbar").hidden = !EDIT; $("#previewbar").hidden = !PREVIEW;
+    $("#top-actions").hidden = EDIT;
+    $("#mascot").hidden = EDIT || !(C.skill && C.skill.enabled);
+    var eb = $("#btn-edit"); if (eb) eb.hidden = EDIT;
+    rebuild();
+    if (EDIT) { updateBar(); setState("draft"); } else if (store) setState(store.kind, store.stateText);
+  }
+
+  window.addEventListener("beforeunload", function (e) { if (EDIT && editDirty) { saveDraft(); e.preventDefault(); e.returnValue = ""; } });
+
+  /* ---------------------------------------------------------------- boot */
+  function start() {
+    $("#eb-settings").addEventListener("click", settingsDialog);
+    $("#eb-preview").addEventListener("click", function () { clearTimeout(saveTimer); if (editDirty) saveDraft(); setMode("preview"); });
+    $("#pv-back").addEventListener("click", function () { setMode("edit"); });
+    $("#eb-undo").addEventListener("click", function () { var prev = history_.pop(); if (!prev) return; C = JSON.parse(prev); $("#eb-undo").disabled = !history_.length; changed(true); });
+    $("#eb-publish").addEventListener("click", publishFlow);
+    $("#eb-discard").addEventListener("click", function () {
+      if (!confirm("Discard the unpublished changes and go back to the published version?")) return;
+      C = clone(LIVE); history_ = []; saveDraft().then(function () { setMode("view"); C = LIVE; rebuild(); });
+    });
+    $("#btn-resume").addEventListener("click", function () { goTo(firstOpen(S)); });
+    window.addEventListener("hashchange", route);
+
+    function boot(info) {
+      INFO = info || {};
+      LIVE = INFO.live || null;
+      canEdit = !!INFO.canEdit;
+      C = LIVE || INFO.draft;
+      if (!C) { $("#main").textContent = ""; $("#main").appendChild(h("div", { class: "empty" }, "This learning path isn't published yet.")); setState("local", "Not published"); return; }
+      var cached = readCache();
+      if (cached && cached.done) S = Object.assign(blank(), cached);
+      var draftMode = canEdit && (!LIVE || location.hash === "#edit");
+      if (draftMode) C = clone(INFO.draft || LIVE);
+      buildAll(); renderAll();
+      if (!route()) show("g0");
+      var skillOn = !!(C.skill && C.skill.enabled);
+      DROnb.init({ api: API, title: C.title, skill: skillOn ? C.skill.name || "" : "", assetBase: ROOT + "assets/", paceMount: $("#pace"), badgeMount: $("#badge"),
+        mascotMount: skillOn ? $("#mascot") : null, toolsMount: $("#top-actions"), searchEntries: searchEntries, context: reportContext,
+        isStarred: function (id) { return !!(S.stars && S.stars[id]); }, toggleStar: toggleStar, server: false, custom: true });
+      if (!skillOn) $("#mascot").hidden = true;
+      if (draftMode) { setMode("edit"); }
+      if (canEdit && LIVE) {
+        var eb = h("button", { type: "button", class: "btn ghost", id: "btn-edit" }, "Edit content");
+        eb.addEventListener("click", function () { C = clone(INFO.draft || LIVE); setMode("edit"); });
+        $("#top-actions").insertBefore(eb, $("#top-actions .onb-tools"));
+      }
+      if (!LIVE) return;  // drafts: no progress
+      return api(API + "me").then(function (me) { return me && me.app === "dr-onboarding" ? serverStore(me) : localStore(); }, function () { return localStore(); }).then(function (st) {
+        store = st; ME = st.me;
+        return store.load().then(function (remote) {
+          if (remote && (remote.done || remote.stars)) {
+            var local = S; S = Object.assign(blank(), remote);
+            if (earlyEdits) { Object.keys(local.done).forEach(function (k) { S.done[k] = local.done[k]; }); Object.keys(local.stars || {}).forEach(function (k) { S.stars[k] = local.stars[k]; }); save(); }
+          } else if (Object.keys(S.done).length || Object.keys(S.stars || {}).length) save();
+          if (!EDIT) setState(store.kind, store.stateText);
+          if (store.kind === "server") DROnb.init({ server: true, onEnrolled: function () { renderProgress(); } });
+          if (store.me && store.me.name) $("#who-name").textContent = store.me.name;
+          if (canEdit && store.team) {
+            var pollTeam = function () { store.team().then(function (j) { teamData = j; renderTeam(j); }, function () {}).then(function () { setTimeout(pollTeam, 60000); }); };
+            pollTeam();
+          }
+          renderAll();
+        });
+      });
+    }
+    var embedded = DATA.content ? { live: DATA.status === "published" ? DATA.content : null, status: DATA.status } : null;
+    api(API + "content").then(boot, function (e) {
+      if (embedded && embedded.live) boot(embedded);
+      else { $("#main").textContent = ""; $("#main").appendChild(h("div", { class: "empty" }, e.message)); setState("local", "Couldn't load"); }
+    });
+  }
+  start();
+})();
+</script>
+</body>
+</html>

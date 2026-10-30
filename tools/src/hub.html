@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DataRobot Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=DM+Mono:wght@400;500&display=swap">
+<!--BRAND_CSS-->
+<link rel="stylesheet" href="assets/common.css">
+<script src="assets/common.js"></script>
+<style>
+[hidden]{display:none!important}
+.hub{display:grid;gap:44px;padding-block:36px 80px}
+.hub > *{min-width:0}
+.topnav{display:flex;gap:8px;align-items:center}
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:18px}
+.path{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:grid;align-content:start;text-decoration:none;color:var(--ink)}
+.path:hover{border-color:var(--ink)}
+.path .sky{--glow:#2E7BEA;position:relative;height:170px;display:grid;grid-template-columns:150px minmax(0,1fr);align-items:center;gap:8px;padding:0 18px 0 8px;color:#EDF1EE;
+  background:radial-gradient(90% 140% at 18% 100%,color-mix(in srgb,var(--glow) 38%,transparent) 0%,transparent 60%),linear-gradient(160deg,#151a2e 0%,#0b0e1a 70%)}
+.path .sky::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.75;background-image:
+  radial-gradient(1px 1px at 62% 18%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 84% 40%,#fff 50%,transparent 51%),
+  radial-gradient(1px 1px at 92% 78%,#cfe3ff 50%,transparent 51%),radial-gradient(1px 1px at 70% 66%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 40% 12%,#ffe9a8 50%,transparent 51%)}
+.path .sky img{height:140px;max-width:130px;object-fit:contain;justify-self:center;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));animation:onb-float 3.4s ease-in-out infinite}
+.path .sky.locked img{filter:brightness(0) drop-shadow(0 0 1px rgba(255,255,255,.6));opacity:.5;animation:none}
+.path .sky .st{display:grid;gap:4px;position:relative;z-index:1}
+.path .sky .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#A2ACA5}
+.path .sky b{font-weight:400;font-size:20px}
+.path .sky .dots{display:flex;gap:3px}
+.path .sky .dots i{width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,.16)}
+.path .body{padding:18px 22px 20px;display:grid;gap:14px}
+.path h2{font-size:clamp(26px,3.2vw,32px);line-height:1.08;letter-spacing:-.015em}
+.path p{color:var(--muted);max-width:60ch}
+.path .bar{height:12px;background:var(--brick-empty);position:relative;overflow:hidden}
+.path .bar i{position:absolute;inset:0 auto 0 0;background:var(--green);width:0}
+.path .figs{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums;color:var(--muted);font-size:15px;align-items:baseline}
+.path .figs b{font-weight:400;color:var(--ink);font-size:28px;line-height:1;letter-spacing:-.02em}
+.path .foot-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.mini-badge svg{width:30px;height:30px}
+.path .meta-r{display:flex;align-items:center;gap:12px;min-width:0}
+.starred h2{font-size:28px}
+.stargroups{display:grid;gap:8px;margin-top:12px;max-width:860px}
+.stargroup{border:1px solid var(--line);border-radius:var(--r)}
+.stargroup > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:18px}
+.stargroup > summary::-webkit-details-marker{display:none}
+.stargroup > summary::before{content:"";width:8px;height:8px;border-right:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);transform:rotate(-45deg);transition:transform .15s ease;flex:none}
+.stargroup[open] > summary::before{transform:rotate(45deg)}
+.stargroup > summary .n{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stargroup ul{list-style:none;margin:0;padding:0 16px 12px 36px;display:grid;gap:2px}
+.stargroup li a{display:block;padding:8px 10px;border-radius:4px;color:var(--ink);text-decoration:none}
+.stargroup li a:hover{background:var(--panel)}
+.stargroup li a .s{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.onb-welcome{border:1.5px solid var(--green);background:color-mix(in srgb,var(--green) 14%,var(--bg));border-radius:var(--r);padding:16px 18px;display:grid;gap:8px;margin-top:20px}
+.onb-welcome .label{color:var(--ink)}
+.onb-welcome h2{font-size:24px;line-height:1.15}
+.onb-welcome p{color:var(--ink);max-width:70ch;font-size:16px}
+.onb-welcome .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+@media (prefers-reduced-motion:reduce){.path .sky img{animation:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="title-block">
+        <span class="eyebrow">DataRobot onboarding</span>
+        <h1>Learning paths</h1>
+        <div class="who"><span id="who-name"></span><span class="save-state" id="who-state" data-s="init">Loading</span></div>
+      </div>
+      <nav class="topnav" id="topnav" aria-label="Sections"></nav>
+    </div>
+    <section class="onb-welcome" id="welcome" aria-labelledby="welcome-h" hidden></section>
+  </div>
+</header>
+<main class="wrap hub">
+  <section class="paths" id="paths" aria-label="Learning paths"></section>
+  <section class="starred" id="starred" hidden>
+    <h2>Your starred steps</h2>
+    <div class="stargroups" id="starred-out"></div>
+  </section>
+  <p class="foot">Enroll in a path to track your progress.</p>
+</main>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var BASE = location.pathname.replace(/\/?$/, "/");
+  var FALLBACK = [
+    { id: "ai-engineer", title: "AI Engineer Learning Plan", skill: "AI Engineering", length: "10 weeks", blurb: "", done: 0, total: 0, started: false, enrolled: false, mascot: 0 },
+    { id: "agentic", title: "Agentic AI Learning Path", skill: "agentic", length: "7 days", blurb: "", done: 0, total: 0, started: false, enrolled: false, mascot: 0 }
+  ];
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v == null || v === false) return;
+      if (k === "class") el.className = v; else if (k === "text") el.textContent = v; else if (k === "html") el.innerHTML = v;
+      else el.setAttribute(k, v === true ? "" : v);
+    });
+    for (var i = 2; i < arguments.length; i++) [].concat(arguments[i]).forEach(function (c) { if (c != null && c !== false) el.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return el;
+  }
+  function pct(d, t) { return t ? Math.round(100 * d / t) : 0; }
+  function rel(ts) {
+    if (!ts) return "";
+    var diff = (ts - Date.now()) / 1000, a = Math.abs(diff), f = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+    if (a < 3600) return f.format(Math.round(diff / 60), "minute");
+    if (a < 86400) return f.format(Math.round(diff / 3600), "hour");
+    return f.format(Math.round(diff / 86400), "day");
+  }
+  function src(k) { return BASE + "assets/mascots/year-" + (k < 10 ? "0" : "") + k + ".png"; }
+
+  function renderPaths(paths) {
+    var out = $("#paths"); out.textContent = "";
+    paths.forEach(function (p) {
+      var earned = p.badge && p.badge.earned, st = p.enrolled ? (p.mascot || 0) : 0, shown = Math.max(1, st);
+      var sky = p.skillEnabled === false ? null : h("div", { class: "sky" + (st ? "" : " locked"), style: "--glow:#44BFFC" },
+        h("img", { src: src(shown), alt: "" }),
+        h("div", { class: "st" },
+          h("span", { class: "k" }, "Skill growth"),
+          p.enrolled ? h("b", null, st >= 10 ? "Fully grown" : st ? "Growing stronger" : "Just getting started") : h("b", null, "Enroll to start growing your " + p.skill + " skill"),
+          p.enrolled ? h("span", { class: "dots" }, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (k) { return h("i", { style: k <= st ? "background:#44BFFC" : null }); })) : null));
+      out.appendChild(h("a", { class: "path", href: BASE + p.id + "/" },
+        sky,
+        h("div", { class: "body" },
+          h("div", { class: "foot-row" }, h("span", { class: "label" }, p.length),
+            h("span", { class: "meta-r" }, DROnb.byline(p.author), earned ? h("span", { class: "mini-badge", title: "Completed", html: DROnb.badgeSvg() }) : null)),
+          h("h2", null, p.title),
+          p.blurb ? h("p", null, p.blurb) : null,
+          p.enrolled ? [
+            h("div", { class: "figs" }, h("b", null, pct(p.done, p.total) + "%"), h("span", null, p.done + " of " + p.total + (p.updatedAt ? " · " + rel(p.updatedAt) : ""))),
+            h("div", { class: "bar" }, h("i", { style: "width:" + pct(p.done, p.total) + "%" }))
+          ] : null,
+          h("div", { class: "foot-row" },
+            h("span", { class: "btn " + (p.enrolled && !earned ? "primary" : p.enrolled ? "" : "primary") }, earned ? "Review" : p.enrolled ? "Continue" : "Explore and enroll"),
+            p.enrolled && p.pace ? h("span", { class: "onb-chip", "data-s": p.pace.status }, p.pace.label) : null))));
+    });
+  }
+  function renderStarred(paths) {
+    var groups = paths.filter(function (p) { return (p.starred || []).length; });
+    $("#starred").hidden = !groups.length;
+    var out = $("#starred-out"); out.textContent = "";
+    groups.forEach(function (p) {
+      var n = p.starred.length;
+      out.appendChild(h("details", { class: "stargroup" },
+        h("summary", null, h("span", null, p.title), h("span", { class: "n" }, n + " starred step" + (n === 1 ? "" : "s"))),
+        h("ul", null, p.starred.map(function (s) {
+          var m = /^([^:]{1,40}): (.*)$/.exec(s.label);
+          return h("li", null, h("a", { href: BASE + s.href }, m ? h("span", { class: "s" }, m[1]) : null, m ? m[2] : s.label));
+        }))));
+    });
+  }
+
+  function renderWelcome(w) {
+    var box = $("#welcome"); box.textContent = "";
+    if (!w) { box.hidden = true; return; }
+    function dismiss() { fetch(BASE + "api/welcome/dismiss", { method: "POST", keepalive: true }).catch(function () {}); }
+    var go = h("a", { class: "btn primary", href: BASE + w.action.path }, w.action.label);
+    var ok = h("button", { type: "button", class: "btn ghost" }, "Got it");
+    go.addEventListener("click", dismiss);
+    ok.addEventListener("click", function () { dismiss(); box.hidden = true; });
+    box.appendChild(h("span", { class: "label" }, w.label));
+    box.appendChild(h("h2", { id: "welcome-h" }, w.title));
+    box.appendChild(h("p", null, w.text));
+    box.appendChild(h("div", { class: "row" }, go, ok));
+    box.hidden = false;
+  }
+
+  renderPaths(FALLBACK);
+  fetch(BASE + "api/summary", { headers: { accept: "application/json" } })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (j) {
+      $("#who-name").textContent = j.me.name || j.me.email || "";
+      $("#who-state").hidden = true;
+      renderWelcome(j.me.welcome);
+      renderPaths(j.paths);
+      renderStarred(j.paths);
+      if (j.me.canAdmin) {
+        var n = j.openReports || 0;
+        $("#topnav").appendChild(h("a", { class: "btn ghost", href: BASE + "admin/" }, "Admin", n ? h("span", { class: "onb-chip", "data-s": "behind", style: "margin-left:6px", title: n + " open problem reports" }, String(n)) : null));
+      }
+    })
+    .catch(function (e) {
+      console.warn(e);
+      var s = $("#who-state"); s.dataset.s = "local"; s.textContent = "Couldn't load your progress";
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# OS / editor
+.DS_Store
+.fuse_hidden*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Local scratch output
+.lavish/
+Claude outputs/

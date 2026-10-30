@@ -1,0 +1,271 @@
+<title>Onboarding Hub Staging</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one slim staging bar over the real app, which fills the rest of the screen in a frame.
+   The bar stays dark in both themes so it never reads as part of the app; yellow marks "staging". */
+:root{
+  --bar:#0B0B0B; --bar-2:#1E2320; --bar-ink:#EDF1EE; --bar-muted:#A2ACA5; --bar-line:#2F3532;
+  --stage:#FFFF54; --on-stage:#0B0B0B; --green:#81FBA5; --bg:#FFFFFF; --ink:#0B0B0B; --muted:#4C5650; --line:#E4E4E4; --panel:#F3F4F3;
+  --sans:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bar:#050605; --bar-2:#1A1E1C; --bar-ink:#EDF1EE; --bar-muted:#A2ACA5; --bar-line:#2A2F2C;
+  --bg:#0B0B0B; --ink:#EDF1EE; --muted:#A2ACA5; --line:#2A2F2C; --panel:#151816; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bar:#050605; --bar-2:#1A1E1C; --bar-ink:#EDF1EE; --bar-muted:#A2ACA5; --bar-line:#2A2F2C;
+  --bg:#0B0B0B; --ink:#EDF1EE; --muted:#A2ACA5; --line:#2A2F2C; --panel:#151816; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;display:flex;flex-direction:column;overflow:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bar);z-index:10}
+.bar{background:var(--bar);color:var(--bar-ink);display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
+  padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--bar-line);flex:none}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--stage);color:var(--on-stage);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.name{font-size:16px;white-space:nowrap}
+.addr{font-family:var(--mono);font-size:12px;color:var(--bar-muted);background:var(--bar-2);border:1px solid var(--bar-line);border-radius:6px;padding:4px 8px;min-width:0;flex:1 1 160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bar label{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--bar-muted)}
+.bar select,.bar button{font:inherit;font-size:14px;color:var(--bar-ink);background:var(--bar-2);border:1px solid var(--bar-line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.bar select{max-width:270px}
+.bar button:hover,.bar select:hover{border-color:var(--bar-muted)}
+.bar :focus-visible{outline:2px solid var(--green);outline-offset:1px}
+.bar .count{font-family:var(--mono);font-size:11px;background:var(--green);color:#0B0B0B;border-radius:999px;padding:1px 6px;margin-left:4px}
+.frame{flex:1 1 auto;min-height:0;position:relative}
+iframe{border:0;width:100%;height:100%;display:block;background:var(--bg)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--bg);color:var(--ink);border-left:1px solid var(--line);box-shadow:-20px 0 40px rgba(0,0,0,.18);
+  z-index:20;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.drawer header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.drawer h2{font-size:22px;font-weight:400;margin:0}
+.drawer p.lead{margin:0;padding:10px 16px 0;color:var(--muted);font-size:14px}
+.drawer ol{list-style:none;margin:0;padding:8px 16px 24px;overflow:auto;display:grid;gap:10px;align-content:start;flex:1}
+.drawer li{border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:grid;gap:4px;min-width:0}
+.drawer li .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;justify-content:space-between}
+.drawer li .t{font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.drawer li .d{font-size:13.5px;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
+.drawer .empty{color:var(--muted);font-size:14px}
+.drawer button{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--bar);color:var(--bar-ink);border:1px solid var(--bar-line);
+  border-radius:8px;padding:10px 14px;font-size:14px;max-width:min(520px,calc(100% - 32px));box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.confirm{position:fixed;inset:0;z-index:25;background:rgba(11,11,11,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.confirm>div{background:var(--bg);color:var(--ink);border-radius:8px;max-width:440px;width:100%;padding:20px;display:grid;gap:14px}
+.confirm h2{font-size:22px;font-weight:400;margin:0}
+.confirm .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.confirm button{font:inherit;font-size:15px;border-radius:6px;padding:7px 14px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.confirm button.go{background:#0B0B0B;color:#FFFFFF;border-color:#0B0B0B}
+@media (max-width:560px){.name{display:none}.bar{gap:6px 8px;padding-block:6px}.bar select{max-width:190px}.bar button{font-size:13px;padding:4px 8px}.addr{order:9;flex-basis:100%}.bar label{display:none}}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}}}
+</style>
+
+<div class="bar" role="toolbar" aria-label="Staging controls">
+  <span class="tag">Staging</span>
+  <span class="name">Onboarding hub</span>
+  <div class="grp">
+    <label for="who">View as</label>
+    <select id="who"></select>
+  </div>
+  <div class="addr" id="addr" title="Page in the app">/</div>
+  <div class="grp">
+    <button type="button" id="b-hub">Hub</button>
+    <button type="button" id="b-admin">Admin</button>
+    <button type="button" id="b-log" aria-haspopup="dialog">Outbox<span class="count" id="log-n" hidden>0</span></button>
+    <button type="button" id="b-reset">Reset data</button>
+  </div>
+</div>
+<div class="frame"><iframe id="app" title="Onboarding hub (staging)"></iframe></div>
+
+<div class="drawer" id="drawer" role="dialog" aria-labelledby="dr-h" hidden>
+  <header><h2 id="dr-h">Outbox</h2><button type="button" id="dr-close">Close</button></header>
+  <p class="lead">What the app would send outside DataRobot: Jira issues, Slack messages and DMs. Nothing here is really sent.</p>
+  <ol id="dr-list"></ol>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<div class="confirm" id="reset-confirm" hidden><div role="dialog" aria-labelledby="rc-h">
+  <h2 id="rc-h">Reset staging data?</h2>
+  <p style="margin:0;color:var(--muted)">Users, learners, paths and reports go back to the sample data. This only affects your browser.</p>
+  <div class="row"><button type="button" id="rc-no">Cancel</button><button type="button" class="go" id="rc-yes">Reset</button></div>
+</div></div>
+
+<!--SRC-->
+<script>
+/*BACKEND*/
+</script>
+<script>
+(function () {
+  "use strict";
+  var SRC = JSON.parse(document.getElementById("stg-src").textContent);
+  var PERSONAS = [
+    { email: "lidiia.saakian@datarobot.com", name: "Lidiia Saakian", role: "System admin" },
+    { email: "jen.walsh@datarobot.com", name: "Jen Walsh", role: "Admin" },
+    { email: "omar.haddad@datarobot.com", name: "Omar Haddad", role: "Admin and Author" },
+    { email: "maria.novak@datarobot.com", name: "Maria Novak", role: "Author, path owner" },
+    { email: "priya.raman@datarobot.com", name: "Priya Raman", role: "Invited, no role yet" },
+    { email: "sam.okafor@datarobot.com", name: "Sam Okafor", role: "Learner" },
+    { email: "new.hire@datarobot.com", name: "New Hire", role: "Learner, first visit" }
+  ];
+  var LS = "onb-staging-shell";
+  function get() { try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch (e) { return {}; } }
+  function put(o) { try { localStorage.setItem(LS, JSON.stringify(Object.assign(get(), o))); } catch (e) {} }
+  var saved = get();
+  var who = document.getElementById("who"), frame = document.getElementById("app"), addr = document.getElementById("addr");
+  PERSONAS.forEach(function (p, i) { var o = document.createElement("option"); o.value = i; o.textContent = p.name + " · " + p.role; who.appendChild(o); });
+  var pi = Math.max(0, PERSONAS.findIndex(function (p) { return p.email === saved.who; }));
+  who.value = pi; STG.setViewer(PERSONAS[pi]);
+  var CUR = { path: saved.path || "/", hash: saved.hash || "" };
+
+  // ---------------------------------------------------------------- page preparation
+  var PRELUDE = "(" + function () {
+    var P = parent.STGSHELL, F = P.frameInfo(), BASE = "https://app.stg";
+    var lastClick = null, approved = null;
+    window.__STG = {
+      pathname: F.path,
+      go: function (u) { P.go(String(u), F.path); },
+      reload: function () { P.render(F.path, location.hash); },
+      mascot: function (k) { return parent.STG.mascot(k); }
+    };
+    var th = parent.document.documentElement.getAttribute("data-theme");
+    if (th) document.documentElement.setAttribute("data-theme", th);
+    var rs = history.replaceState.bind(history), ps = history.pushState.bind(history);
+    function fix(u) { if (u == null) return u; u = String(u); var i = u.indexOf("#"); return i >= 0 ? "about:srcdoc" + u.slice(i) : undefined; }
+    history.replaceState = function (s, t, u) { try { rs(s, t, fix(u)); } catch (e) {} P.address(F.path, location.hash); };
+    history.pushState = function (s, t, u) { try { ps(s, t, fix(u)); } catch (e) {} P.address(F.path, location.hash); };
+    if (F.hash) try { rs(null, "", "about:srcdoc" + F.hash); } catch (e) {}
+    addEventListener("hashchange", function () { P.address(F.path, location.hash); });
+    window.alert = function (m) { P.toast(String(m)); };
+    window.confirm = function (m) {
+      m = String(m);
+      if (approved === m) { approved = null; return true; }
+      var target = lastClick;
+      P.confirm(m, function () { approved = m; if (target && target.isConnected) target.click(); else approved = null; });
+      return false;
+    };
+    window.fetch = function (input, opts) {
+      opts = opts || {};
+      var url = new URL(typeof input === "string" ? input : input.url, BASE + F.path);
+      var h = {}, src = opts.headers || {};
+      if (typeof src.forEach === "function" && !Array.isArray(src)) src.forEach(function (v, k) { h[k.toLowerCase()] = v; });
+      else Object.keys(src).forEach(function (k) { h[k.toLowerCase()] = src[k]; });
+      var b = opts.body, text, file;
+      if (typeof b === "string") text = b; else if (b && typeof b.size === "number") file = b;
+      var res = parent.STG.request((opts.method || "GET").toUpperCase(), url.pathname, url.search.slice(1), h, text, file);
+      return new Promise(function (ok) {
+        setTimeout(function () {
+          var body = res.body;
+          if (body && body.__blob) ok(new Response(body.__blob, { status: 200, headers: { "content-type": body.__blob.type || "application/octet-stream" } }));
+          else ok(new Response(JSON.stringify(body), { status: res.status, headers: { "content-type": "application/json" } }));
+        }, 90);
+      });
+    };
+    document.addEventListener("click", function (e) { lastClick = e.target; }, true);
+    window.addEventListener("click", function (e) {
+      if (e.defaultPrevented) return;
+      var a = e.target.closest && e.target.closest("a[href]");
+      if (!a) return;
+      var href = a.getAttribute("href") || "";
+      if (!href || href.charAt(0) === "#" || /^(javascript|mailto|tel):/i.test(href)) return;
+      if (a.hasAttribute("download")) { e.preventDefault(); P.toast("Downloads don't work in the staging copy. Try this one in DataRobot."); return; }
+      var u; try { u = new URL(href, BASE + F.path); } catch (err) { return; }
+      if (u.origin === BASE) {
+        e.preventDefault();
+        if (a.hasAttribute("download") || /\/api\/|\.(csv|xlsx)$/.test(u.pathname)) { P.toast("Downloads don't work in the staging copy. Try this one in DataRobot."); return; }
+        P.go(u.pathname + u.hash, F.path);
+        return;
+      }
+      var jk = /atlassian\.net\/browse\/([A-Z][A-Z0-9_]+-\d+)/.exec(u.href);
+      if (jk && P.simulatedKey(jk[1])) { e.preventDefault(); P.toast(jk[1] + " is a simulated Jira issue. It doesn't exist in Jira."); return; }
+      if (!a.target) a.target = "_blank";
+    });
+  } + ")();";
+
+  var MASCOT_RE = /(return |src: )[^;,]*?"(?:assets\/)?mascots\/year-" \+ \(k < 10 \? "0" : ""\) \+ k \+ "\.png"/g;
+  function prepare(html) {
+    html = html.replace(/<link rel="stylesheet" href="(?:\.\.\/)?assets\/common\.css">/, function () { return "<style>" + SRC.css + "</style>"; })
+      .replace(/<script src="(?:\.\.\/)?assets\/common\.js"><\/script>/, function () { return "<script>" + SRC.js.replace(MASCOT_RE, "$1__STG.mascot(k)") + "<\/script>"; })
+      .replace(/location\.pathname/g, "__STG.pathname")
+      .replace(/location\.reload\(\)/g, "__STG.reload()")
+      .replace(/location\.href\s*=\s*([^;]+);/g, "__STG.go($1);")
+      .replace(MASCOT_RE, "$1__STG.mascot(k)");
+    var pre = "<script>" + PRELUDE + "<\/script>";
+    return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, function (m) { return m + pre; }) : pre + html;
+  }
+  function notFound(path) {
+    return '<!doctype html><meta charset="utf-8"><body style="font-family:Barlow,system-ui,sans-serif;padding:32px 16px;max-width:560px;margin:auto"><h1 style="font-weight:400">This page doesn\'t exist</h1><p>' +
+      path.replace(/[<>&]/g, "") + ' isn\'t a learning path in the staging data. It may have been deleted.</p><p><a href="../" onclick="parent.STGSHELL.go(\'/\', \'/\');return false">Back to the hub</a></p>';
+  }
+
+  // ---------------------------------------------------------------- navigation
+  function render(path, hash) {
+    CUR = { path: path, hash: hash || "" };
+    put({ path: CUR.path, hash: CUR.hash });
+    showAddr();
+    var html = STG.pageFor(path);
+    frame.srcdoc = html ? prepare(html) : notFound(path);
+  }
+  function showAddr() { addr.textContent = CUR.path + (CUR.hash || ""); }
+  function go(u, from) {
+    var url = new URL(u, "https://app.stg" + (from || CUR.path));
+    var path = url.pathname;
+    if (!/\/$/.test(path)) path += "/";
+    if (path === CUR.path && url.hash && frame.contentWindow) { frame.contentWindow.location.hash = url.hash; return; }
+    render(path, url.hash);
+  }
+  var toastT;
+  function toast(m) { var t = document.getElementById("toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 4200); }
+  function confirmBox(message, yes) {
+    var box = document.createElement("div"); box.className = "confirm";
+    box.innerHTML = '<div role="dialog" aria-modal="true"><p style="margin:0;font-size:16px;line-height:1.4"></p><div class="row"><button type="button">Cancel</button><button type="button" class="go">OK</button></div></div>';
+    box.querySelector("p").textContent = message;
+    var bs = box.querySelectorAll("button");
+    bs[0].onclick = function () { box.remove(); };
+    bs[1].onclick = function () { box.remove(); yes(); };
+    document.body.appendChild(box); bs[1].focus();
+  }
+  window.STGSHELL = {
+    frameInfo: function () { return CUR; },
+    go: go,
+    render: render,
+    address: function (path, hash) { CUR = { path: path, hash: hash || "" }; put({ path: path, hash: CUR.hash }); showAddr(); },
+    toast: toast,
+    confirm: confirmBox,
+    simulatedKey: function (k) { return STG.events().some(function (e) { return e.text.indexOf(k) >= 0; }) || /-9\d{3}$/.test(k); }
+  };
+
+  who.addEventListener("change", function () { var p = PERSONAS[+who.value]; STG.setViewer(p); put({ who: p.email }); render(CUR.path, CUR.hash); toast("Viewing as " + p.name + " (" + p.role + ")"); });
+  document.getElementById("b-hub").onclick = function () { render("/", ""); };
+  document.getElementById("b-admin").onclick = function () { render("/admin/", ""); };
+
+  // outbox
+  var drawer = document.getElementById("drawer"), list = document.getElementById("dr-list"), nEl = document.getElementById("log-n");
+  var seenN = saved.seen || 0;
+  function fmt(t) { var d = new Date(t); return d.toLocaleDateString(undefined, { day: "numeric", month: "short" }) + " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }); }
+  function drawLog() {
+    var ev = STG.events(), unseen = ev.length - seenN;
+    nEl.hidden = !(unseen > 0) || !drawer.hidden; nEl.textContent = unseen;
+    list.textContent = "";
+    if (!ev.length) { var e0 = document.createElement("li"); e0.className = "empty"; e0.style.border = "0"; e0.textContent = "Nothing yet. Report a DataRobot bug from a path, or give someone a role in Admin → Users."; list.appendChild(e0); return; }
+    ev.forEach(function (e) {
+      var li = document.createElement("li");
+      li.innerHTML = '<div class="k"><span></span><span></span></div><div class="t"></div>' + (e.detail ? '<div class="d"></div>' : "");
+      li.querySelector(".k span").textContent = { jira: "Jira", slack: "Slack" }[e.kind] || e.kind;
+      li.querySelectorAll(".k span")[1].textContent = fmt(e.at);
+      li.querySelector(".t").textContent = e.text;
+      if (e.detail) li.querySelector(".d").textContent = e.detail;
+      list.appendChild(li);
+    });
+  }
+  STG.onEvent(drawLog);
+  document.getElementById("b-log").onclick = function () { drawer.hidden = false; seenN = STG.events().length; put({ seen: seenN }); drawLog(); document.getElementById("dr-close").focus(); };
+  document.getElementById("dr-close").onclick = function () { drawer.hidden = true; drawLog(); };
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") drawer.hidden = true; });
+
+  var rc = document.getElementById("reset-confirm");
+  document.getElementById("b-reset").onclick = function () { rc.hidden = false; document.getElementById("rc-yes").focus(); };
+  document.getElementById("rc-no").onclick = function () { rc.hidden = true; };
+  document.getElementById("rc-yes").onclick = function () { rc.hidden = true; STG.reset(); seenN = 0; put({ seen: 0 }); drawLog(); render("/", ""); toast("Staging data is back to the sample."); };
+
+  drawLog();
+  render(CUR.path, CUR.hash);
+})();
+</script>

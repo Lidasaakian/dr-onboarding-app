@@ -1,0 +1,1042 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agentic AI Learning Path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a field manual. Header with one "data brick" per day; sidebar of days, each showing a brick per lab;
+   one day at a time in the main column, every step a checkbox. Brand: DataRobot green as the anchor,
+   black/white/gray base, solid colors only, regular weight type, mono caps for labels. */
+:root{
+  --bg:#FFFFFF;
+  --panel:#F3F4F3;
+  --ink:#0B0B0B;
+  --muted:#4C5650;
+  --line:#E4E4E4;
+  --green:#81FBA5;
+  --on-green:#0B0B0B;
+  --link:#5C41FF;
+  --yellow:#FFFF54;
+  --blue:#44BFFC;
+  --brick-empty:#E4E4E4;
+  --focus:#5C41FF;
+  --sans:"STK Miso","Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Monument Grotesk Mono","DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B0B0B;--panel:#151816;--ink:#EDF1EE;--muted:#A2ACA5;--line:#2A2F2C;
+    --link:#A6B0FF;--brick-empty:#2A2F2C;--focus:#A6B0FF;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B0B0B;--panel:#151816;--ink:#EDF1EE;--muted:#A2ACA5;--line:#2A2F2C;
+  --link:#A6B0FF;--brick-empty:#2A2F2C;--focus:#A6B0FF;color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.45;font-weight:400;margin:0}
+a{color:var(--link);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow,.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+code,pre,kbd{font-family:var(--mono)}
+code{font-size:.84em;background:var(--panel);padding:.08em .35em;border-radius:3px;overflow-wrap:anywhere}
+pre code{background:none;padding:0;font-size:inherit;overflow-wrap:normal}
+
+/* ---------- shell ---------- */
+.wrap{max-width:1240px;margin:0 auto;padding-inline:24px}
+.top{border-bottom:1px solid var(--line);padding-block:28px 22px}
+.top-row{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:flex-end;justify-content:space-between}
+.title-block{display:grid;gap:10px;min-width:0}
+.title-block h1{font-size:clamp(34px,5vw,56px);line-height:1.02;letter-spacing:-.02em}
+.who{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:15px;flex-wrap:wrap}
+.who img{width:24px;height:24px;border-radius:50%}
+.save-state{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line);border-radius:999px}
+.save-state[data-s="saving"]{border-color:var(--muted)}
+.save-state[data-s="local"]{background:var(--yellow);color:#0B0B0B;border-color:var(--yellow)}
+.meter{display:grid;gap:10px;min-width:min(100%,420px)}
+.meter-figs{display:flex;align-items:baseline;gap:12px}
+.meter-pct{font-size:44px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.meter-sub{color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
+.daybricks{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.daybrick{display:grid;gap:5px;text-decoration:none;color:var(--muted)}
+.daybrick .b{height:14px;background:var(--brick-empty);position:relative;overflow:hidden}
+.daybrick .b i{position:absolute;inset:0 auto 0 0;background:var(--green);width:0}
+.daybrick span{font-family:var(--mono);font-size:10px;letter-spacing:.06em}
+.daybrick[aria-current="true"] span{color:var(--ink)}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.btn{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--ink);border-radius:var(--r);padding:7px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn:hover{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.btn.primary{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.btn.primary:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.ghost{border-color:var(--line)}
+
+/* values panel */
+.values{border-bottom:1px solid var(--line);background:var(--panel);padding-block:20px}
+.values-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 18px}
+.field{display:grid;gap:6px;min-width:0}
+.field input{font:inherit;font-size:15px;font-family:var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;width:100%;min-width:0}
+.field input:focus{border-color:var(--ink);outline:none}
+.values p.hint{color:var(--muted);font-size:14px;margin-top:12px;max-width:80ch}
+
+/* frame: sidebar + main */
+.frame{display:grid;grid-template-columns:250px minmax(0,1fr);gap:48px;padding-block:32px 80px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;display:grid;gap:2px;max-height:calc(100vh - 32px);overflow:auto}
+.nav-item{display:grid;gap:6px;padding:10px 12px;border-radius:var(--r);text-decoration:none;color:var(--ink);border:1px solid transparent}
+.nav-item:hover{background:var(--panel)}
+.nav-item[aria-current="page"]{background:var(--panel);border-color:var(--line)}
+.nav-item .nh{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.nav-item .nt{font-size:16px;line-height:1.2}
+.nav-item .nc{font-family:var(--mono);font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.labbricks{display:flex;gap:3px;flex-wrap:wrap}
+.labbricks i{width:14px;height:6px;background:var(--brick-empty);position:relative;overflow:hidden;display:block}
+.labbricks i b{position:absolute;inset:0 auto 0 0;background:var(--green)}
+.labbricks i.opt{opacity:.55}
+.side .sep{height:1px;background:var(--line);margin:8px 12px}
+
+main{min-width:0}
+[data-page]{display:grid;gap:28px;max-width:860px}
+.page-head{display:grid;gap:12px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.page-head h2{font-size:clamp(30px,4vw,42px);line-height:1.06;letter-spacing:-.02em}
+.page-head .lede{font-size:19px;color:var(--muted);max-width:68ch}
+.module{display:grid;gap:18px}
+.module-head{display:grid;gap:8px;padding-top:6px}
+.module-head h3{font-size:28px;line-height:1.1}
+.goal{font-size:18px;max-width:68ch}
+.explain{color:var(--ink);max-width:68ch}
+.readfirst{display:grid;gap:8px;padding:16px 18px;border:1px solid var(--line);border-radius:var(--r)}
+.readfirst ul{margin:0;padding-left:18px;display:grid;gap:4px}
+
+/* lab cards */
+.lab{border:1px solid var(--line);border-radius:var(--r);display:grid;scroll-margin-top:20px}
+.lab-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.lab-num{font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:4px 8px;background:var(--panel);border-radius:3px;white-space:nowrap}
+.lab.done .lab-num{background:var(--green);color:var(--on-green)}
+.lab-head h4{font-size:21px;line-height:1.15}
+.lab-count{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 7px;margin-left:8px;vertical-align:3px;color:var(--muted)}
+.lab-body{display:grid;gap:16px;padding:16px 18px 18px;min-width:0}
+.lab-body > p,.lab-body > .explain{max-width:68ch}
+
+/* tasks */
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.task{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;align-items:start}
+.tb{display:grid;gap:10px;min-width:0}
+.tb > ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.tick{appearance:none;-webkit-appearance:none;width:22px;height:22px;margin:1px 0 0;border:1.5px solid var(--ink);border-radius:4px;background:var(--bg);cursor:pointer;display:grid;place-content:center}
+.tick::after{content:"";width:11px;height:6px;border-left:2px solid var(--on-green);border-bottom:2px solid var(--on-green);transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.tick:checked{background:var(--green);border-color:var(--green)}
+.tick:checked::after{opacity:1}
+.task.is-done > .tb > p:first-child{color:var(--muted)}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{background:var(--green)}100%{background:transparent}}
+
+.checkpoint,.selfcheck{border-radius:var(--r);padding:14px 16px}
+.checkpoint{border:1.5px solid var(--green);}
+.selfcheck{background:var(--panel)}
+.checkpoint .label,.selfcheck .label{color:var(--ink)}
+
+/* callouts */
+.note,.known{display:grid;grid-template-columns:6px minmax(0,1fr);gap:14px;padding:12px 14px 12px 0;max-width:72ch}
+.note::before,.known::before{content:"";background:var(--blue)}
+.known::before{background:var(--yellow)}
+.note > div,.known > div{display:grid;gap:6px;min-width:0}
+.known .label::before{content:"Known issue"}
+.note .label::before{content:attr(data-l)}
+
+/* code */
+.code{position:relative;min-width:0}
+.code pre{margin:0;background:var(--panel);border-radius:var(--r);padding:38px 16px 14px;font-size:13.5px;line-height:1.55;overflow-x:auto;white-space:pre}
+.copy{position:absolute;top:8px;right:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:4px 8px;cursor:pointer}
+.copy:hover{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.ph{border-bottom:1.5px dashed var(--link);color:inherit}
+.ph.filled{background:var(--green);color:var(--on-green);border-bottom:0;padding:0 2px;border-radius:2px}
+.cm{color:var(--muted)}
+
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--sans);font-size:14px;color:var(--muted);font-weight:400;background:var(--panel)}
+td code{white-space:nowrap}
+td.wrap code{white-space:normal}
+
+/* overview */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.how{margin:0;padding-left:18px;display:grid;gap:8px;max-width:72ch}
+
+/* learning log */
+
+/* team */
+.team-row-name{display:flex;align-items:center;gap:10px;min-width:160px}
+.team-row-name img{width:28px;height:28px;border-radius:50%}
+.minibricks{display:grid;grid-template-columns:repeat(8,22px);gap:3px}
+.minibricks i{height:12px;background:var(--brick-empty);position:relative;overflow:hidden;display:block}
+.minibricks i b{position:absolute;inset:0 auto 0 0;background:var(--green)}
+.empty{padding:28px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);max-width:68ch}
+.foot{color:var(--muted);font-size:14px;max-width:72ch;border-top:1px solid var(--line);padding-top:16px}
+
+/* responsive */
+
+/* rebuild: content generated from the Google Doc */
+[data-page] > p,[data-page] > .block,[data-page] > ul{max-width:72ch}
+[data-page] > .block ul,[data-page] > ul{margin:0;padding-left:18px;display:grid;gap:6px}
+h2.mod{font-size:clamp(26px,3.4vw,34px);line-height:1.1;letter-spacing:-.015em;padding-top:18px;border-top:1px solid var(--line)}
+[data-page] > h2.mod:first-child{border-top:0;padding-top:0}
+h3.sub{font-size:20px;line-height:1.2}
+.lab-head h3{font-size:21px;line-height:1.2;font-weight:400}
+.lab-head{display:flex;align-items:center;gap:14px}
+.lab-head h3{flex:1;min-width:0}
+.lab-head .labtick{display:contents}
+.lab-body ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.lab-body > p{max-width:72ch}
+.tb > p + p{margin-top:0}
+td.tickcell{white-space:nowrap}
+td.tickcell .tick{display:inline-grid;vertical-align:middle;margin-right:8px}
+.celltick{white-space:nowrap}
+.foot{font-style:normal}
+.values .hint{color:var(--muted);font-size:14px;margin-top:12px}
+
+@media (max-width:900px){
+  .frame{grid-template-columns:minmax(0,1fr);gap:20px;padding-block:16px 64px}
+  .side{position:static;max-height:none;display:flex;overflow-x:auto;gap:6px;padding-bottom:6px;margin-inline:-4px}
+  .side .sep{display:none}
+  .nav-item{flex:0 0 auto;min-width:150px}
+  }
+@media (max-width:520px){
+  .wrap{padding-inline:16px}
+  body{font-size:16px}
+  .lab-head{padding:12px 14px}
+  .lab-body{padding:14px}
+  .meter-pct{font-size:36px}
+  .daybrick span{font-size:9px}
+}
+.backlink{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.backlink:hover{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}}
+.rightcol{display:grid;gap:14px;min-width:min(100%,420px)}
+.top-row{align-items:flex-start}
+.mascot-slot{min-width:0}
+.rightcol .onb-mascot{max-width:none}
+.linkpop{position:absolute;z-index:45;display:flex;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--ink);border-radius:6px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.linkpop input{font:inherit;font-size:13px;font-family:var(--mono);border:1px solid var(--line);border-radius:4px;padding:3px 6px;width:min(420px,60vw)}
+.linkpop button{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);padding:3px 8px;cursor:pointer}
+</style>
+<style>[hidden]{display:none!important}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<link rel="stylesheet" href="../assets/common.css">
+<script src="../assets/common.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="backlink" href="../">&larr; All learning paths</a>
+    <div class="top-row" style="margin-top:10px">
+      <div class="title-block">
+        <h1 id="doc-title">DataRobot Onboarding: Agentic AI Learning Path</h1>
+        <div class="who"><img id="who-avatar" alt="" hidden><span id="who-name"></span><span class="save-state" id="save-state" data-s="init">Loading</span></div>
+        <div class="onb-pace" id="pace"></div>
+        <div id="badge" hidden></div>
+      </div>
+      <div class="rightcol">
+      <div id="mascot" class="mascot-slot"></div>
+      <div class="meter" aria-label="Overall progress">
+        <div class="meter-figs"><span class="meter-pct" id="pct">0%</span><span class="meter-sub" id="pct-sub">0 of 0 steps</span></div>
+        <nav class="daybricks" id="daybricks" aria-label="Days"></nav>
+      </div>
+      </div>
+    </div>
+    <div class="top-actions" id="top-actions">
+      <button class="btn primary" id="btn-resume" type="button">Continue where I left off</button>
+      <button class="btn ghost" id="btn-values" type="button" aria-expanded="false" aria-controls="values">Your values</button>
+    </div>
+  </div>
+</header>
+
+<section class="values" id="values" hidden>
+  <div class="wrap">
+    <div class="values-grid">
+      <label class="field"><span class="label">YOUR_DR_HOST</span><input id="v-host" placeholder="app.datarobot.com" autocomplete="off" spellcheck="false"></label>
+      <label class="field"><span class="label">INITIALS</span><input id="v-initials" placeholder="ls" autocomplete="off" spellcheck="false"></label>
+      <label class="field"><span class="label">YOUR_USE_CASE_ID</span><input id="v-usecase" autocomplete="off" spellcheck="false"></label>
+      <label class="field"><span class="label">YOUR_AGENT_DEPLOYMENT_ID</span><input id="v-deployment" autocomplete="off" spellcheck="false"></label>
+    </div>
+    <p class="hint">Fills in these placeholders throughout the page. Don't enter your API key here.</p>
+  </div>
+</section>
+
+<div class="onb-editbar" id="editbar" hidden>
+  <div class="wrap">
+    <b>Editing the Agentic AI Learning Path.</b><span>Click any text to change it. Click a link to change where it goes. Changes aren't live until you publish.</span>
+    <span style="flex:1"></span>
+    <button class="btn" id="ed-discard" type="button">Discard changes</button>
+    <button class="btn primary" id="ed-publish" type="button">Review and publish</button>
+  </div>
+</div>
+<div class="wrap frame">
+  <nav class="side" id="side" aria-label="Learning path"></nav>
+  <main id="main">
+<section data-page="start" data-title="Before you start" data-short="D0" hidden>
+<p><b>Audience:</b> new team members who are comfortable with Python, a terminal, git and REST APIs.</p><p><b>Scope:</b> DataRobot Agentic AI product functionality only (build, evaluate, deploy, monitor agents; RAG, vector databases, LLM gateway, tools, MCP, prompt management).</p><p><b>Duration:</b> 7 working days (about 5–6 hours per day). Companion document: <i>DataRobot Onboarding: Workloads (Workload API) Learning Path</i>, planned for the following 4 days.</p><p><b>Source of truth:</b> <a href="https://docs.datarobot.com/en/docs/agentic-ai/index.html" target="_blank" rel="noopener">DataRobot Agentic AI documentation</a>. Every module links to the pages it is built from. If a step here and the docs disagree, follow the docs and flag the difference to the path owner.</p><h2 class="mod" id="s-how-to-use-this-learning-path">How to use this learning path</h2><div class="block"><ul><li>Work through the days in order. Each module has the same shape: <b>Goal → Read first → Hands-on lab (numbered steps) → Checkpoint → Check yourself</b>.</li><li>Keep a personal <b>learning log</b> (template in Appendix D). Record every ID you create (Use Case, vector database, playground, deployment IDs). You will reuse them on later days.</li><li>Prefix every asset you create with your initials, for example ls-onb-, so shared environments stay tidy and you can clean up easily.</li><li>Placeholders used throughout: YOUR_DR_HOST is your DataRobot host name <b>without</b> https:// (for example app.datarobot.com, app.eu.datarobot.com, app.jp.datarobot.com, or your organization's own host); commands already include the https:// prefix. YOUR_API_TOKEN is your DataRobot API key. INITIALS is your prefix.</li><li>Items marked <b>(Optional)</b> or <b>(Stretch)</b> can be skipped if you are short on time or if the feature is not enabled in your environment.</li></ul></div><h2 class="mod" id="s-before-you-start-day-0-checklist">Before you start (Day 0 checklist)</h2><div class="tbl"><table><thead><tr><th>Item</th><th>Why</th><th>Done?</th></tr></thead><tbody><tr><td>DataRobot account on the environment your team uses, with Agentic AI and the LLM gateway enabled</td><td>Agentic AI, the LLM gateway, and evaluation/moderation guardrails are premium features. A trial account has them in limited form. Ask your manager or org admin if a menu in this guide is missing.</td><td class="tickcell"><span class="celltick" data-t="0.1"></span></td></tr><tr><td>Laptop: macOS, Linux, or Windows (after completing the Windows prerequisites; WSL, a DataRobot codespace or a VM also work), Python 3.10+, at least 4 GB RAM, admin rights to install tools</td><td>Required by the Agentic Starter template (<a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-get-started.html" target="_blank" rel="noopener">system requirements</a>).</td><td class="tickcell"><span class="celltick" data-t="0.2"></span></td></tr><tr><td>A code editor (VS Code, PyCharm, Cursor)</td><td>You will edit agent code on Days 4–5.</td><td class="tickcell"><span class="celltick" data-t="0.3"></span></td></tr><tr><td>(Optional) An AI coding agent such as Claude Code, Cursor, Codex or Gemini CLI</td><td>Used for DataRobot agentic skills and Agent Assist on Day 7.</td><td class="tickcell"><span class="celltick" data-t="0.4" data-opt></span></td></tr><tr><td>A buddy on the team</td><td>Someone to share assets with and to review your capstone.</td><td class="tickcell"><span class="celltick" data-t="0.5"></span></td></tr></tbody></table></div><h2 class="mod" id="s-the-big-picture-how-the-pieces-fit">The big picture: how the pieces fit</h2><p>DataRobot organizes Agentic AI around a lifecycle: <b>Build → Evaluate → Deploy → Monitor &amp; govern</b>. You build agents in code (usually from the Agentic Starter template with the DataRobot CLI), evaluate them in an agentic playground, register and deploy them through Registry, and monitor them in Console. RAG (retrieval-augmented generation) building blocks—vector databases, LLM blueprints and RAG playgrounds—live alongside agents and share the same evaluation, tracing and deployment machinery.</p><div class="tbl"><table><thead><tr><th>Building block</th><th>What it is</th><th>Where you find it</th></tr></thead><tbody><tr><td>Use Case</td><td>A container that groups related assets: datasets, vector databases, playgrounds, codespaces.</td><td>Workbench → Use Cases</td></tr><tr><td>LLM gateway</td><td>One OpenAI-compatible DataRobot endpoint that proxies many provider LLMs (Azure OpenAI, Anthropic, Google and others). No provider keys needed in your code.</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/genai/llmgw; dr llm list</td></tr><tr><td>Vector database (VDB)</td><td>Chunked, embedded documents used for retrieval. Types: <i>resident</i> (built and stored in DataRobot, up to 10 GB), <i>connected</i> (stored in an external provider, up to 100 GB), <i>external</i> (hosted via the Registry workshop).</td><td>Use Case → Vector databases</td></tr><tr><td>RAG playground and LLM blueprint</td><td>A playground is where you build and compare LLM blueprints. A blueprint = base LLM + settings + optional VDB + system prompt.</td><td>Use Case → Playgrounds</td></tr><tr><td>Agentic workflow</td><td>An agent packaged as a DataRobot custom model with target type agenticworkflow. It exposes a chat() hook (OpenAI-compatible chat completions).</td><td>Registry → Workshop / Models</td></tr><tr><td>Agentic Starter template</td><td>A ready-to-use application: agent (LangGraph, CrewAI, LlamaIndex, NAT or generic), FastAPI backend, React frontend and MCP server, deployed with Pulumi.</td><td><a href="https://github.com/datarobot-community/datarobot-agent-application" target="_blank" rel="noopener">datarobot-agent-application</a> on GitHub</td></tr><tr><td>DataRobot CLI (dr)</td><td>Terminal tool for auth, templates, local dev and deployment: dr start, dr run dev, dr run deploy-dev, dr run deploy.</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/overview.html" target="_blank" rel="noopener">CLI overview</a></td></tr><tr><td>Agentic playground</td><td>Where you connect agentic workflows, chat, compare, trace and evaluate them with metrics and evaluation datasets.</td><td>Use Case → Playgrounds</td></tr><tr><td>Tools and MCP</td><td>Agents call tools: local tools in code, DataRobot global tools ([Tool] models in Registry), or tools hosted on an MCP server (DataRobot Global MCP, standalone MCP template, or the MCP server bundled with Agentic Starter).</td><td>Registry; MCP endpoints</td></tr><tr><td>Prompt management</td><td>Versioned, shareable prompt templates with {{ variables }}, callable from agent code.</td><td>Registry → Prompts</td></tr><tr><td>Evaluation and moderation guardrails</td><td>Metrics and guard models (for example prompt injection, toxicity, PII) applied to prompts and responses.</td><td>Playground → Evaluation; Workshop → Assemble</td></tr><tr><td>Tracing (OpenTelemetry)</td><td>End-to-end traces of each request: LLM calls, tool calls, latency, tokens. Available locally (dr xp) and on the platform.</td><td>Local dashboard on port 8090; playground and deployment Tracing tabs</td></tr><tr><td>Console deployment</td><td>A production deployment of an agent with service health, usage, custom metrics, tracing, logs and moderation events.</td><td>Console → Deployed workloads → Agentic Workflow tab</td></tr><tr><td>Agent Assist and agentic skills</td><td>dr assist designs, simulates, codes and deploys agents through conversation. Agentic skills teach third-party coding agents DataRobot workflows.</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agent-assist/index.html" target="_blank" rel="noopener">Agent Assist</a>; <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-skills.html" target="_blank" rel="noopener">Agentic skills</a></td></tr></tbody></table></div><h2 class="mod" id="s-schedule-at-a-glance">Schedule at a glance</h2><div class="tbl"><table><thead><tr><th>Day</th><th>Modules</th><th>Outcome by end of day</th></tr></thead><tbody><tr><td>1</td><td>M0 Orientation; M1 Environment setup</td><td>Tools installed, CLI authenticated, first LLM gateway call made, Use Case created.</td></tr><tr><td>2</td><td>M2 Vector database and RAG playground; M3 Evaluate RAG</td><td>A VDB built from sample documents, two LLM blueprints compared, synthetic evaluation dataset and aggregated metrics produced.</td></tr><tr><td>3</td><td>M4 Your first agent with the Agentic Starter</td><td>Agent app running locally; code structure understood; local traces inspected.</td></tr><tr><td>4</td><td>M5 Customize the agent</td><td>Prompts changed, a local tool added, LLM switched, MCP and prompt management explored.</td></tr><tr><td>5</td><td>M6 Evaluate the agent in DataRobot</td><td>Agent connected to an agentic playground, evaluated with metrics and an evaluation dataset.</td></tr><tr><td>6</td><td>M7 Deploy, govern and monitor</td><td>Agent deployed to Console, called via API, monitoring tabs explored, guardrails understood.</td></tr><tr><td>7</td><td>M8 Accelerators; M9 Capstone</td><td>Agent Assist and skills tried; capstone agent built, evaluated, deployed and demoed.</td></tr></tbody></table></div>
+</section>
+<section data-page="day1" data-title="M0 Orientation; M1 Environment setup" data-short="D1" hidden>
+<h2 class="mod" id="s-day-1-module-0-orientation-1-1-5-h">Day 1 — Module 0: Orientation (1–1.5 h)</h2><p><b>Goal:</b> build a mental model of the Agentic AI product before touching anything.</p><h3 class="sub">Read first</h3><div class="block"><ul><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/index.html" target="_blank" rel="noopener">Agentic AI overview</a> — the lifecycle and section map.</li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-overview.html" target="_blank" rel="noopener">Agent components</a> — the files every DataRobot agent has.</li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-mcp/agentic-mcp-overview.html" target="_blank" rel="noopener">MCP server overview</a> — skim “How MCP works” and “DataRobot MCP server types”.</li><li><a href="https://docs.datarobot.com/en/docs/reference/gen-ai-ref/genai-consider.html" target="_blank" rel="noopener">Generative AI feature considerations</a> — limits worth knowing early.</li></ul></div><article class="lab" id="lab-m0"><div class="lab-head"><h3>Hands-on task</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="m0.1"><div class="tb"><p>In your learning log, write a one-sentence definition, in your own words, for each building block in the table above.</p></div></li></ol><ol class="tasks"><li data-t="m0.2"><div class="tb"><p>Draw (on paper or a whiteboard) the path of a single user message: user → agent (chat hook) → LLM gateway → tool / MCP server → response → trace.</p></div></li></ol><ol class="tasks"><li data-t="m0.cy" class="selfcheck"><div class="tb"><p><b>Check yourself:</b> What is the difference between a RAG playground and an agentic playground? What target type does an agentic workflow custom model use? Name the three MCP server options DataRobot offers.</p></div></li></ol></div></article><h2 class="mod" id="s-day-1-module-1-environment-setup-3-4-h">Day 1 — Module 1: Environment setup (3–4 h)</h2><p><b>Goal:</b> a working local environment, an authenticated CLI, a Use Case, and a first call through the LLM gateway.</p><h3 class="sub">Read first</h3><div class="block"><ul><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/getting-started.html" target="_blank" rel="noopener">Getting started with the DataRobot CLI</a></li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-get-started.html" target="_blank" rel="noopener">Agentic AI: Get started</a> — sections “System requirements” and “Install prerequisite tools”.</li><li><a href="https://docs.datarobot.com/en/docs/platform/acct-settings/api-key-mgmt.html" target="_blank" rel="noopener">API key management</a></li></ul></div><article class="lab" id="lab-1-1"><div class="lab-head"><h3>Lab 1.1 — Create an API key and note your endpoint</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="1.1.1"><div class="tb"><p>Log in to DataRobot. Open the user menu (top right) → <b>API keys and tools</b> → create a new key named <span class="ph" data-tok="INITIALS">INITIALS</span>-onboarding. Copy it.</p></div></li></ol><ol class="tasks"><li data-t="1.1.2"><div class="tb"><p>Your API endpoint is https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2 (for example https://app.datarobot.com/api/v2). Make sure you don’t end up with https://https://.</p></div></li></ol><ol class="tasks"><li data-t="1.1.3"><div class="tb"><p>Add both to your shell profile so every terminal has them:</p><div class="code"><pre><code>export DATAROBOT_ENDPOINT="https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2"
+export DATAROBOT_API_TOKEN="YOUR_API_TOKEN"</code></pre></div></div></li></ol></div></article><article class="lab" id="lab-1-2"><div class="lab-head"><h3>Lab 1.2 — Create your onboarding Use Case</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="1.2.1"><div class="tb"><p>In Workbench, create a Use Case named <span class="ph" data-tok="INITIALS">INITIALS</span> – Agentic onboarding (<a href="https://docs.datarobot.com/en/docs/workbench/nxt-workbench/usecases/usecase-overview.html" target="_blank" rel="noopener">how to create a Use Case</a>).</p></div></li></ol><ol class="tasks"><li data-t="1.2.2"><div class="tb"><p>Copy the Use Case ID from the browser URL and record it in your learning log. You will pass it to dr start on Day 3.</p></div></li></ol></div></article><article class="lab" id="lab-1-3"><div class="lab-head"><span class="labtick" data-t="1.3.lab"></span><h3>Lab 1.3 — Install the prerequisite tools</h3><span class="lab-count"></span></div><div class="lab-body"><p>Install system-wide (not inside a virtual environment). Minimum versions come from the Agentic Starter prerequisites.</p><div class="tbl"><table><thead><tr><th>Tool</th><th>Min. version</th><th>Verify with</th></tr></thead><tbody><tr><td>DataRobot CLI (dr-cli)</td><td>0.2.77</td><td>dr --version</td></tr><tr><td>git</td><td>2.30.0</td><td>git --version</td></tr><tr><td>uv</td><td>0.10.0</td><td>uv --version</td></tr><tr><td>Pulumi</td><td>3.163.0</td><td>pulumi version</td></tr><tr><td>Taskfile (task)</td><td>3.43.3</td><td>task --version</td></tr><tr><td>Node.js</td><td>24</td><td>node --version</td></tr><tr><td>C++ build tools</td><td>—</td><td>macOS: xcode-select --install; Linux: build-essential</td></tr></tbody></table></div><p><b>macOS (Homebrew):</b></p><div class="code"><pre><code>brew install datarobot-oss/taps/dr-cli uv pulumi/tap/pulumi go-task node git
+xcode-select --install</code></pre></div><p><b>Linux (Debian/Ubuntu or a DataRobot codespace):</b></p><div class="code"><pre><code>curl https://cli.datarobot.com/install | sh
+sudo apt-get update
+sudo apt-get install -y python3 python3-pip python3-venv build-essential git
+curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -fsSL https://get.pulumi.com | sh
+sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+sudo apt-get install -y nodejs npm   # see note below: you need Node.js 24+</code></pre></div><p>Most distributions’ default nodejs package is older than 24. If node --version shows less than v24, install Node.js 24 from the <a href="https://nodejs.org/en/download" target="_blank" rel="noopener">official Node.js downloads</a> (for example via nvm or the NodeSource packages) instead.</p><p><b>After installing:</b></p><div class="code"><pre><code>uv tool update-shell      # so your shell picks up uv-installed tools
+pulumi login --local      # local Pulumi state; no Pulumi account needed</code></pre></div><p>Windows users: follow the <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-get-started.html" target="_blank" rel="noopener">Windows prerequisites</a> (symlinks, Developer Mode, Git usr\bin on PATH) before cloning anything, or use WSL.</p></div></article><article class="lab" id="lab-1-4"><div class="lab-head"><span class="labtick" data-t="1.4.lab"></span><h3>Lab 1.4 — Authenticate the CLI</h3><span class="lab-count"></span></div><div class="lab-body"><div class="code"><pre><code>dr auth set-url            # enter 1 for app.datarobot.com, 2 for EU, 3 for JP, or your own URL
+dr auth login              # opens the browser; credentials are saved to ~/.config/datarobot/drconfig.yaml
+dr templates list          # proves authentication works</code></pre></div><p>If anything fails, see “Common issues” in <a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/getting-started.html" target="_blank" rel="noopener">CLI getting started</a> (dr auth logout then dr auth login fixes most token problems)v . Keep the <a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/quick-reference.html" target="_blank" rel="noopener">CLI quick reference</a> open this week.</p></div></article><article class="lab" id="lab-1-5"><div class="lab-head"><h3>Lab 1.5 — Your first LLM gateway call</h3><span class="lab-count"></span></div><div class="lab-body"><p><b>Why:</b> every agent and blueprint in this path talks to an LLM. The gateway gives you one endpoint and one credential (your DataRobot key) for many models.</p><ol class="tasks"><li data-t="1.5.1"><div class="tb"><p>List the models your org can use:</p><div class="code"><pre><code>dr llm list                      # table: ID, NAME, SOURCE (gateway | deployed), PROVIDER, MODEL, CONTEXT
+dr llm list --output-format json</code></pre></div></div></li></ol><ol class="tasks"><li data-t="1.5.2"><div class="tb"><p>Same list through the REST API:</p><div class="code"><pre><code>curl -s -H "Authorization: Bearer $DATAROBOT_API_TOKEN" \
+  "$DATAROBOT_ENDPOINT/genai/llmgw/catalog/" | jq '[.data[] | select(.isActive == true) | .model]'</code></pre></div></div></li></ol><ol class="tasks"><li data-t="1.5.3"><div class="tb"><p>Call two different models (Replace placeholders with real IDs from the MODEL column of dr llm list) with the OpenAI Python client. Create a virtual environment, then run:</p><div class="code"><pre><code>pip install openai datarobot
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url=os.environ["DATAROBOT_ENDPOINT"] + "/genai/llmgw",
+    api_key=os.environ["DATAROBOT_API_TOKEN"],
+)
+
+# Pick two models from the MODEL column of `dr llm list`
+for model in ["MODEL_FROM_LIST_1", "MODEL_FROM_LIST_2"]:
+    r = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": "In one sentence, what is an AI agent?"}],
+    )
+    print(model, "-&gt;", r.choices[0].message.content)</code></pre></div></div></li></ol><ol class="tasks"><li data-t="1.5.4"><div class="tb"><p>Try an unsupported model name (for example unsupported-provider/random-llm) and read the error.</p></div></li></ol><p>Reference: <a href="https://docs.datarobot.com/en/docs/agentic-ai/genai-code/dr-llm-gateway.html" target="_blank" rel="noopener">Use the DataRobot LLM gateway</a> (also shows LLMGatewayCatalog for filtering active/deprecated models) and <a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/commands/llm-gateway.html" target="_blank" rel="noopener">dr llm-gateway command</a>.</p><ol class="tasks"><li data-t="m1.cp" class="checkpoint"><div class="tb"><p><b>Checkpoint:</b> dr templates list works, dr llm list returns models, and your script prints two answers.</p></div></li></ol><ol class="tasks"><li data-t="m1.cy" class="selfcheck"><div class="tb"><p><b>Check yourself:</b> In agent code, the gateway model name uses the format datarobot/&lt;provider&gt;/&lt;model&gt;. How does that differ from what you passed to the OpenAI client above, and why? (Hint: see “Model format for LLM gateway” in <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-llm-providers.html" target="_blank" rel="noopener">Configure LLM providers in code</a>—LiteLLM uses the datarobot/ prefix to route.)</p></div></li></ol></div></article>
+</section>
+<section data-page="day2" data-title="M2 Vector database and RAG playground; M3 Evaluate RAG" data-short="D2" hidden>
+<h2 class="mod" id="s-day-2-module-2-vector-database-and-rag-playground-3-h">Day 2 — Module 2: Vector database and RAG playground (3 h)</h2><p><b>Goal:</b> understand retrieval-augmented generation in DataRobot by building a vector database and comparing LLM blueprints with and without it.</p><p><b>Explanation:</b> an LLM only knows what it was trained on. RAG retrieves relevant chunks of <i>your</i> documents from a vector database and adds them to the prompt, so answers are grounded and cite sources. In DataRobot, an <b>LLM blueprint</b> captures the full recipe: base LLM, generation settings (temperature, max tokens…), system prompt, context state, and optionally a VDB with retrieval settings.</p><h3 class="sub">Read first</h3><div class="block"><ul><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/vector-database/vector-dbs-data.html" target="_blank" rel="noopener">Vector database data sources</a> — dataset requirements (document and document_file_path columns, ZIP or CSV).</li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/vector-database/vector-dbs.html" target="_blank" rel="noopener">Create a vector database</a> — skim chunking and embedding settings.</li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/playground-tools/playground-overview.html" target="_blank" rel="noopener">Playground overview</a> and <a href="https://docs.datarobot.com/en/docs/agentic-ai/playground-tools/build-llm-blueprints.html" target="_blank" rel="noopener">Build LLM blueprints</a>.</li></ul></div><h3 class="sub">Dataset</h3><p><b>Pirate resumes</b> — a public DataRobot sample ZIP of resume documents, used in the official <a href="https://docs.datarobot.com/en/docs/agentic-ai/genai-code/genai-e2e.html" target="_blank" rel="noopener">end-to-end GenAI walkthrough</a>:</p><div class="code"><pre><code>https://s3.amazonaws.com/datarobot_public_datasets/genai/pirate_resumes.zip</code></pre></div><p>A ZIP is processed automatically into document + document_file_path columns. All files must sit at the root of the archive or in a single folder.</p><article class="lab" id="lab-2-1"><div class="lab-head"><h3>Lab 2.1 — Add the dataset</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="2.1.1"><div class="tb"><p>Open your Use Case → add data → choose the import-from-URL option and paste the dataset URL above. (Alternative: download the ZIP and upload the local file.)</p></div></li></ol><ol class="tasks"><li data-t="2.1.2"><div class="tb"><p>Wait until processing finishes. Open the dataset and confirm it has document and document_file_path columns. Read two or three resumes so you know what questions to ask later.</p></div></li></ol></div></article><article class="lab" id="lab-2-2"><div class="lab-head"><h3>Lab 2.2 — Build a resident vector database</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="2.2.1"><div class="tb"><p>In the Use Case, click <b>Add → Vector database → Create vector database</b>.</p></div></li></ol><ol class="tasks"><li data-t="2.2.2"><div class="tb"><p>Provider: <b>DataRobot</b> (resident). Data source: the pirate resumes dataset.</p></div></li></ol><ol class="tasks"><li data-t="2.2.3"><div class="tb"><p>Embedding model: keep the DataRobot-provided default. Chunking: keep the default (recursive) method and note the chunk size and overlap values.</p></div></li></ol><ol class="tasks"><li data-t="2.2.4"><div class="tb"><p>Name it <span class="ph" data-tok="INITIALS">INITIALS</span>-pirate-resumes-vdb and save. Wait for the build to complete; record the VDB ID.</p></div></li></ol><ol class="tasks"><li data-t="2.2.5"><div class="tb"><p>Open the VDB details and review what DataRobot reports (chunks, embedding model, versions).</p></div></li></ol><p><b>Tip:</b> For your own data later, a CSV with one text column renamed to document and a document_file_path column containing “fake” paths such as /kb/1234.txt works, plus up to 50 metadata columns for filtering.</p></div></article><article class="lab" id="lab-2-3"><div class="lab-head"><h3>Lab 2.3 — Create a RAG playground and compare two blueprints</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="2.3.1"><div class="tb"><p>In the Use Case, open the <b>Playgrounds</b> tile → <b>Add Playground → Add RAG playground</b>. Rename it <span class="ph" data-tok="INITIALS">INITIALS</span>-rag-playground.</p></div></li></ol><ol class="tasks"><li data-t="2.3.2"><div class="tb"><p><b>Blueprint A (no retrieval):</b> Select LLM → pick a model available to you → Save. Set a system prompt:<br>You are a recruiting assistant for a pirate crew. Answer concisely. If you do not know, say so.</p></div></li></ol><ol class="tasks"><li data-t="2.3.3"><div class="tb"><p>Copy Blueprint A to create <b>Blueprint B</b>, then on the <b>Vector database</b> tab select <span class="ph" data-tok="INITIALS">INITIALS</span>-pirate-resumes-vdb. Save.</p></div></li></ol><ol class="tasks"><li data-t="2.3.4"><div class="tb"><p>Chat with each blueprint using these prompts:</p><ul><li>“Which candidates have navigation experience? Name them.”</li><li>“Summarize the strongest candidate for a quartermaster role and cite the resume you used.”</li><li>“Who has leadership experience, and what evidence supports that?”</li></ul></div></li></ol><ol class="tasks"><li data-t="2.3.5"><div class="tb"><p>Use the comparison view to send the same prompt to both blueprints side by side (<a href="https://docs.datarobot.com/en/docs/agentic-ai/playground-tools/compare-llm.html" target="_blank" rel="noopener">compare LLM blueprints</a>).</p></div></li></ol><ol class="tasks"><li data-t="2.3.6"><div class="tb"><p>For Blueprint B, open the <b>citations</b> under a response and review the retrieved chunks and scores (<a href="https://docs.datarobot.com/en/docs/agentic-ai/playground-tools/rag-chatting.html" target="_blank" rel="noopener">chatting and citations</a>).</p></div></li></ol><ol class="tasks"><li data-t="2.3.7"><div class="tb"><p>Change one setting on Blueprint B (for example temperature to 0, or the context state between context-aware and no context) and repeat a prompt. Note the difference.</p></div></li></ol><ol class="tasks"><li data-t="2.3.8"><div class="tb"><p>Open the <b>Tracing</b> tile and find your prompts, the LLM used and the VDB used.</p></div></li></ol><ol class="tasks"><li data-t="m2.cp" class="checkpoint"><div class="tb"><p><b>Checkpoint:</b> Blueprint A gives generic or “I don’t know” answers; Blueprint B names real candidates and shows citations.</p></div></li></ol><ol class="tasks"><li data-t="m2.cy" class="selfcheck"><div class="tb"><p><b>Check yourself:</b> What does the context state setting change? Why does max completion tokens interact with the number of retrieved chunks?</p></div></li></ol></div></article><h2 class="mod" id="s-day-2-module-3-evaluate-rag-2-3-h">Day 2 — Module 3: Evaluate RAG (2–3 h)</h2><p><b>Goal:</b> learn DataRobot’s evaluation toolkit—metrics, evaluation datasets, aggregated metrics—on the blueprints you just built. The same concepts apply to agents on Day 5.</p><h3 class="sub">Read first</h3><div class="block"><ul><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/playground-tools/playground-eval-metrics.html" target="_blank" rel="noopener">Use LLM evaluation tools</a></li></ul></div><article class="lab" id="lab-3-1"><div class="lab-head"><h3>Lab 3.1 — Configure metrics</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="3.1.1"><div class="tb"><p>In the RAG playground, click the <b>Evaluation</b> tile. On the Metrics tab, note which metrics are enabled by default. Citations and ROUGE-1 only report values when a VDB is attached.</p></div></li></ol><ol class="tasks"><li data-t="3.1.2"><div class="tb"><p>Add metrics that are available to you without extra guard deployments (for example latency- and token-based metrics). Note which metrics need deployed guard models from Registry (Prompt Injection, Toxicity, PII Detection, Emotions Classifier, Custom Deployment).</p></div></li></ol></div></article><article class="lab" id="lab-3-2"><div class="lab-head"><h3>Lab 3.2 — Generate a synthetic evaluation dataset</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="3.2.1"><div class="tb"><p>Evaluation → <b>Evaluation datasets</b> tab → <b>Add evaluation dataset</b>.</p></div></li></ol><ol class="tasks"><li data-t="3.2.2"><div class="tb"><p>Name <span class="ph" data-tok="INITIALS">INITIALS</span>-pirate-eval-synthetic, pick an LLM, select your VDB and its version, language English → <b>Generate data</b>.</p></div></li></ol><ol class="tasks"><li data-t="3.2.3"><div class="tb"><p>Understand what happens: DataRobot clusters the VDB chunks, takes a representative chunk per cluster and asks the LLM for question/answer pairs (up to about 100). A placeholder dataset appears first; the real Q&amp;A pairs arrive as a second version in the Data Registry.</p></div></li></ol><ol class="tasks"><li data-t="3.2.4"><div class="tb"><p>Open the dataset and read a few rows.</p></div></li></ol></div></article><article class="lab" id="lab-3-3"><div class="lab-head"><h3>Lab 3.3 — Aggregated metrics and a leaderboard</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="3.3.1"><div class="tb"><p>Back in the playground, click <b>Configure aggregation</b> under the prompt box.</p></div></li></ol><ol class="tasks"><li data-t="3.3.2"><div class="tb"><p>Select your metrics, the synthetic evaluation dataset, and both Blueprint A and Blueprint B → <b>Generate metrics</b>. Only one aggregation job runs at a time.</p></div></li></ol><ol class="tasks"><li data-t="3.3.3"><div class="tb"><p>When it finishes, open the <b>Aggregated metrics</b> tab on the blueprint comparison page and compare A vs B: configure aggregation -&gt; select metrics -&gt; select evaluation dataset -&gt; generate metrics. Wait for the job to finish and observe Aggregated metrics.</p></div></li></ol></div></article><article class="lab" id="lab-3-4" data-optlab><div class="lab-head"><span class="labtick" data-t="3.4.lab" data-opt></span><h3>Lab 3.4 (Optional) — Compliance tests</h3><span class="lab-count"></span></div><div class="lab-body"><p>From the Evaluation tile, review the DataRobot-provided compliance tests and run one against Blueprint B (<a href="https://docs.datarobot.com/en/docs/agentic-ai/playground-tools/playground-eval-metrics.html" target="_blank" rel="noopener">configure compliance testing</a>).</p></div></article><article class="lab" id="lab-3-5"><div class="lab-head"><h3>Lab 3.5 — From blueprint to the Registry workshop</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="3.5.1"><div class="tb"><p>Read <a href="https://docs.datarobot.com/en/docs/agentic-ai/playground-tools/deploy-llm.html" target="_blank" rel="noopener">Deploy an LLM from the playground</a>.</p></div></li></ol><ol class="tasks"><li data-t="3.5.2"><div class="tb"><p>Send Blueprint B to the workshop. When registration completes, click <b>Go to the workshop</b>. The blueprint is now a custom model with target type <b>Text Generation</b> that implements the <a href="https://docs.datarobot.com/en/docs/agentic-ai/genai-code/genai-chat-completion-api.html" target="_blank" rel="noopener">Bolt-on Governance API</a> (OpenAI-style chat).</p></div></li></ol><ol class="tasks"><li data-t="3.5.3"><div class="tb"><p>On the Assemble tab, find the runtime parameters. With the LLM gateway, confirm ENABLE_LLM_GATEWAY_INFERENCE is present and True—no provider credentials needed.</p></div></li></ol><ol class="tasks"><li data-t="3.5.4"><div class="tb"><p>Stop here; you will practice register → deploy with your agent on Day 6. (Optional: register and deploy now to compare later.)</p></div></li></ol><ol class="tasks"><li data-t="m3.cy" class="selfcheck"><div class="tb"><p><b>Check yourself:</b> Why must an evaluation dataset’s columns not share names with the VDB’s metadata columns? What is the difference between a metric computed per response and an aggregated metric?</p></div></li></ol><ol class="tasks"><li data-t="m3.s" data-opt><div class="tb"><p><b>(Stretch)</b> Reproduce Modules 2–3 in code with the <a href="https://docs.datarobot.com/en/docs/agentic-ai/genai-code/genai-e2e.html" target="_blank" rel="noopener">end-to-end code-first GenAI walkthrough</a> (VectorDatabase.create, Playground.create, LLMBlueprint, ChatPrompt, ComparisonChat) in a DataRobot notebook or codespace.</p></div></li></ol></div></article>
+</section>
+<section data-page="day3" data-title="M4 Your first agent with the Agentic Starter" data-short="D3" hidden>
+<h2 class="mod" id="s-day-3-module-4-your-first-agent-with-the-agentic-starter-5-6">Day 3 — Module 4: Your first agent with the Agentic Starter (5–6 h)</h2><p><b>Goal:</b> create, run and understand an agentic application built from DataRobot’s template.</p><p><b>Explanation:</b> the Agentic Starter is a full app, not just an agent. dr start clones it, runs a configuration wizard and writes a .env file. dr run dev starts four processes: frontend, backend, agent and MCP server. The agent is a DataRobot custom model: custom.py implements the DataRobot hooks (load_model, chat), myagent.py holds your workflow logic, and model-metadata.yaml declares targetType: agenticworkflow plus runtime parameters.</p><h3 class="sub">Read first</h3><div class="block"><ul><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-get-started.html" target="_blank" rel="noopener">Agentic AI: Get started</a> (all of it)</li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-overview.html" target="_blank" rel="noopener">Agent components</a></li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/commands/start.html" target="_blank" rel="noopener">dr start</a> and <a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/commands/run.html" target="_blank" rel="noopener">dr run</a></li></ul></div><article class="lab" id="lab-4-1"><div class="lab-head"><h3>Lab 4.1 — Initialize the application</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="4.1.1"><div class="tb"><p>Create and enter a new, empty working folder: mkdir ~/dr-onboarding &amp;&amp; cd ~/dr-onboarding</p></div></li></ol><ol class="tasks"><li data-t="4.1.2"><div class="tb"><p>Run dr start and answer the wizard:</p><div class="tbl"><table><thead><tr><th>Wizard step</th><th>Recommended answer for onboarding</th></tr></thead><tbody><tr><td>Memory</td><td><b>None</b></td></tr><tr><td>Use the “low-code” template?</td><td><b>N</b>, then choose the <b>LangGraph</b> agent template (the docs’ examples use it). <i>Y</i> selects the YAML-based NeMo Agent Toolkit template—try it later.</td></tr><tr><td>Browser opens to configure API endpoint and key</td><td>Click <b>Proceed</b>. If the browser doesn’t open, copy the URL from the terminal.</td></tr><tr><td>Local web application (agent) port</td><td>Default <b>8842</b></td></tr><tr><td>Default execution environment</td><td>Default <b>[DataRobot] Python 3.11 GenAI Agents</b></td></tr><tr><td>Session secret key</td><td>Leave blank (random key generated)</td></tr><tr><td>Database URI</td><td>Default sqlite+aiosqlite:///.data/database.sqlite</td></tr><tr><td>OAuth provider / authorization server</td><td>Use your team’s standard; if none, keep the defaults. See <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-authentication.html" target="_blank" rel="noopener">Agent authentication</a>.</td></tr><tr><td>Pulumi stack passphrase</td><td>Leave blank or set one (record it)</td></tr><tr><td>Use Case ID</td><td>Your Use Case ID from Lab 1.2</td></tr><tr><td>LLM integration</td><td><b>DataRobot LLM gateway</b></td></tr><tr><td>MCP server port</td><td>Default <b>9000</b></td></tr><tr><td>Review .env</td><td>Read it, then confirm (this step takes several minutes)</td></tr><tr><td>Pulumi stack</td><td>Create a new stack named <span class="ph" data-tok="INITIALS">INITIALS</span>-onb</td></tr></tbody></table></div></div></li></ol><ol class="tasks"><li data-t="4.1.3"><div class="tb"><p>Verify: a .env file exists and an application folder (typically datarobot-agent-application) was created.</p></div></li></ol></div></article><article class="lab" id="lab-4-2"><div class="lab-head"><h3>Lab 4.2 — Read the code before you run it</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="4.2.1"><div class="tb"><p>cd datarobot-agent-application and open the project in your editor.</p></div></li></ol><ol class="tasks"><li data-t="4.2.2"><div class="tb"><p>Find each file below and write one line in your log about what it does:</p><div class="tbl"><table><thead><tr><th>File</th><th>Look for</th></tr></thead><tbody><tr><td>agent/agent/myagent.py</td><td>graph_factory(llm, tools, verbose), the planner and writer nodes built with create_agent, and MyAgent = datarobot_agent_class_from_langgraph(...)</td></tr><tr><td>agent/custom.py</td><td>The DRUM hooks load_model() and chat(); resolve_authorization_context()</td></tr><tr><td>agent/agent/model-metadata.yaml</td><td>type: inference, targetType: agenticworkflow, runtime parameters such as LLM_DEFAULT_MODEL, USE_DATAROBOT_LLM_GATEWAY, MCP_DEPLOYMENT_ID</td></tr><tr><td>agent/agent/config.py</td><td>How env vars, runtime parameters and credentials are loaded</td></tr><tr><td>agent/agent/register.py, workflow.yaml</td><td>How the DRAgent server wires the LLM and MCP tools to your agent</td></tr><tr><td>infra/</td><td>Pulumi code that creates the custom model, deployment and app</td></tr><tr><td>Taskfile.yml</td><td>Run dr task list to see every available task</td></tr></tbody></table></div></div></li></ol></div></article><article class="lab" id="lab-4-3"><div class="lab-head"><h3>Lab 4.3 — Run the full stack locally</h3><span class="lab-count"></span></div><div class="lab-body"><div class="code"><pre><code>dr run dev</code></pre></div><ol class="tasks"><li data-t="4.3.1"><div class="tb"><p>Wait until all four services are up, then open http://localhost:5173.</p></div></li></ol><ol class="tasks"><li data-t="4.3.2"><div class="tb"><p>Send: “Write a short article about the history of AI.” Watch the terminal logs from the planner and writer.</p><div class="tbl"><table><thead><tr><th>Port</th><th>Service</th></tr></thead><tbody><tr><td>5173</td><td>Frontend dev server</td></tr><tr><td>8080</td><td>FastAPI backend</td></tr><tr><td>8842</td><td>Local agent (OpenAI-compatible endpoint, /v1)</td></tr><tr><td>9000</td><td>MCP server (MCP_SERVER_PORT)</td></tr><tr><td>8090</td><td>Local experimentation dashboard (dr xp)</td></tr></tbody></table></div></div></li></ol></div></article><article class="lab" id="lab-4-4"><div class="lab-head"><span class="labtick" data-t="4.4.lab"></span><h3>Lab 4.4 — Test the agent from the command line</h3><span class="lab-count"></span></div><div class="lab-body"><p>In a second terminal (from the project root, with the dev server running or using auto-start):</p><div class="code"><pre><code>task agent:cli START_DEV=1 -- execute --user_prompt 'Write a document about the history of AI.'
+task agent:cli START_DEV=1 -- execute --user_prompt '{"topic":"Generative AI"}'</code></pre></div><p>For many tests, start the agent once with task agent:dev and drop START_DEV=1. See <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-development.html" target="_blank" rel="noopener">Customize agents → Testing the agent during local development</a>.</p></div></article><article class="lab" id="lab-4-5"><div class="lab-head"><h3>Lab 4.5 — Inspect local traces: <a href="http://localhost:8090" target="_blank" rel="noopener">http://localhost:8090</a></h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="4.5.1"><div class="tb"><p>If the dashboard isn’t already running with dr run dev, install and start it:</p><div class="code"><pre><code>dr plugin install xp
+dr plugin list
+dr xp --entity-id <span class="ph" data-tok="YOUR_USE_CASE_ID">YOUR_USE_CASE_ID</span></code></pre></div></div></li></ol><ol class="tasks"><li data-t="4.5.2"><div class="tb"><p>Open http://localhost:8090 → <b>Traces</b> tab. Open your last request and find: the root span, the planner and writer spans, each LLM call, latency per span, and token counts.</p></div></li></ol><ol class="tasks"><li data-t="4.5.3"><div class="tb"><p>Use the status filter and search to find a specific trace.</p></div></li></ol><p>Reference: <a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/local-experimentation/index.html" target="_blank" rel="noopener">DataRobot experimentation plugin</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/local-experimentation/experimentation-tracing.html" target="_blank" rel="noopener">Local tracing</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-troubleshooting.html" target="_blank" rel="noopener">Troubleshooting</a>.</p><ol class="tasks"><li data-t="m4.cp" class="checkpoint"><div class="tb"><p><b>Checkpoint:</b> the chat UI answers, the CLI test prints output, and you can explain one trace span by span.</p></div></li></ol><ol class="tasks"><li data-t="m4.cy" class="selfcheck"><div class="tb"><p><b>Check yourself:</b> Which file would you change to alter what the agent does? Which to add a runtime parameter? What does USE_DATAROBOT_LLM_GATEWAY=0 mean?</p></div></li></ol></div></article>
+</section>
+<section data-page="day4" data-title="M5 Customize the agent" data-short="D4" hidden>
+<h2 class="mod" id="s-day-4-module-5-customize-the-agent-5-6-h">Day 4 — Module 5: Customize the agent (5–6 h)</h2><p><b>Goal:</b> change agent behavior through prompts, tools, LLM choice, MCP and managed prompts—and see each change in traces.</p><h3 class="sub">Read first</h3><div class="block"><ul><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-development.html" target="_blank" rel="noopener">Customize agents</a> — “Modify the agent code” and “Modify agent prompts” (LangGraph tab).</li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-tools-integrate.html" target="_blank" rel="noopener">Add tools to agents</a></li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-llm-providers.html" target="_blank" rel="noopener">Configure LLM providers in code</a></li></ul></div><article class="lab" id="lab-5-1"><div class="lab-head"><h3>Lab 5.1 — Change the prompts</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="5.1.1"><div class="tb"><p>In agent/agent/myagent.py, find the strings passed to make_system_prompt() inside graph_factory.</p></div></li></ol><ol class="tasks"><li data-t="5.1.2"><div class="tb"><p>Change the writer’s agent prompt so it writes at most 150 words, as bullet points, for a non-technical audience.</p></div></li></ol><ol class="tasks"><li data-t="5.1.3"><div class="tb"><p>Restart the agent and repeat the Day 3 prompt. Compare output length and token counts in the local Traces tab.</p></div></li></ol><p>Current templates use langchain.agents.create_agent(..., system_prompt=...). Community examples that use langgraph.prebuilt.create_react_agent(prompt=...) are a different API—don’t mix them.</p></div></article><article class="lab" id="lab-5-2"><div class="lab-head"><h3>Lab 5.2 — Add a local tool</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="5.2.1"><div class="tb"><p>Add this tool class to myagent.py (from the docs’ Local datetime tool example):</p><div class="code"><pre><code>from datetime import datetime
+from typing import Optional
+from zoneinfo import ZoneInfo
+from langchain.tools import BaseTool
+
+class DateTimeTool(BaseTool):
+    name: str = "datetime_tool"
+    description: str = (
+        "Returns the current date and time. Optionally accepts a timezone parameter as an IANA timezone "
+        "string (e.g., 'America/New_York', 'Europe/London', 'Asia/Tokyo'). If no timezone is provided, "
+        "returns local time.")
+
+    def _run(self, timezone: Optional[str] = None) -&gt; str:
+        try:
+            if timezone:
+                current_time = datetime.now(ZoneInfo(timezone))
+                return f"{current_time.strftime('%Y-%m-%d %H:%M:%S')} ({timezone})"
+            return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        except Exception:
+            return (f"Error: Invalid timezone '{timezone}'. "
+                    "Please use a valid IANA timezone string (e.g., 'America/New_York', 'Europe/London').")</code></pre></div></div></li></ol><ol class="tasks"><li data-t="5.2.2"><div class="tb"><p>Give it to the planner inside graph_factory, keeping the MCP/workflow tools already passed in:</p><div class="code"><pre><code>def graph_factory(llm, tools, verbose=False):
+    datetime_tool = DateTimeTool()
+    all_tools = [datetime_tool] + list(tools)
+    planner = create_agent(
+        llm,
+        tools=all_tools,
+        system_prompt=make_system_prompt("...your planner prompt..."),
+        name="planner_agent",
+        debug=verbose,
+    )
+    ...</code></pre></div></div></li></ol><ol class="tasks"><li data-t="5.2.3"><div class="tb"><p>Test: task agent:cli START_DEV=1 -- execute --user_prompt 'What time is it in Tokyo and in Dublin right now? Then write two sentences about working across those time zones.'</p></div></li></ol><ol class="tasks"><li data-t="5.2.4"><div class="tb"><p>In the Traces tab, find the datetime_tool span and its arguments. Try an invalid timezone and see how the agent recovers from the tool’s error message.</p></div></li></ol><p><b>Explanation:</b> tools can live in three places. <i>Local tools</i> (like this one) run inside the agent process. <i>Deployed global tools</i> (Registry models prefixed [Tool], such as Search Data Registry or Summarize DataFrame) scale independently and get Console monitoring—see <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-tools.html" target="_blank" rel="noopener">Deploy agentic tools</a>. <i>MCP tools</i> are served by an MCP server and discovered at runtime (Lab 5.4).</p></div></article><article class="lab" id="lab-5-3"><div class="lab-head"><h3>Lab 5.3 — Switch the LLM</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="5.3.1"><div class="tb"><p>Pick a different model from dr llm list.</p></div></li></ol><ol class="tasks"><li data-t="5.3.2"><div class="tb"><p>Open .env and find the LLM settings the wizard wrote (for example LLM_DEFAULT_MODEL). Change the model, restart dr run dev, and repeat a prompt.</p></div></li></ol><ol class="tasks"><li data-t="5.3.3"><div class="tb"><p>Compare latency and tokens for the two models in local traces. Record which you prefer and why.</p></div></li></ol><ol class="tasks"><li data-t="5.3.4"><div class="tb"><p>Read how to configure providers without code changes (<a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-llm-providers-metadata.html" target="_blank" rel="noopener">LLM providers with metadata</a>) and how to add a fallback provider (<a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-llm-fallback.html" target="_blank" rel="noopener">LLM provider fallback</a>).</p></div></li></ol></div></article><article class="lab" id="lab-5-4"><div class="lab-head"><h3>Lab 5.4 — Explore MCP</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="5.4.1"><div class="tb"><p>Read <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-mcp/agentic-tools-mcp.html" target="_blank" rel="noopener">Integrate tools using an MCP server</a>.</p></div></li></ol><ol class="tasks"><li data-t="5.4.2"><div class="tb"><p>With dr run dev running, the bundled MCP server listens on http://localhost:9000/mcp/. In the agent code, find where MCP tools arrive (mcp_tools_context / the tools argument of graph_factory).</p></div></li></ol><p>Will show ‘method not allowed’, this is expected.<br>Install MCP inspector: npx @modelcontextprotocol/inspector</p><ol class="tasks"><li data-t="5.4.3"><div class="tb"><p>Find the MCP server code in the project and list the tools it exposes (usually mcp_Server folder). Note the custom-tool pattern (the standalone MCP template uses a @dr_mcp_tool decorator with a docstring the LLM reads).</p></div></li></ol><ol class="tasks"><li data-t="5.4.4" data-opt><div class="tb"><p>(Optional) Connect your IDE assistant to the <b>DataRobot Global MCP</b> (predictive AI tools, no deployment needed). For Claude, add to the MCP settings (<b>Claude Desktop:</b> go to Settings → Developer → <b>Edit Config</b>. This opens claude_desktop_config.json. Add (replace YOUR_API_TOKEN with your DataRobot token):</p><div class="code"><pre><code>  "mcpServers": {
+    "datarobot-mcp": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest",
+               "https://app.datarobot.com/api/v2/genai/globalmcp/mcp",
+               "--header", "Authorization: ${AUTH_HEADER}",
+               "--transport", "http"],
+      "env": { "AUTH_HEADER": "Bearer YOUR_API_TOKEN" }
+    }
+  }</code></pre></div></div></li></ol><p>Restart Claude Desktop.</p><p><b>Test it.</b> Open a new chat in Claude Desktop, ask:</p><ul><li>"What tools does the datarobot-mcp server provide?"</li><li>"List my DataRobot deployments."</li><li>"Show my most recent DataRobot projects."</li></ul><p>The assistant should call Global MCP tools and return real data from your account. Record which tools it used in your learning log.</p><ol class="tasks"><li data-t="5.4.5"><div class="tb"><p>See <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-mcp/agentic-mcp-clients.html" target="_blank" rel="noopener">Connect agentic coding environments to MCP servers</a> for Claude Desktop and VS Code.</p><div class="tbl"><table><thead><tr><th>MCP server type</th><th>Local URL</th><th>Deployed URL</th></tr></thead><tbody><tr><td>Global MCP</td><td>—</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/genai/globalmcp/mcp</td></tr><tr><td>Standalone MCP template</td><td>http://localhost:8080/mcp</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/deployments/DEPLOYMENT_ID/directAccess/mcp</td></tr><tr><td>Agentic Starter bundled</td><td>http://localhost:9000/mcp</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/deployments/DEPLOYMENT_ID/directAccess/mcp</td></tr></tbody></table></div></div></li></ol></div></article><article class="lab" id="lab-5-5" data-optlab><div class="lab-head"><h3>Lab 5.5 (Stretch) — Managed prompts</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="5.5.1" data-opt><div class="tb"><p>Registry → <b>Prompts</b> → <b>Create prompt</b>. Name <span class="ph" data-tok="INITIALS">INITIALS</span>-article-prompt, text:<br>Write an article about {{ topic }} for a non-technical audience. Keep it under 300 words.Fill in the variable description and create it. Record the prompt template ID.</p></div></li></ol><ol class="tasks"><li data-t="5.5.2" data-opt><div class="tb"><p>Click <b>Create new version from current</b>, change the word limit, create version 2, then use <b>Compare versions</b>.</p></div></li></ol><ol class="tasks"><li data-t="5.5.3" data-opt><div class="tb"><p>Wire it into the LangGraph agent by replacing the prompt_template with one fetched from DataRobot (code in <a href="https://docs.datarobot.com/en/docs/agentic-ai/prompt-mgmt/prompt-in-agent.html" target="_blank" rel="noopener">Call prompts in an agent</a>):</p><div class="code"><pre><code>def build_prompt_template() -&gt; ChatPromptTemplate:
+   template = dr.genai.PromptTemplate.get('&lt;your prompt ID&gt;')
+   version = template.get_latest_version()
+   # To pin a version instead: version = template.get_version("PROMPT_VERSION_ID")
+   text = version.to_fstring()   # converts {{ topic }} into {topic}
+   return ChatPromptTemplate.from_messages(
+       [
+           ("system", "You are a helpful assistant that plans and writes content based on the user's topic."),
+           ("user", text),
+       ]
+   )</code></pre></div></div></li></ol><ol class="tasks"><li data-t="5.5.4" data-opt><div class="tb"><p>Test with --user_prompt '{"topic":"Generative AI"}', then create version 3 and confirm the agent picks it up without a code change (assistant restart is still needed).</p></div></li></ol><p><b>Optional reading today:</b> <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-python-packages.html" target="_blank" rel="noopener">Add Python packages</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-tracing-code.html" target="_blank" rel="noopener">Implement tracing</a> (custom spans), <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-memory-service.html" target="_blank" rel="noopener">Agentic memory service</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-request-headers.html" target="_blank" rel="noopener">Access request headers</a>.</p><ol class="tasks"><li data-t="m5.cp" class="checkpoint"><div class="tb"><p><b>Checkpoint:</b> your agent calls datetime_tool visibly in traces, and you’ve run it on two different LLMs.</p></div></li></ol><ol class="tasks"><li data-t="m5.cy" class="selfcheck"><div class="tb"><p><b>Check yourself:</b> When would you put a tool on an MCP server instead of in agent code? What are the trade-offs of a deployed global tool?</p></div></li></ol></div></article>
+</section>
+<section data-page="day5" data-title="M6 Evaluate the agent in DataRobot" data-short="D5" hidden>
+<h2 class="mod" id="s-day-5-module-6-evaluate-the-agent-in-datarobot-5-h">Day 5 — Module 6: Evaluate the agent in DataRobot (5 h)</h2><p><b>Goal:</b> move from local testing to platform evaluation: connect your agent to an agentic playground, chat, trace, and score it with metrics and an evaluation dataset.</p><h3 class="sub">Read first</h3><div class="block"><ul><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-eval/agentic-playground.html" target="_blank" rel="noopener">Connect to a playground</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-eval/agentic-chatting.html" target="_blank" rel="noopener">Chat with agents</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-eval/agentic-tracing.html" target="_blank" rel="noopener">Review tracing</a></li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-eval/agentic-evaluation-tools.html" target="_blank" rel="noopener">Evaluate metrics</a></li></ul></div><article class="lab" id="lab-6-1"><div class="lab-head"><span class="labtick" data-t="6.1.lab"></span><h3>Lab 6.1 — Deploy development infrastructure</h3><span class="lab-count"></span></div><div class="lab-body"><div class="code"><pre><code>dr run deploy-dev</code></pre></div><p>This runs Pulumi with development targets (custom model and playground-related resources), not a full production deployment, so it is faster. When it finishes, open Registry → <b>Workshop</b> and find your agentic workflow custom model. Review its Assemble tab: files, runtime parameters, execution environment.</p></div></article><article class="lab" id="lab-6-2"><div class="lab-head"><h3>Lab 6.2 — Connect the agent to an agentic playground</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="6.2.1"><div class="tb"><p>In your Use Case → <b>Playgrounds</b> → <b>Add Playground</b> → choose the agentic playground option. (If the deploy output printed a playground URL, you can open that instead.)</p></div></li></ol><ol class="tasks"><li data-t="6.2.2"><div class="tb"><p><b>Agentic playground</b> tile → <b>Workflows</b> tab → <b>Connect workflow from workshop</b> → select your agent → <b>Connect</b>.</p></div></li></ol></div></article><article class="lab" id="lab-6-3"><div class="lab-head"><h3>Lab 6.3 — Chat and trace</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="6.3.1"><div class="tb"><p>Click the agent tile (not the checkbox) to open a <b>single-agent chat</b>. Send three prompts, including one that needs datetime_tool.</p></div></li></ol><ol class="tasks"><li data-t="6.3.2"><div class="tb"><p>Click <b>Review tracing</b> in a response header. Inspect the Chart and List views, the span services, and Trace details (input/output).</p></div></li></ol><ol class="tasks"><li data-t="6.3.3"><div class="tb"><p>Rate responses with the thumbs; find your feedback in the Tracing tile’s table.</p></div></li></ol><ol class="tasks"><li data-t="6.3.4" data-opt><div class="tb"><p>(Optional) Use <b>Open in codespace</b> to tweak the agent in DataRobot and save—changes flow to the workshop and playground (<a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-eval/agentic-workflow-build.html" target="_blank" rel="noopener">Build workflows</a>).</p></div></li></ol><p>Tracing is only available in single-agent chats, not the multi-agent comparison view. Agent latency, total tokens and cost metrics therefore appear per agent, not in comparison.</p></div></article><article class="lab" id="lab-6-4"><div class="lab-head"><h3>Lab 6.4 — Evaluation dataset and metrics</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="6.4.1"><div class="tb"><p>Save the CSV in Appendix C as <span class="ph" data-tok="INITIALS">INITIALS</span>_agent_eval.csv and upload it to the Data Registry.</p></div></li></ol><ol class="tasks"><li data-t="6.4.2"><div class="tb"><p>Playground → <b>Evaluation</b> tile → <b>Playground metrics</b> tab → <b>Configure metrics</b>. Add:</p><ul><li>Operational: <b>Agent latency</b>, <b>Agent total tokens</b></li><li>Quality: <b>Tool Call Accuracy</b> and <b>Agent Goal Accuracy with Reference</b> (select an LLM as judge for goal accuracy)</li></ul></div></li></ol><p>Save the configuration.</p><ol class="tasks"><li data-t="6.4.3"><div class="tb"><p><b>Evaluation datasets</b> tab → <b>Add evaluation dataset</b> → select your CSV and map columns: Prompt = promptText, Response = expectedResponse, Reference goals = agentGoal, Reference tools = toolCalls.</p></div></li></ol></div></article><article class="lab" id="lab-6-5"><div class="lab-head"><h3>Lab 6.5 — Aggregate and interpret</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="6.5.1"><div class="tb"><p>Open playground chat and Click <b>Configure aggregation</b>, select the metrics, your evaluation dataset and your agent → <b>Generate metrics</b>. A “Metric” chat is created with all prompts and responses.</p></div></li></ol><ol class="tasks"><li data-t="6.5.2"><div class="tb"><p>Review the <b>Agentic aggregated metrics</b> and <b>Evaluation aggregated metrics</b> tabs.</p></div></li></ol><ol class="tasks"><li data-t="6.5.3"><div class="tb"><p>Write three findings in your log. Expect correctness-style comparisons on time questions to be noisy—the answer changes every minute—which is exactly why tool-call and goal metrics exist.</p></div></li></ol><ol class="tasks"><li data-t="6.5.4"><div class="tb"><p>Improve one thing (prompt or tool description), redeploy with dr run deploy, and re-run aggregation. Did the score move?</p><div class="tbl"><table><thead><tr><th>Playground metrics</th><th>Agentic workflow metrics</th></tr></thead><tbody><tr><td>Configured in the playground</td><td>Configured in the Workshop</td></tr><tr><td>Need reference data (evaluation dataset)</td><td>No reference data needed</td></tr><tr><td>Not computed in production</td><td>Computed in production</td></tr><tr><td>Apply to the top-level workflow only</td><td>Can apply to sub-agents and sub-tools deployed as separate custom models</td></tr></tbody></table></div></div></li></ol></div></article><article class="lab" id="lab-6-6" data-optlab><div class="lab-head"><span class="labtick" data-t="6.6.lab" data-opt></span><h3>Lab 6.6 (Optional, preview) — Batch evaluation locally</h3><span class="lab-count"></span></div><div class="lab-body"><p>Run evaluations on your laptop with the experimentation plugin’s Evaluation tab: add the evaluation component, set DR_EXPERIMENT_ENABLE_EVALUATION=true in .env, and start dr xp --enable-evaluation. See <a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/local-experimentation/experimentation-evaluation.html" target="_blank" rel="noopener">Batch agent evaluation</a>.</p><ol class="tasks"><li data-t="m6.cp" class="checkpoint"><div class="tb"><p><b>Checkpoint:</b> an aggregated metrics chat exists for your agent with Tool Call Accuracy and Agent Goal Accuracy values.</p></div></li></ol><ol class="tasks"><li data-t="m6.cy" class="selfcheck"><div class="tb"><p><b>Check yourself:</b> Which metrics can guard production traffic and which only help during development? Why?</p></div></li></ol></div></article>
+</section>
+<section data-page="day6" data-title="M7 Deploy, govern and monitor" data-short="D6" hidden>
+<h2 class="mod" id="s-day-6-module-7-deploy-govern-and-monitor-5-6-h">Day 6 — Module 7: Deploy, govern and monitor (5–6 h)</h2><p><b>Goal:</b> ship the agent to production, call it through the API, and learn the monitoring and governance surface.</p><h3 class="sub">Read first</h3><div class="block"><ul><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-deploy/agentic-workflow-register.html" target="_blank" rel="noopener">Register workflows</a> and <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-deploy/agentic-workflow-deploy.html" target="_blank" rel="noopener">Deploy workflows</a></li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/index.html" target="_blank" rel="noopener">Monitor agentic deployments</a></li><li><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-deploy/agentic-configure-evaluation-moderation.html" target="_blank" rel="noopener">Configure evaluation and moderation</a> (read “Important prerequisites”)</li></ul></div><article class="lab" id="lab-7-1"><div class="lab-head"><span class="labtick" data-t="7.1.lab"></span><h3>Lab 7.1 — Deploy with the CLI</h3><span class="lab-count"></span></div><div class="lab-body"><div class="code"><pre><code>dr run deploy</code></pre></div><p>This builds the custom model and creates a production deployment plus the application (several minutes). Copy these outputs into your log: AGENT_DEPLOYMENT_ID, the <i>Agent Deployment Chat Endpoint</i> (…/api/v2/deployments/ID/chat/completions), the <i>Agentic Starter</i> application URL, and the MCP server deployment ID and endpoint.</p><p><b>Explanation:</b> the CLI path does, in code, what the UI path does by hand: Workshop (assemble) → <b>Register a workflow</b> (Registry → Models, Agentic workflow tab, status Building → Ready for deployment) → <b>Deploy</b> (Console). Under the hood it is Pulumi (infra/); setting AGENT_DEPLOY=0 creates only the custom model.</p></div></article><article class="lab" id="lab-7-2"><div class="lab-head"><h3>Lab 7.2 — Walk the UI path</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="7.2.1"><div class="tb"><p>Registry → <b>Models</b> → <b>Agentic workflow</b> tab: open your registered workflow and its version. Note lineage back to the Workshop version.</p></div></li></ol><ol class="tasks"><li data-t="7.2.2"><div class="tb"><p>Registry → <b>Workshop</b>: find <b>Test workflow</b> and <b>Register a workflow</b> on the Assemble tab. You don’t need to register again—just learn where each step lives. If a build ever fails, the Workshop version panel has <b>Model logs</b>.</p></div></li></ol></div></article><article class="lab" id="lab-7-3"><div class="lab-head"><h3>Lab 7.3 — Call the deployed agent</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="7.3.1"><div class="tb"><p>Console → <b>Deployed workloads</b> → <b>Agentic Workflow</b> tab → your deployment → <b>Predictions → Prediction API</b>: choose Real time, Python, and copy the snippet.</p></div></li></ol><ol class="tasks"><li data-t="7.3.2"><div class="tb"><p>Or use the OpenAI client (from the docs):</p><div class="code"><pre><code>import os
+from openai import OpenAI
+
+DEPLOYMENT_ID = "<span class="ph" data-tok="YOUR_AGENT_DEPLOYMENT_ID">YOUR_AGENT_DEPLOYMENT_ID</span>"
+client = OpenAI(
+    base_url=f"{os.environ['DATAROBOT_ENDPOINT']}/deployments/{DEPLOYMENT_ID}/",
+    api_key=os.environ["DATAROBOT_API_TOKEN"],
+    _strict_response_validation=False,
+)
+r = client.chat.completions.create(
+    model="datarobot-deployed-llm",
+    messages=[{"role": "user", "content": "What time is it in Singapore? Then write a two-line status update."}],
+)
+print(r.choices[0].message.content)</code></pre></div></div></li></ol><ol class="tasks"><li data-t="7.3.3"><div class="tb"><p>Send 15–20 varied requests (loop the call) so the monitoring tabs have data.</p></div></li></ol><ol class="tasks"><li data-t="7.3.4"><div class="tb"><p>Open the deployed application URL and chat through the UI too.</p></div></li></ol></div></article><article class="lab" id="lab-7-4"><div class="lab-head"><h3>Lab 7.4 — Monitoring tour</h3><span class="lab-count"></span></div><div class="lab-body"><div class="tbl"><table><thead><tr><th>Tab</th><th>What to look at</th><th>Doc</th></tr></thead><tbody><tr><td>Overview</td><td>Details, lineage, runtime parameters, tags</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-overview.html" target="_blank" rel="noopener">Deployment overview</a></td></tr><tr><td>Tracing</td><td>Filter traces, span duration, token usage, inputs/outputs</td><td><a href="https://docs.datarobot.com/en/docs/workbench/nxt-console/nxt-monitoring/nxt-tracing.html" target="_blank" rel="noopener">Tracing</a></td></tr><tr><td>Service health</td><td>Latency, throughput, error rate</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-service-health.html" target="_blank" rel="noopener">Service health</a></td></tr><tr><td>Usage</td><td>Prediction processing; quota usage by user or agent</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-usage.html" target="_blank" rel="noopener">Usage</a></td></tr><tr><td>Custom metrics</td><td>Business/performance metrics; guard metrics when moderation is on</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-custom-metrics.html" target="_blank" rel="noopener">Custom metrics</a></td></tr><tr><td>Resource monitoring</td><td>CPU, memory, replicas</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-resource-monitoring.html" target="_blank" rel="noopener">Resource monitoring</a></td></tr><tr><td>Activity log</td><td>Standard output logs, OpenTelemetry logs, moderation events</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-runtime-logs.html" target="_blank" rel="noopener">Standard output logs</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-otel-logs.html" target="_blank" rel="noopener">OTel logs</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-monitor/agent-moderation.html" target="_blank" rel="noopener">Moderation events</a></td></tr></tbody></table></div><ol class="tasks"><li data-t="7.4.1"><div class="tb"><p>Task: find the slowest trace from your 20 requests and explain which span made it slow.</p></div></li></ol></div></article><article class="lab" id="lab-7-5"><div class="lab-head"><h3>Lab 7.5 — Guardrails (read; hands-on if enabled)</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="7.5.1"><div class="tb"><p>Understand the prerequisites: guard models (global or custom) are deployed first; the central agent/LLM runs on a different prediction environment; an association ID and prediction storage are set so moderation metrics appear on Custom metrics.</p></div></li></ol><ol class="tasks"><li data-t="7.5.2"><div class="tb"><p>If your org has global guard models available (<a href="https://docs.datarobot.com/en/docs/workbench/nxt-registry/nxt-model-directory/nxt-global-models.html" target="_blank" rel="noopener">Global models</a>), configure one guard (for example prompt injection) on a copy of your workflow in the Workshop with Text Generation target (<a href="https://docs.datarobot.com/en/docs/workbench/nxt-registry/nxt-model-workshop/nxt-configure-evaluation-moderation.html" target="_blank" rel="noopener">Workshop evaluation and moderation</a>), use a moderation-compatible base environment, deploy, and send a prompt-injection attempt. Review Moderation events.</p></div></li></ol><ol class="tasks"><li data-t="7.5.3"><div class="tb"><p>Note: moderations evaluate the complete response, so they negate streaming, and they work with real-time (not batch) predictions.</p></div></li></ol></div></article><article class="lab" id="lab-7-6"><div class="lab-head"><h3>Lab 7.6 — Clean up (end of day or after the capstone)</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="7.6.1"><div class="tb"><p>Run dr task list and look for a teardown task in your template. If none exists, remove the stack with standard Pulumi from the infra/ folder:</p><ul><li>in the same directory: set -o allexport &amp;&amp; source .env &amp;&amp; set +o allexport,</li><li>echo ${DATAROBOT_API_TOKEN:0:4} # should print the first 4 characters, not an empty line</li><li>then cd infra &amp;&amp; pulumi destroy).</li></ul></div></li></ol><ol class="tasks"><li data-t="7.6.2"><div class="tb"><p>Delete test chats and playgrounds you no longer need; keep your Use Case for reference.</p></div></li></ol><ol class="tasks"><li data-t="m7.cp" class="checkpoint"><div class="tb"><p><b>Checkpoint:</b> the agent answers via API, and you can navigate every monitoring tab and explain what it shows.</p></div></li></ol><ol class="tasks"><li data-t="m7.cy" class="selfcheck"><div class="tb"><p><b>Check yourself:</b> What’s the difference between dr run deploy-dev and dr run deploy? Where do you look first if the deployed agent returns errors: Service health, Tracing or Standard output logs? Why?</p></div></li></ol></div></article>
+</section>
+<section data-page="day7" data-title="M8 Accelerators; M9 Capstone" data-short="D7" hidden>
+<h2 class="mod" id="s-day-7-module-8-accelerators-2-3-h">Day 7 — Module 8: Accelerators (2–3 h)</h2><p><b>Goal:</b> learn the tools that speed up agent development: agentic skills for coding agents and Agent Assist.</p><article class="lab" id="lab-8-1"><div class="lab-head"><h3>Lab 8.1 — DataRobot agentic skills</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="8.1.1"><div class="tb"><p>Install from your coding agent’s marketplace (Claude Code, Cursor, Gemini CLI, Codex) or with the universal installer:</p><div class="code"><pre><code>npx ai-agent-skills install datarobot-oss/datarobot-agent-skills --agent claude    # or --agent cursor</code></pre></div></div></li></ol><ol class="tasks"><li data-t="8.1.2"><div class="tb"><p>Ask your coding agent (Claude <b>Code</b>): “What DataRobot skills do I have available?” You should see datarobot-setup, datarobot-agent-assist, datarobot-discover and others.</p></div></li></ol><ol class="tasks"><li data-t="8.1.3"><div class="tb"><p>Run datarobot-setup once per workspace.</p></div></li></ol><ol class="tasks"><li data-t="8.1.4"><div class="tb"><p>Try a prompt such as “List the LLMs available in my DataRobot LLM gateway” or “Show my agentic workflow deployments.”</p></div></li></ol><p>Reference: <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-skills.html" target="_blank" rel="noopener">DataRobot agentic skills</a>.</p></div></article><article class="lab" id="lab-8-2"><div class="lab-head"><h3>Lab 8.2 — Agent Assist</h3><span class="lab-count"></span></div><div class="lab-body"><ol class="tasks"><li data-t="8.2.1"><div class="tb"><p>Install the plugin and verify:</p><div class="code"><pre><code>dr plugin install assist
+dr plugin list
+dr assist --help</code></pre></div></div></li></ol><ol class="tasks"><li data-t="8.2.2"><div class="tb"><p><b>Always start in an empty directory</b>—Agent Assist clones the template into the current folder: mkdir ~/assist-demo &amp;&amp; cd ~/assist-demo &amp;&amp; dr assist</p></div></li></ol><ol class="tasks"><li data-t="8.2.3"><div class="tb"><p>Use the <b>Design</b> workflow: describe an agent (for example “an agent that turns meeting notes into action items with owners and due dates, using today’s date”). Answer its clarifying questions until it writes agent_spec.md.</p></div></li></ol><ol class="tasks"><li data-t="8.2.4"><div class="tb"><p><b>Simulate</b> the agent from the spec (tools are chosen but not executed) and check whether the design holds up.</p></div></li></ol><ol class="tasks"><li data-t="8.2.5" data-opt><div class="tb"><p>(Optional) Let it <b>Code</b> the agent and compare the result with what you built by hand.</p></div></li></ol><p>Reference: <a href="https://docs.datarobot.com/en/docs/agentic-ai/agent-assist/index.html" target="_blank" rel="noopener">Agent Assist</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agent-assist/installation.html" target="_blank" rel="noopener">installation</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agent-assist/workflows-and-prompting.html" target="_blank" rel="noopener">workflows and prompting</a>, <a href="https://docs.datarobot.com/en/docs/agentic-ai/agent-assist/agent-spec-reference.html" target="_blank" rel="noopener">agent spec reference</a>.</p></div></article><article class="lab" id="lab-8-3" data-optlab><div class="lab-head"><span class="labtick" data-t="8.3.lab" data-opt></span><h3>Lab 8.3 (Optional) — Global tools</h3><span class="lab-count"></span></div><div class="lab-body"><p>In Registry, apply the <b>Global</b> filter and look for [Tool] models (Search Data Registry, Get Data Registry Dataset, Summarize DataFrame, Render Plotly Chart, Make AutoML Predictions…). Open one, find the global.model.source tag and follow it to the source in <a href="https://github.com/datarobot-oss/agent-tool-templates" target="_blank" rel="noopener">agent-tool-templates</a>. Read how agents call deployed tools with ToolClient in <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-tools-integrate.html" target="_blank" rel="noopener">Add tools to agents</a>.</p></div></article><h2 class="mod" id="s-day-7-module-9-capstone-3-h">Day 7 — Module 9: Capstone (3 h)</h2><p><b>Goal:</b> prove you can take an agent through the whole lifecycle on your own.</p><p><b>Brief — “Time-zone meeting planner” agent:</b> given a list of cities and a preferred meeting length, the agent proposes a meeting slot that falls within 09:00–17:00 local time for everyone and writes a short invite text.</p><div class="tbl"><table><thead><tr><th>#</th><th>Requirement</th><th>Evidence</th></tr></thead><tbody><tr><td class="tickcell"><span class="celltick" data-t="cap.1"></span>1</td><td>Built from the Agentic Starter (your Day 3 project or a fresh dr start)</td><td>Repo/folder</td></tr><tr><td class="tickcell"><span class="celltick" data-t="cap.2"></span>2</td><td>Uses datetime_tool plus one new local tool you write (for example working_hours_overlap)</td><td>Trace screenshot showing both tools</td></tr><tr><td class="tickcell"><span class="celltick" data-t="cap.3"></span>3</td><td>Planner/writer prompts adapted to the task (bonus: writer prompt stored in Registry → Prompts)</td><td>Code diff or prompt version</td></tr><tr><td class="tickcell"><span class="celltick" data-t="cap.4"></span>4</td><td>Evaluation dataset of at least 6 rows with toolCalls and agentGoal; aggregated metrics run in an agentic playground</td><td>Aggregated metrics screenshot</td></tr><tr><td class="tickcell"><span class="celltick" data-t="cap.5"></span>5</td><td>Deployed with dr run deploy and called via API</td><td>Deployment ID and a sample response</td></tr><tr><td class="tickcell"><span class="celltick" data-t="cap.6"></span>6</td><td>One monitoring insight (slowest span, token cost, error)</td><td>Short note</td></tr><tr><td class="tickcell"><span class="celltick" data-t="cap.7"></span>7</td><td>10-minute demo to your buddy: architecture, what you’d improve, one thing that surprised you</td><td>Demo</td></tr></tbody></table></div><ol class="tasks"><li data-t="cap.s" data-opt><div class="tb"><p><b>(Stretch) RAG agent:</b> deploy your pirate resumes VDB (<a href="https://docs.datarobot.com/en/docs/agentic-ai/vector-database/vector-dbs-register-deploy.html" target="_blank" rel="noopener">Register and deploy vector databases</a>) and give the agent a retrieval tool—for example through the standalone MCP server’s vector database tools (<a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-mcp/agentic-mcp-overview.html" target="_blank" rel="noopener">MCP server overview</a>).</p></div></li></ol>
+</section>
+<section data-page="ref" data-title="Appendices" data-short="REF" hidden>
+<h2 class="mod" id="s-appendix-a-command-cheat-sheet">Appendix A — Command cheat sheet</h2><div class="tbl"><table><thead><tr><th>Command</th><th>What it does</th></tr></thead><tbody><tr><td>dr auth set-url / dr auth login / dr auth logout</td><td>Point the CLI at an instance and authenticate</td></tr><tr><td>dr self update / dr self version</td><td>Update / show CLI version</td></tr><tr><td>dr templates list / dr templates setup</td><td>Browse and clone application templates</td></tr><tr><td>dr start (--yes for non-interactive)</td><td>Clone and configure the Agentic Starter; later runs only set up the local environment</td></tr><tr><td>dr component update</td><td>Reconfigure the agent component after first initialization</td></tr><tr><td>dr task list</td><td>List tasks defined by the template</td></tr><tr><td>dr run dev</td><td>Run frontend, backend, agent and MCP server locally</td></tr><tr><td>task agent:dev / task agent:cli -- execute --user_prompt '...'</td><td>Run only the agent / send it a test prompt</td></tr><tr><td>dr run deploy-dev</td><td>Deploy development resources (custom model, playground) quickly</td></tr><tr><td>dr run deploy</td><td>Full production deployment</td></tr><tr><td>dr llm list / dr llm select</td><td>List gateway and deployed LLMs / set the CLI default</td></tr><tr><td>dr plugin install xp / dr xp --entity-id USE_CASE_ID</td><td>Local experimentation dashboard (traces; evaluation in preview)</td></tr><tr><td>dr plugin install assist / dr assist</td><td>Agent Assist (run in an empty directory)</td></tr><tr><td>dr --verbose ... / dr --debug ...</td><td>Troubleshooting output</td></tr></tbody></table></div><h2 class="mod" id="s-appendix-b-endpoints-and-urls">Appendix B — Endpoints and URLs</h2><div class="tbl"><table><thead><tr><th>Purpose</th><th>URL</th></tr></thead><tbody><tr><td>REST API base</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2</td></tr><tr><td>LLM gateway (OpenAI-compatible base URL)</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/genai/llmgw</td></tr><tr><td>LLM gateway catalog</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/genai/llmgw/catalog/</td></tr><tr><td>Deployed agent chat completions</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/deployments/DEPLOYMENT_ID/chat/completions</td></tr><tr><td>Global MCP</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/genai/globalmcp/mcp</td></tr><tr><td>Deployed MCP server</td><td>https://<span class="ph" data-tok="YOUR_DR_HOST">YOUR_DR_HOST</span>/api/v2/deployments/DEPLOYMENT_ID/directAccess/mcp</td></tr><tr><td>Local: frontend / backend / agent / MCP / dashboard</td><td>localhost:5173 / :8080 / :8842/v1 / :9000/mcp / :8090</td></tr></tbody></table></div><h2 class="mod" id="s-appendix-c-agent-evaluation-dataset-for-lab-6-4">Appendix C — Agent evaluation dataset (for Lab 6.4)</h2><p>Save exactly as below (UTF-8 CSV). The toolCalls column is a JSON list; doubled quotes are CSV escaping.</p><div class="code"><pre><code>id,promptText,expectedResponse,toolCalls,agentGoal
+1,What time is it in Tokyo right now?,The current date and time in Tokyo (Asia/Tokyo).,"[{""name"":""datetime_tool"",""args"":{""timezone"":""Asia/Tokyo""}}]",A short answer stating the current time in the requested timezone.
+2,What is the current time in Dublin and in New York?,The current times in Dublin (Europe/Dublin) and New York (America/New_York).,"[{""name"":""datetime_tool"",""args"":{""timezone"":""Europe/Dublin""}},{""name"":""datetime_tool"",""args"":{""timezone"":""America/New_York""}}]",An answer that states both current times with their timezones.
+3,Write a two-sentence explanation of what a vector database is.,A vector database stores embeddings of documents so that semantically similar content can be retrieved. It is used in RAG to ground LLM answers in your own data.,[],A concise two-sentence explanation that needs no tool calls.
+4,Write a short note (under 100 words) that includes today's date and one tip for weekly planning.,A short note that includes today's date and a planning tip.,"[{""name"":""datetime_tool"",""args"":{}}]",A short note under 100 words that includes today's date.
+5,How many planets are in the solar system?,Our solar system has 8 planets.,[],A concise factual answer with no tool calls.
+6,Is it currently business hours (09:00-17:00) in Sydney?,Whether the current local time in Sydney (Australia/Sydney) is within 09:00-17:00.,"[{""name"":""datetime_tool"",""args"":{""timezone"":""Australia/Sydney""}}]",A yes/no answer supported by the current Sydney time.</code></pre></div><h2 class="mod" id="s-appendix-d-learning-log-template">Appendix D — Learning log template</h2><div class="tbl"><table><thead><tr><th>Asset</th><th>Name</th><th>ID / URL</th><th>Created on</th><th>Notes</th></tr></thead><tbody><tr><td>API key</td><td><span class="ph" data-tok="INITIALS">INITIALS</span>-onboarding</td><td>(don’t paste the key)</td><td></td><td></td></tr><tr><td>Use Case</td><td></td><td></td><td></td><td></td></tr><tr><td>Dataset (pirate resumes)</td><td></td><td></td><td></td><td></td></tr><tr><td>Vector database</td><td></td><td></td><td></td><td></td></tr><tr><td>RAG playground</td><td></td><td></td><td></td><td></td></tr><tr><td>Agentic Starter project folder / Pulumi stack</td><td></td><td></td><td></td><td></td></tr><tr><td>Agentic playground</td><td></td><td></td><td></td><td></td></tr><tr><td>Prompt template</td><td></td><td></td><td></td><td></td></tr><tr><td>Agent deployment</td><td></td><td></td><td></td><td></td></tr><tr><td>MCP server deployment</td><td></td><td></td><td></td><td></td></tr></tbody></table></div><h2 class="mod" id="s-appendix-e-self-assessment-can-you">Appendix E — Self-assessment: can you…</h2><ol class="tasks"><li data-t="sa.1"><div class="tb"><p>Explain the Build → Evaluate → Deploy → Monitor lifecycle and name the DataRobot area used at each stage?</p></div></li><li data-t="sa.2"><div class="tb"><p>Call an LLM through the gateway from Python and from agent code?</p></div></li><li data-t="sa.3"><div class="tb"><p>Build a vector database, attach it to an LLM blueprint and explain its citations?</p></div></li><li data-t="sa.4"><div class="tb"><p>Generate a synthetic evaluation dataset and run aggregated metrics?</p></div></li><li data-t="sa.5"><div class="tb"><p>Scaffold an agent with dr start, run it with dr run dev, and explain what each core file does?</p></div></li><li data-t="sa.6"><div class="tb"><p>Add a local tool and see it in a trace?</p></div></li><li data-t="sa.7"><div class="tb"><p>Explain when to use a local tool, a deployed global tool, or an MCP server?</p></div></li><li data-t="sa.8"><div class="tb"><p>Connect an agent to an agentic playground and evaluate it with Tool Call Accuracy and Agent Goal Accuracy?</p></div></li><li data-t="sa.9"><div class="tb"><p>Deploy with dr run deploy, call the deployment with the OpenAI client, and use the monitoring tabs?</p></div></li><li data-t="sa.10"><div class="tb"><p>Describe what evaluation and moderation guardrails need before they work?</p></div></li><li data-t="sa.11"><div class="tb"><p>Use Agent Assist to produce an agent_spec.md?</p></div></li></ol><h2 class="mod" id="s-appendix-f-troubleshooting-quick-map">Appendix F — Troubleshooting quick map</h2><div class="tbl"><table><thead><tr><th>Symptom</th><th>First thing to try</th><th>Doc</th></tr></thead><tbody><tr><td>dr: command not found</td><td>Add the binary folder to PATH or reinstall</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/getting-started.html" target="_blank" rel="noopener">CLI getting started</a></td></tr><tr><td>Authentication failed</td><td>dr auth logout, dr auth set-url, dr auth login</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/commands/auth.html" target="_blank" rel="noopener">Authentication management</a></td></tr><tr><td>No traces in the local dashboard</td><td>Start the agent, send a request, refresh; check port 8090 isn’t taken</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/local-experimentation/experimentation-tracing.html" target="_blank" rel="noopener">Local tracing</a></td></tr><tr><td>Agent build fails after deploy</td><td>Workshop → version → Model logs</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-deploy/agentic-workflow-register.html" target="_blank" rel="noopener">Register workflows</a></td></tr><tr><td>Missing Python package in deployment</td><td>Add it the documented way (environment vs runtime dependencies)</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-python-packages.html" target="_blank" rel="noopener">Add Python packages</a></td></tr><tr><td>Anything else</td><td>Search the agent troubleshooting page</td><td><a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-troubleshooting.html" target="_blank" rel="noopener">Troubleshooting</a></td></tr></tbody></table></div><h2 class="mod" id="s-appendix-g-further-reading-by-area">Appendix G — Further reading by area</h2><div class="block"><ul><li><b>Build:</b> <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-authentication.html" target="_blank" rel="noopener">Agent authentication</a> · <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-tracing-code.html" target="_blank" rel="noopener">Implement tracing</a> · <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-memory-service.html" target="_blank" rel="noopener">Memory service</a> · <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/agentic-tools.html" target="_blank" rel="noopener">Global agentic tools</a></li><li><b>MCP:</b> <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-mcp/agentic-mcp-dynamic-tool-registration.html" target="_blank" rel="noopener">Dynamic tool registration</a> · <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-mcp/agentic-mcp-clients.html" target="_blank" rel="noopener">MCP clients</a></li><li><b>Vector databases:</b> <a href="https://docs.datarobot.com/en/docs/agentic-ai/vector-database/vector-versions.html" target="_blank" rel="noopener">Update resident VDBs</a> · <a href="https://docs.datarobot.com/en/docs/agentic-ai/vector-database/vector-dbs-register-deploy.html" target="_blank" rel="noopener">Register and deploy VDBs</a></li><li><b>Code-first:</b> <a href="https://docs.datarobot.com/en/docs/agentic-ai/genai-code/genai-e2e.html" target="_blank" rel="noopener">End-to-end GenAI in code</a> · <a href="https://docs.datarobot.com/en/docs/agentic-ai/genai-code/agentic-example.html" target="_blank" rel="noopener">Agentic workflow with code (calculator tool)</a> · <a href="https://docs.datarobot.com/en/docs/agentic-ai/genai-code/genai-chat-completion-api.html" target="_blank" rel="noopener">Bolt-on Governance API</a></li><li><b>Reference:</b> <a href="https://docs.datarobot.com/en/docs/reference/gen-ai-ref/llm-availability.html" target="_blank" rel="noopener">LLM availability</a> · <a href="https://docs.datarobot.com/en/docs/reference/gen-ai-ref/genai-consider.html" target="_blank" rel="noopener">Feature considerations</a> · <a href="https://docs.datarobot.com/en/docs/agentic-ai/cli/quick-reference.html" target="_blank" rel="noopener">CLI quick reference</a></li><li><b>Next:</b> continue with <i>DataRobot Onboarding: Workloads (Workload API) Learning Path</i>—you can host agent services, MCP servers and model servers as governed containers.</li></ul></div><p class="foot"><i>Built from docs.datarobot.com (Agentic AI section, September 2026). Product features change quickly; when the UI or a command differs from this guide, trust the linked documentation.</i></p>
+</section>
+<section data-page="team" data-title="Team progress" data-short="TEAM" hidden>
+  <h2 class="mod">Team progress</h2>
+  <div id="team-out"><div class="empty">Loading progress…</div></div>
+</section>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  var CACHE_KEY = "dr-onb-agentic-v3";
+  var VAL_KEYS = { YOUR_DR_HOST: "host", INITIALS: "initials", YOUR_USE_CASE_ID: "usecase", YOUR_AGENT_DEPLOYMENT_ID: "deployment" };
+  var NAV_LABEL = { start: "Day 0", day1: "Day 1", day2: "Day 2", day3: "Day 3", day4: "Day 4", day5: "Day 5", day6: "Day 6", day7: "Day 7", ref: "Appendix", team: "Owner" };
+  var BRICK_PAGES = ["start", "day1", "day2", "day3", "day4", "day5", "day6", "day7"];
+  var API = location.pathname.replace(/\/?$/, "/") + "api/";
+
+  function blank() { return { v: 1, done: {}, values: {}, stars: {}, startedAt: null, updatedAt: null, last: null }; }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  var S = blank();
+  var store = null;
+  var earlyEdits = false;
+
+  /* ---------- pristine copy of the content (for admins editing it in place) ---------- */
+  var PRISTINE = $("#main").cloneNode(true);
+  var starredSec = document.createElement("section");
+  starredSec.dataset.page = "starred"; starredSec.dataset.title = "Starred"; starredSec.dataset.short = "STAR"; starredSec.hidden = true;
+  starredSec.innerHTML = '<h2 class="mod">Starred</h2><p>Steps you starred, newest first. Star any step with the ☆ under it.</p><div id="starred-out" class="onb-starred"></div>';
+  $("#main").insertBefore(starredSec, $("#main").firstChild);
+  NAV_LABEL.starred = "Your list";
+
+  /* ---------- pages ---------- */
+  var pages = $$("[data-page]");
+  var pageById = {};
+  pages.forEach(function (p) { pageById[p.dataset.page] = p; });
+
+  /* ---------- tasks: every [data-t] gets a checkbox ---------- */
+  var tasks = [];
+  var lastHeading = "";
+  var walker = document.createTreeWalker($("#main"), NodeFilter.SHOW_ELEMENT, null);
+  var order = [];
+  while (walker.nextNode()) {
+    var el = walker.currentNode;
+    if (el.matches("h2.mod")) lastHeading = el.textContent.trim();
+    if (el.hasAttribute("data-t")) order.push([el, lastHeading]);
+  }
+  order.forEach(function (pair) {
+    var el = pair[0];
+    var id = el.dataset.t;
+    var page = el.closest("[data-page]").dataset.page;
+    var lab = el.closest(".lab");
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.className = "tick";
+    cb.id = "t-" + id.replace(/[^A-Za-z0-9_-]/g, "-");
+    var labelSrc = el.tagName === "LI" ? el : (el.closest("tr") || el.closest(".lab-head") || el);
+    cb.setAttribute("aria-label", "Done: " + labelSrc.textContent.replace(/\s+/g, " ").trim().slice(0, 80));
+    if (el.tagName === "LI") { el.classList.add("task"); el.insertBefore(cb, el.firstChild); }
+    else el.appendChild(cb);
+    var t = { id: id, el: el, cb: cb, page: page, lab: lab, section: pair[1], opt: el.hasAttribute("data-opt") };
+    tasks.push(t);
+    cb.addEventListener("change", function () {
+      if (cb.checked && window.DROnb && !DROnb.isEnrolled()) {
+        cb.checked = false;
+        DROnb.ensureEnrolled().then(function (ok) { if (ok) { cb.checked = true; cb.dispatchEvent(new Event("change")); } });
+        return;
+      }
+      if (cb.checked) S.done[id] = Date.now(); else delete S.done[id];
+      S.last = id;
+      if (!S.startedAt) S.startedAt = Date.now();
+      if (!store) earlyEdits = true;
+      renderProgress();
+      save();
+    });
+  });
+
+  var labs = $$(".lab").map(function (el) {
+    var ts = tasks.filter(function (t) { return t.lab === el; });
+    var req = ts.filter(function (t) { return !t.opt; });
+    var h = el.querySelector(".lab-head h3");
+    return { el: el, tasks: ts, req: req.length ? req : ts, optional: req.length === 0, page: el.closest("[data-page]").dataset.page, title: h ? h.textContent.trim() : "" };
+  });
+
+  function countsFor(doneMap, filterFn) {
+    var d = 0, n = 0;
+    tasks.forEach(function (t) { if (t.opt || !filterFn(t)) return; n++; if (doneMap[t.id]) d++; });
+    return [d, n];
+  }
+  function firstOpen(doneMap) {
+    for (var i = 0; i < tasks.length; i++) { var t = tasks[i]; if (!t.opt && !doneMap[t.id] && t.page !== "ref") return t; }
+    return null;
+  }
+  function where(t) {
+    if (!t) return "Finished";
+    var labEl = t.lab && t.lab.querySelector(".lab-head h3");
+    return (NAV_LABEL[t.page] || "") + " · " + (labEl ? labEl.textContent.trim() : t.section);
+  }
+
+  /* ---------- navigation ---------- */
+  var side = $("#side");
+  var navItems = {};
+  function navItem(pid) {
+    var p = pageById[pid];
+    var a = document.createElement("a");
+    a.className = "nav-item"; a.href = "#" + pid; a.dataset.nav = pid;
+    var nh = document.createElement("div"); nh.className = "nh";
+    var lb = document.createElement("span"); lb.className = "label"; lb.textContent = NAV_LABEL[pid] || "";
+    var nc = document.createElement("span"); nc.className = "nc";
+    nh.appendChild(lb); nh.appendChild(nc);
+    var nt = document.createElement("span"); nt.className = "nt"; nt.textContent = p.dataset.title;
+    var bricks = document.createElement("div"); bricks.className = "labbricks";
+    var pl = labs.filter(function (l) { return l.page === pid; });
+    pl.forEach(function (l) { var i = document.createElement("i"); if (l.optional) i.className = "opt"; i.title = l.title; var b = document.createElement("b"); b.style.width = "0%"; i.appendChild(b); bricks.appendChild(i); });
+    a.appendChild(nh); a.appendChild(nt);
+    if (pl.length) a.appendChild(bricks);
+    navItems[pid] = { a: a, nc: nc, bricks: $$("i", bricks).map(function (i) { return i.firstChild; }), labs: pl };
+    return a;
+  }
+  BRICK_PAGES.forEach(function (pid) { side.appendChild(navItem(pid)); });
+  var sep = document.createElement("div"); sep.className = "sep"; side.appendChild(sep);
+  side.appendChild(navItem("ref"));
+  side.insertBefore(navItem("starred"), side.children[1] || null);
+
+  var dayBricks = $("#daybricks");
+  var dbEls = {};
+  BRICK_PAGES.forEach(function (pid) {
+    var a = document.createElement("a");
+    a.className = "daybrick"; a.href = "#" + pid;
+    a.setAttribute("aria-label", NAV_LABEL[pid] + ": " + pageById[pid].dataset.title);
+    var b = document.createElement("div"); b.className = "b";
+    var i = document.createElement("i"); b.appendChild(i);
+    var s = document.createElement("span"); s.textContent = pageById[pid].dataset.short;
+    a.appendChild(b); a.appendChild(s);
+    dayBricks.appendChild(a);
+    dbEls[pid] = { a: a, fill: i };
+  });
+
+  var current = null;
+  function show(pid, target) {
+    if (!pageById[pid]) pid = "start";
+    current = pid;
+    pages.forEach(function (p) { p.hidden = p.dataset.page !== pid; });
+    Object.keys(navItems).forEach(function (k) { if (k === pid) navItems[k].a.setAttribute("aria-current", "page"); else navItems[k].a.removeAttribute("aria-current"); });
+    Object.keys(dbEls).forEach(function (k) { dbEls[k].a.setAttribute("aria-current", k === pid ? "true" : "false"); });
+    if (navItems[pid] && side.scrollWidth > side.clientWidth + 4) side.scrollLeft = Math.max(0, navItems[pid].a.offsetLeft - side.offsetLeft - 8);
+    if (target) target.scrollIntoView({ block: "center", behavior: "auto" });
+    else { var top = $(".frame"); if (top && window.scrollY > top.offsetTop) window.scrollTo(0, top.offsetTop - 8); }
+  }
+  function route() {
+    var h = decodeURIComponent(location.hash.slice(1));
+    if (EDITING) { var sec = $('#main [data-page="' + h + '"]'); if (sec) sec.scrollIntoView({ block: "start" }); return true; }
+    if (!h || h === "edit") return false;
+    if (pageById[h]) { show(h); return true; }
+    var el = document.getElementById(h);
+    if (el && el.closest("[data-page]")) { show(el.closest("[data-page]").dataset.page, el); return true; }
+    return false;
+  }
+  window.addEventListener("hashchange", route);
+
+  function goToTask(t) {
+    if (!t) { location.hash = "ref"; return; }
+    if (location.hash.slice(1) !== t.page) history.replaceState(null, "", "#" + t.page);
+    var target = t.el.tagName === "LI" ? t.el : (t.el.closest("tr") || t.el.closest(".lab") || t.el);
+    show(t.page, target);
+    target.classList.remove("flash"); void target.offsetWidth; target.classList.add("flash");
+    t.cb.focus({ preventScroll: true });
+  }
+  $("#btn-resume").addEventListener("click", function () { goToTask(firstOpen(S.done)); });
+
+  /* ---------- progress ---------- */
+  function renderProgress() {
+    tasks.forEach(function (t) { var on = !!S.done[t.id]; t.cb.checked = on; if (t.el.tagName === "LI") t.el.classList.toggle("is-done", on); });
+    labs.forEach(function (l) {
+      var d = l.req.filter(function (t) { return S.done[t.id]; }).length;
+      var c = l.el.querySelector(".lab-count");
+      if (c) c.textContent = l.req.length ? d + "/" + l.req.length : "";
+      l.el.classList.toggle("done", l.req.length > 0 && d === l.req.length);
+      l.frac = l.req.length ? d / l.req.length : 0;
+    });
+    Object.keys(navItems).forEach(function (pid) {
+      if (pid === "team") return;
+      var ni = navItems[pid];
+      var c = countsFor(S.done, function (t) { return t.page === pid; });
+      ni.nc.textContent = c[0] + "/" + c[1];
+      ni.labs.forEach(function (l, i) { ni.bricks[i].style.width = Math.round(l.frac * 100) + "%"; });
+    });
+    BRICK_PAGES.forEach(function (pid) {
+      var c = countsFor(S.done, function (t) { return t.page === pid; });
+      dbEls[pid].fill.style.width = (c[1] ? Math.round(100 * c[0] / c[1]) : 0) + "%";
+    });
+    var all = countsFor(S.done, function () { return true; });
+    $("#pct").textContent = (all[1] ? Math.round(100 * all[0] / all[1]) : 0) + "%";
+    $("#pct-sub").textContent = all[0] + " of " + all[1] + " steps";
+  }
+
+  /* ---------- your values: fill placeholders ---------- */
+  var phs = $$(".ph[data-tok]");
+  function renderTokens() {
+    phs.forEach(function (sp) {
+      var tok = sp.dataset.tok, v = S.values[VAL_KEYS[tok]];
+      sp.textContent = v || tok;
+      sp.classList.toggle("filled", !!v);
+      sp.title = v ? tok : "Set under Your values";
+    });
+  }
+  var valInputs = { host: $("#v-host"), initials: $("#v-initials"), usecase: $("#v-usecase"), deployment: $("#v-deployment") };
+  Object.keys(valInputs).forEach(function (k) {
+    valInputs[k].addEventListener("input", function () {
+      var v = valInputs[k].value.trim();
+      if (k === "host") v = v.replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
+      if (v) S.values[k] = v; else delete S.values[k];
+      if (!store) earlyEdits = true;
+      renderTokens();
+      save(900);
+    });
+  });
+  function renderValues() { Object.keys(valInputs).forEach(function (k) { if (document.activeElement !== valInputs[k]) valInputs[k].value = S.values[k] || ""; }); }
+  var vbtn = $("#btn-values");
+  vbtn.addEventListener("click", function () {
+    var p = $("#values"); p.hidden = !p.hidden; vbtn.setAttribute("aria-expanded", String(!p.hidden));
+    if (!p.hidden) valInputs.host.focus();
+  });
+
+  /* ---------- copy buttons ---------- */
+  $$(".code").forEach(function (box) {
+    var pre = box.querySelector("pre");
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "copy"; b.textContent = "Copy";
+    b.addEventListener("click", function () {
+      var text = pre.textContent;
+      var done = function (msg) { b.textContent = msg; setTimeout(function () { b.textContent = "Copy"; }, 1600); };
+      var fallback = function () {
+        var r = document.createRange(); r.selectNodeContents(pre);
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        done("Press Ctrl/⌘+C");
+      };
+      try { navigator.clipboard.writeText(text).then(function () { done("Copied"); }, fallback); } catch (e) { fallback(); }
+    });
+    box.appendChild(b);
+  });
+
+  /* ---------- saving ---------- */
+  var stateEl = $("#save-state");
+  var STATE_TEXT = { init: "Loading", saving: "Saving…", cloud: "Saved to your profile", server: "Saved", local: "Saved in this browser only" };
+  function setState(s, text) { stateEl.dataset.s = s; stateEl.textContent = text || STATE_TEXT[s] || s; }
+  var timer = null, busy = false, dirty = false;
+  function save(delay) {
+    dirty = true;
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ }
+    if (!store) return;
+    setState("saving");
+    clearTimeout(timer);
+    timer = setTimeout(flush, delay || 500);
+  }
+  function flush() {
+    if (busy || !dirty || !store) return;
+    busy = true; dirty = false;
+    S.updatedAt = Date.now();
+    store.save(clone(S)).then(function () {
+      setState(store.kind, store.stateText);
+    }, function (e) {
+      console.warn("Progress save failed", e);
+      if (store.kind !== "local") {
+        store = localStore("View-only access: saved in this browser only");
+        store.save(clone(S));
+        setState("local", store.stateText);
+      }
+    }).then(function () { busy = false; if (dirty) flush(); });
+  }
+
+  function readCache() { try { var raw = localStorage.getItem(CACHE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+  function localStore(text) {
+    return {
+      kind: "local", stateText: text, me: { id: null, name: "" }, canTeam: false,
+      load: function () { return Promise.resolve(readCache()); },
+      save: function (st) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(st)); } catch (e) {} return Promise.resolve(); }
+    };
+  }
+
+  function claudeStore(db, user, me) {
+    var ref = db.doc("progress/" + me.id);
+    return {
+      kind: "cloud", me: { id: me.id, name: me.name, avatar: me.avatarUrl }, canTeam: !!(me.isOwner || me.canEdit),
+      load: function () { return ref.get().then(function (s) { return s.exists ? clone(s.data()) : null; }); },
+      save: function (st) { return ref.set(st); },
+      watchTeam: function (cb) {
+        return db.collection("progress").onSnapshot(function (qs) {
+          cb(qs.docs.map(function (d) { return { id: d.id, state: d.data() }; }));
+        }, function (e) { cb(null, e); });
+      },
+      names: function (ids) {
+        return user.profiles(ids).then(function (ps) {
+          var o = {}; ids.forEach(function (i) { var p = ps[i] || {}; o[i] = { name: p.name || "", avatar: p.avatarUrl || "", isMe: !!p.isMe }; }); return o;
+        });
+      }
+    };
+  }
+
+  function serverStore(me) {
+    var cachedNames = {};
+    return {
+      kind: "server", me: me, canTeam: !!me.isManager,
+      load: function () { return fetch(API + "progress", { headers: { accept: "application/json" } }).then(function (r) { if (!r.ok) throw new Error("load " + r.status); return r.json(); }).then(function (j) { return j && j.state ? j.state : null; }); },
+      save: function (st) { return fetch(API + "progress", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ state: st }) }).then(function (r) { if (!r.ok) throw new Error("save " + r.status); return r.json(); }).then(function (j) { if (window.DROnb) DROnb.onSaved(j); }); },
+      watchTeam: function (cb) {
+        var stop = false;
+        var tick = function () {
+          if (stop) return;
+          fetch(API + "team", { headers: { accept: "application/json" } }).then(function (r) { if (!r.ok) throw new Error("team " + r.status); return r.json(); })
+            .then(function (j) { (j.learners || []).forEach(function (l) { cachedNames[l.id] = { name: l.name || "", avatar: "", isMe: l.id === me.id }; }); cb((j.learners || []).map(function (l) { return { id: l.id, state: l.state || {}, meta: l.meta || {}, email: l.email || "", inactiveAfterDays: j.inactiveAfterDays }; })); }, function (e) { cb(null, e); })
+            .then(function () { if (!stop) setTimeout(tick, 60000); });
+        };
+        tick();
+        return function () { stop = true; };
+      },
+      names: function (ids) { var o = {}; ids.forEach(function (i) { o[i] = cachedNames[i] || { name: "", avatar: "", isMe: false }; }); return Promise.resolve(o); }
+    };
+  }
+
+  function pickStore() {
+    var c = window.claude;
+    if (c && typeof c.use === "function") {
+      return Promise.all([c.use("db"), c.use("user")]).then(function (r) {
+        var db = r[0], user = r[1];
+        if (!db || !user) return localStore();
+        return user.me().then(function (me) { return me && me.id ? claudeStore(db, user, me) : localStore(); });
+      }).catch(function () { return localStore(); });
+    }
+    return fetch(API + "me", { headers: { accept: "application/json" } }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (me) { return me && me.app === "dr-onboarding" ? serverStore(me) : localStore(); })
+      .catch(function () { return localStore(); });
+  }
+
+  /* ---------- team view ---------- */
+  var teamOut = $("#team-out");
+  function rel(ts) {
+    if (!ts) return "—";
+    var diff = (ts - Date.now()) / 1000, a = Math.abs(diff);
+    var f = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+    if (a < 3600) return f.format(Math.round(diff / 60), "minute");
+    if (a < 86400) return f.format(Math.round(diff / 3600), "hour");
+    return f.format(Math.round(diff / 86400), "day");
+  }
+  var lastRows = null, teamCohort = "", teamInactiveOnly = false;
+  function mk(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) { if (k === "text") e.textContent = attrs[k]; else if (k === "html") e.innerHTML = attrs[k]; else e.setAttribute(k, attrs[k]); });
+    (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return e;
+  }
+  function fmtDay(iso) { return iso ? new Date(iso + "T12:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "—"; }
+  function startCell(r) {
+    var td = mk("td", { style: "white-space:nowrap" });
+    var b = mk("button", { type: "button", class: "onb-linkbtn", title: "Change start date", text: fmtDay(r.meta.start) });
+    b.addEventListener("click", function () {
+      td.textContent = "";
+      var inp = mk("input", { type: "date", class: "onb-date" }); inp.value = r.meta.start || "";
+      var ok = mk("button", { type: "button", class: "onb-linkbtn", text: "Save" });
+      ok.addEventListener("click", function () {
+        if (!inp.value) return;
+        fetch(API + "start", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ date: inp.value, learner: r.id }) })
+          .then(function (x) { if (!x.ok) throw new Error(x.status); return x.json(); })
+          .then(function (j) { r.meta = Object.assign(r.meta, j.status); renderTeam(); }, function () { td.appendChild(mk("span", { style: "color:#B00020", text: " Couldn't save" })); });
+      });
+      td.appendChild(inp); td.appendChild(document.createTextNode(" ")); td.appendChild(ok); inp.focus();
+    });
+    td.appendChild(b);
+    return td;
+  }
+  function renderTeam(rows, err) {
+    if (rows) lastRows = rows;
+    teamOut.textContent = "";
+    if (!lastRows) { teamOut.appendChild(mk("div", { class: "empty", text: err ? "Couldn't load team progress. Reload the page to try again." : "Loading progress…" })); return; }
+    var all = lastRows.filter(function (r) { return (r.state && r.state.done && Object.keys(r.state.done).length) || (r.meta && r.meta.start); });
+    if (!all.length) { teamOut.appendChild(mk("div", { class: "empty", text: "No one has started this path yet." })); return; }
+    var cohorts = []; all.forEach(function (r) { if (r.meta.cohort && cohorts.indexOf(r.meta.cohort) < 0) cohorts.push(r.meta.cohort); });
+    cohorts.sort(function (x, y) { return new Date("1 " + y) - new Date("1 " + x); });
+    var sel = mk("select", { class: "onb-date", "aria-label": "Cohort" }, [mk("option", { value: "", text: "All cohorts" })].concat(cohorts.map(function (c) { var o = mk("option", { value: c, text: c + " cohort" }); if (c === teamCohort) o.selected = true; return o; })));
+    sel.addEventListener("change", function () { teamCohort = sel.value; renderTeam(); });
+    var ina = mk("input", { type: "checkbox" }); ina.checked = teamInactiveOnly;
+    ina.addEventListener("change", function () { teamInactiveOnly = ina.checked; renderTeam(); });
+    var csv = mk("a", { class: "btn ghost", href: location.pathname.replace(/\/?$/, "/") + "../api/export.csv" + (teamCohort ? "?cohort=" + encodeURIComponent(teamCohort) : ""), text: "Export CSV" });
+    teamOut.appendChild(mk("div", { style: "display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:12px" }, [sel,
+      mk("label", { style: "display:flex;gap:6px;align-items:center;font-size:15px" }, [ina, "Only inactive for " + (all[0].inactiveAfterDays || 7) + "+ days"]), csv]));
+    var list = all.filter(function (r) { return (!teamCohort || r.meta.cohort === teamCohort) && (!teamInactiveOnly || r.meta.inactiveDays); });
+    if (!list.length) { teamOut.appendChild(mk("div", { class: "empty", text: "No learners match these filters." })); return; }
+    list.sort(function (a, b) { return ((b.state || {}).updatedAt || 0) - ((a.state || {}).updatedAt || 0); });
+    store.names(list.map(function (r) { return r.id; })).then(function (names) {
+      var tb = mk("tbody");
+      list.forEach(function (r) {
+        var done = (r.state && r.state.done) || {};
+        var allc = countsFor(done, function () { return true; });
+        var n = names[r.id] || {}, m = r.meta || {};
+        var name = mk("div", { class: "team-row-name", title: r.email }, [mk("span", { text: (n.name || r.email || "Someone") + (n.isMe ? " (you)" : "") }),
+          m.badge && m.badge.earned && window.DROnb ? mk("span", { title: "Completed " + (m.badge.at || ""), style: "display:inline-flex;width:20px;height:20px", html: DROnb.badgeSvg() }) : null]);
+        var mb = mk("div", { class: "minibricks" }, BRICK_PAGES.map(function (pid) {
+          var c = countsFor(done, function (t) { return t.page === pid; });
+          return mk("i", { title: NAV_LABEL[pid] + ": " + c[0] + "/" + c[1] }, [mk("b", { style: "width:" + (c[1] ? Math.round(100 * c[0] / c[1]) : 0) + "%" })]);
+        }));
+        tb.appendChild(mk("tr", {}, [
+          mk("td", {}, [name]), startCell(r), mk("td", { style: "white-space:nowrap", text: m.cohort || "—" }),
+          mk("td", {}, [m.pace ? mk("span", { class: "onb-chip", "data-s": m.pace.status, text: m.pace.label }) : "—"]),
+          mk("td", { style: "font-variant-numeric:tabular-nums;white-space:nowrap", text: (allc[1] ? Math.round(100 * allc[0] / allc[1]) : 0) + "%  ·  " + allc[0] + "/" + allc[1] }),
+          mk("td", {}, [mb]), mk("td", { text: where(firstOpen(done)) }),
+          mk("td", { style: "white-space:nowrap" }, [m.inactiveDays ? mk("span", { class: "onb-chip", "data-s": "inactive", text: m.inactiveDays + " days idle" }) : rel((r.state || {}).updatedAt)])
+        ]));
+      });
+      teamOut.appendChild(mk("div", { class: "tbl" }, [mk("table", {}, [mk("thead", {}, [mk("tr", {}, ["Learner", "Start date", "Cohort", "Pace", "Progress", "Days 0–7", "Now on", "Last active"].map(function (t) { return mk("th", { text: t }); }))]), tb])]));
+    });
+  }
+
+  /* ---------- search entries and report context for DROnb ---------- */
+  function searchEntries() {
+    var out = [];
+    tasks.forEach(function (t) {
+      var src = t.el.tagName === "LI" ? t.el : (t.el.closest("tr") || t.el.closest(".lab") || t.el);
+      var txt = src.textContent.replace(/Report a problem/g, "").replace(/\s+/g, " ").trim();
+      var labH = t.lab && t.lab.querySelector(".lab-head h3");
+      out.push({ title: txt.slice(0, 140), text: txt + " " + (labH ? labH.textContent : "") + " " + t.section, where: (NAV_LABEL[t.page] || "") + (labH ? " · " + labH.textContent.trim().split(/\s[—-]\s/)[0] : ""), go: function () { goToTask(t); } });
+    });
+    $$("h2.mod, .lab-head h3, h3.sub").forEach(function (hd) {
+      var pg = hd.closest("[data-page]"); if (!pg || pg.dataset.page === "team") return;
+      var box = hd.closest(".lab") || hd;
+      out.push({ title: hd.textContent.trim(), text: (hd.closest(".lab") ? hd.closest(".lab").textContent : hd.textContent).slice(0, 3000), where: (NAV_LABEL[pg.dataset.page] || "") + " · Section",
+        go: function () { if (location.hash.slice(1) !== pg.dataset.page) history.replaceState(null, "", "#" + pg.dataset.page); show(pg.dataset.page, box); } });
+    });
+    return out;
+  }
+  function reportContext() {
+    var p = pageById[current];
+    return { label: p ? (NAV_LABEL[current] || "") + ": " + p.dataset.title : "", anchor: current || "" };
+  }
+  function addReportButtons() {
+    if (!window.DROnb) return;
+    tasks.forEach(function (t) {
+      if (t.el.tagName !== "LI") return;
+      var tb = t.el.querySelector(".tb");
+      var label = (NAV_LABEL[t.page] || "") + ": " + t.el.textContent.replace(/\s+/g, " ").trim().slice(0, 100);
+      if (tb) tb.appendChild(mk("div", { class: "onb-rowtools" }, [DROnb.starButton(t.id, label), DROnb.reportButton({ itemId: t.id, label: label, anchor: t.page })]));
+    });
+    $$(".lab").forEach(function (lab) {
+      if (lab.querySelector("li[data-t]")) return;  // labs without numbered steps get one button for the whole lab
+      var body = lab.querySelector(".lab-body"), hd = lab.querySelector(".lab-head h3");
+      var pg = lab.closest("[data-page]").dataset.page;
+      var tick = lab.querySelector("[data-t]");
+      if (body) body.appendChild(DROnb.reportButton({ itemId: tick ? tick.dataset.t : "", label: (NAV_LABEL[pg] || "") + ": " + (hd ? hd.textContent.trim() : ""), anchor: pg }));
+    });
+  }
+
+  /* ---------- starred ---------- */
+  function renderStarred() {
+    var out = $("#starred-out"); if (!out) return;
+    out.textContent = "";
+    var byT = {}; tasks.forEach(function (t) { byT[t.id] = t; });
+    var ids = Object.keys(S.stars || {}).filter(function (id) { return byT[id]; }).sort(function (x, y) { return S.stars[y] - S.stars[x]; });
+    if (!ids.length) out.appendChild(mk("div", { class: "empty", text: "Nothing starred yet. Use the ☆ Star button under any step to keep it here." }));
+    ids.forEach(function (id) {
+      var t = byT[id];
+      var labH = t.lab && t.lab.querySelector(".lab-head h3");
+      var a = mk("a", { href: "#" + t.page }, [mk("span", { class: "s", text: (NAV_LABEL[t.page] || "") + (labH ? " · " + labH.textContent.trim().split(/\s[—-]\s/)[0] : "") + (S.done[id] ? " · done" : "") }),
+        mk("span", { text: t.el.textContent.replace(/Report a problem|Starred|Star/g, "").replace(/\s+/g, " ").trim().slice(0, 160) })]);
+      a.addEventListener("click", function (e) { e.preventDefault(); goToTask(t); });
+      out.appendChild(a);
+    });
+    if (navItems.starred) navItems.starred.nc.textContent = ids.length ? String(ids.length) : "";
+  }
+  function toggleStar(id) {
+    S.stars = S.stars || {};
+    if (S.stars[id]) delete S.stars[id]; else S.stars[id] = Date.now();
+    if (!store) earlyEdits = true;
+    renderStarred();
+    save();
+  }
+
+  /* ---------- admin: edit the page text in place ---------- */
+  var EDITING = false, editDirty = false, liveMain = null, linkPop = null;
+  function enterEdit() {
+    if (EDITING) return;
+    EDITING = true; editDirty = false;
+    var main = $("#main");
+    liveMain = Array.prototype.slice.call(main.childNodes);
+    main.textContent = "";
+    Array.prototype.slice.call(PRISTINE.cloneNode(true).childNodes).forEach(function (n) { main.appendChild(n); });
+    $$("#main [data-page]").forEach(function (sec) {
+      if (sec.dataset.page === "team") { sec.hidden = true; return; }
+      sec.hidden = false;
+      sec.setAttribute("contenteditable", "true");
+      sec.addEventListener("input", function () { editDirty = true; });
+    });
+    document.body.classList.add("onb-editing");
+    $("#editbar").hidden = false;
+    var b = $("#btn-edit"); if (b) { b.textContent = "Editing…"; b.disabled = true; }
+    var h = location.hash.slice(1); var sec0 = h && $('#main [data-page="' + h + '"]'); if (sec0) sec0.scrollIntoView({ block: "start" });
+  }
+  function leaveEdit() {
+    EDITING = false; editDirty = false;
+    closeLinkPop();
+    var main = $("#main"); main.textContent = "";
+    liveMain.forEach(function (n) { main.appendChild(n); });
+    document.body.classList.remove("onb-editing");
+    $("#editbar").hidden = true;
+    var b = $("#btn-edit"); if (b) { b.textContent = "Edit content"; b.disabled = false; }
+    if (location.hash === "#edit") history.replaceState(null, "", "#start");
+    show(current || "start");
+  }
+  function closeLinkPop() { if (linkPop) { linkPop.remove(); linkPop = null; } }
+  document.addEventListener("click", function (e) {
+    if (!EDITING) return;
+    if (linkPop && linkPop.contains(e.target)) return;
+    closeLinkPop();
+    var aEl = e.target.closest && e.target.closest("#main a[href]");
+    if (!aEl) return;
+    e.preventDefault();
+    var r = aEl.getBoundingClientRect();
+    var inp = mk("input", { "aria-label": "Link address" }); inp.value = aEl.getAttribute("href");
+    var ok = mk("button", { type: "button", text: "Save link" }), un = mk("button", { type: "button", text: "Remove link" });
+    linkPop = mk("div", { class: "linkpop" }, [inp, ok, un]);
+    linkPop.style.left = Math.max(8, r.left + window.scrollX) + "px"; linkPop.style.top = (r.bottom + window.scrollY + 6) + "px";
+    document.body.appendChild(linkPop); inp.focus(); inp.select();
+    ok.addEventListener("click", function () { var v = inp.value.trim(); if (v) { aEl.setAttribute("href", v); editDirty = true; } closeLinkPop(); });
+    inp.addEventListener("keydown", function (ev) { if (ev.key === "Enter") ok.click(); if (ev.key === "Escape") closeLinkPop(); });
+    un.addEventListener("click", function () { aEl.replaceWith(document.createTextNode(aEl.textContent)); editDirty = true; closeLinkPop(); });
+  }, true);
+  function serializeMain() {
+    var c = $("#main").cloneNode(true);
+    $$("[data-page]", c).forEach(function (sec) { sec.removeAttribute("contenteditable"); sec.hidden = true; });
+    $$("[contenteditable]", c).forEach(function (n) { n.removeAttribute("contenteditable"); });
+    return c.innerHTML;
+  }
+  function publishFlow() {
+    var btn = $("#ed-publish");
+    btn.disabled = true; btn.textContent = "Checking…";
+    var root = location.pathname.replace(/\/?$/, "/") + "../";
+    fetch(root + "api/admin/content/agentic/preview", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ main: serializeMain() }) })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.detail || r.status); return j; }); })
+      .then(function (j) {
+        btn.disabled = false; btn.textContent = "Review and publish";
+        var s = j.summary;
+        var go = mk("button", { type: "button", class: "btn primary", text: "Publish now" });
+        var back = mk("button", { type: "button", class: "btn ghost", text: "Keep editing" });
+        var list = function (t, rows) { return rows.length ? [mk("b", { text: t + " (" + rows.length + ")" }), mk("ul", { style: "margin:0;padding-left:18px;max-height:180px;overflow:auto" }, rows.map(function (r) { return mk("li", { text: r.label }); }))] : []; };
+        var dlg = mk("div", { class: "onb-dialog", role: "dialog", "aria-modal": "true" }, [mk("h2", { text: "Publish your changes?" }),
+          mk("p", { text: s.counts + ". Steps that count: " + s.stepsBefore + " → " + s.stepsAfter + "." }),
+          !s.added.length && !s.removed.length ? mk("p", { text: "No steps added or removed; only text or links changed." }) : null]
+          .concat(list("New steps", s.added)).concat(list("Removed steps", s.removed))
+          .concat([s.learnersAffected ? mk("p", { style: "background:var(--yellow);color:#0B0B0B;padding:8px;border-radius:6px", text: s.learnersAffected + " learner(s) ticked a removed step. Their ticks stay saved but stop counting." }) : null,
+            mk("div", { class: "row" }, [back, go])]));
+        var wrap = mk("div", { class: "onb-modal" }, [dlg]);
+        document.body.appendChild(wrap);
+        back.addEventListener("click", function () { wrap.remove(); });
+        go.addEventListener("click", function () {
+          go.disabled = true; go.textContent = "Publishing…";
+          fetch(root + "api/admin/content/agentic/publish", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ token: j.token }) })
+            .then(function (r) { if (!r.ok) throw new Error(r.status); editDirty = false; location.hash = "start"; location.reload(); },
+              function (e) { go.disabled = false; go.textContent = "Publish now"; alert("Couldn't publish: " + e.message); });
+        });
+        go.focus();
+      }, function (e) { btn.disabled = false; btn.textContent = "Review and publish"; alert("Can't publish yet: " + e.message); });
+  }
+  window.addEventListener("beforeunload", function (e) { if (EDITING && editDirty) { e.preventDefault(); e.returnValue = ""; } });
+  $("#ed-discard").addEventListener("click", function () { if (!editDirty || confirm("Discard your unpublished changes?")) leaveEdit(); });
+  $("#ed-publish").addEventListener("click", publishFlow);
+
+  /* ---------- boot ---------- */
+  function renderAll() { renderProgress(); renderValues(); renderTokens(); renderStarred(); if (window.DROnb) DROnb.refreshStars(); }
+  var cached = readCache();
+  if (cached && cached.done) S = Object.assign(blank(), cached);
+  renderAll();
+  addReportButtons();
+  if (window.DROnb) DROnb.init({ api: API, title: "Agentic AI Learning Path", skill: "agentic", assetBase: location.pathname.replace(/\/?$/, "/") + "../assets/", paceMount: $("#pace"), badgeMount: $("#badge"), mascotMount: $("#mascot"),
+    toolsMount: $("#top-actions"), searchEntries: searchEntries, context: reportContext,
+    isStarred: function (id) { return !!(S.stars && S.stars[id]); }, toggleStar: toggleStar });
+  renderStarred(); if (window.DROnb) DROnb.refreshStars();
+  if (!route()) {
+    var nxt = Object.keys(S.done).length ? firstOpen(S.done) : null;
+    show(nxt ? nxt.page : "start");
+  }
+
+  pickStore().then(function (st) {
+    store = st;
+    return store.load().then(function (remote) {
+      if (remote && (remote.done || remote.stars)) {
+        var local = S;
+        S = Object.assign(blank(), remote);
+        if (earlyEdits) {
+          Object.keys(local.stars || {}).forEach(function (k) { S.stars[k] = local.stars[k]; });
+          Object.keys(local.done).forEach(function (k) { S.done[k] = local.done[k]; });
+          Object.keys(local.values).forEach(function (k) { S.values[k] = local.values[k]; });
+          save();
+        }
+      } else if (Object.keys(S.done).length || Object.keys(S.values).length) {
+        save();
+      }
+      renderAll();
+      setState(store.kind, store.stateText);
+      if (store.kind === "server" && window.DROnb) DROnb.init({ server: true });
+      if (store.canTeam) {
+        var eb = mk("button", { type: "button", class: "btn ghost", id: "btn-edit", text: "Edit content" });
+        eb.addEventListener("click", enterEdit);
+        $("#top-actions").insertBefore(eb, $("#top-actions .onb-tools"));
+        if (location.hash === "#edit") enterEdit();
+      }
+      if (store.me && store.me.name) $("#who-name").textContent = store.me.name;
+      if (store.me && store.me.avatar) { var av = $("#who-avatar"); av.src = store.me.avatar; av.hidden = false; }
+      if (!location.hash) { var n2 = Object.keys(S.done).length ? firstOpen(S.done) : null; if (n2 && n2.page !== current) show(n2.page); }
+      if (!store.canTeam && current === "team") show("start");
+      if (store.canTeam && store.watchTeam) {
+        var sep2 = document.createElement("div"); sep2.className = "sep"; side.appendChild(sep2);
+        side.appendChild(navItem("team"));
+        navItems.team.nc.textContent = "";
+        if (location.hash.slice(1) === "team") show("team");
+        store.watchTeam(renderTeam);
+      }
+    });
+  }).catch(function (e) {
+    console.warn(e);
+    store = localStore();
+    setState("local");
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+{
+ "groups": [
+  {
+   "id": "g1",
+   "kind": "jira",
+   "title": "PBMP-1 \u00b7 Agent workforce monitoring",
+   "summary": "3 linked or child issues: 2 shipped, 1 still open (open ones are left out by default)",
+   "warnings": [
+    {
+     "title": "1 Google Doc linked from the issues",
+     "text": "The app can't open Google Docs: https://docs.google.com/document/d/abc/edit. Download them as PDF and upload them below."
+    }
+   ],
+   "items": [
+    {
+     "id": "g1i1",
+     "label": "Descriptions and 2 comments of PBMP-1 and the shipped issues",
+     "checked": true,
+     "note": "",
+     "count": 3
+    },
+    {
+     "id": "g1i2",
+     "label": "1 open issue (not shipped yet)",
+     "checked": false,
+     "note": "",
+     "count": 1
+    },
+    {
+     "id": "g1i3",
+     "label": "2 attachments: 1 PDF, 1 screenshot (the LLM reads the images too)",
+     "checked": true,
+     "note": "",
+     "count": 2
+    },
+    {
+     "id": "g1i4",
+     "label": "1 Confluence page linked from the issues",
+     "checked": true,
+     "note": "",
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "g2",
+   "kind": "confluence",
+   "title": "Confluence: Agent monitoring: design and FAQ",
+   "summary": "2 pages",
+   "warnings": [
+    {
+     "title": "1 page is restricted",
+     "text": "The app's Atlassian account can't open them. Learners may not be able to either."
+    }
+   ],
+   "items": [
+    {
+     "id": "g2i1",
+     "label": "2 pages (the page and its child pages)",
+     "checked": true,
+     "note": "",
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "g4",
+   "kind": "files",
+   "title": "Your files",
+   "summary": "",
+   "warnings": [],
+   "items": [
+    {
+     "id": "g4i1",
+     "label": "Launch FAQ.md",
+     "checked": true,
+     "note": "",
+     "count": 1
+    }
+   ]
+  }
+ ],
+ "chars": 975,
+ "pages": 1,
+ "images": 1
+}

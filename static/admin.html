@@ -1,0 +1,1220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Onboarding Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a field manual. Header with one "data brick" per day; sidebar of days, each showing a brick per lab;
+   one day at a time in the main column, every step a checkbox. Brand: DataRobot green as the anchor,
+   black/white/gray base, solid colors only, regular weight type, mono caps for labels. */
+:root{
+  --bg:#FFFFFF;
+  --panel:#F3F4F3;
+  --ink:#0B0B0B;
+  --muted:#4C5650;
+  --line:#E4E4E4;
+  --green:#81FBA5;
+  --on-green:#0B0B0B;
+  --link:#5C41FF;
+  --yellow:#FFFF54;
+  --blue:#44BFFC;
+  --brick-empty:#E4E4E4;
+  --focus:#5C41FF;
+  --sans:"STK Miso","Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Monument Grotesk Mono","DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B0B0B;--panel:#151816;--ink:#EDF1EE;--muted:#A2ACA5;--line:#2A2F2C;
+    --link:#A6B0FF;--brick-empty:#2A2F2C;--focus:#A6B0FF;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B0B0B;--panel:#151816;--ink:#EDF1EE;--muted:#A2ACA5;--line:#2A2F2C;
+  --link:#A6B0FF;--brick-empty:#2A2F2C;--focus:#A6B0FF;color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.45;font-weight:400;margin:0}
+a{color:var(--link);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow,.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+code,pre,kbd{font-family:var(--mono)}
+code{font-size:.84em;background:var(--panel);padding:.08em .35em;border-radius:3px;overflow-wrap:anywhere}
+pre code{background:none;padding:0;font-size:inherit;overflow-wrap:normal}
+
+/* ---------- shell ---------- */
+.wrap{max-width:1240px;margin:0 auto;padding-inline:24px}
+.top{border-bottom:1px solid var(--line);padding-block:28px 22px}
+.top-row{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:flex-end;justify-content:space-between}
+.title-block{display:grid;gap:10px;min-width:0}
+.title-block h1{font-size:clamp(34px,5vw,56px);line-height:1.02;letter-spacing:-.02em}
+.who{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:15px;flex-wrap:wrap}
+.who img{width:24px;height:24px;border-radius:50%}
+.save-state{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line);border-radius:999px}
+.save-state[data-s="saving"]{border-color:var(--muted)}
+.save-state[data-s="local"]{background:var(--yellow);color:#0B0B0B;border-color:var(--yellow)}
+.meter{display:grid;gap:10px;min-width:min(100%,420px)}
+.meter-figs{display:flex;align-items:baseline;gap:12px}
+.meter-pct{font-size:44px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.meter-sub{color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
+.daybricks{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.daybrick{display:grid;gap:5px;text-decoration:none;color:var(--muted)}
+.daybrick .b{height:14px;background:var(--brick-empty);position:relative;overflow:hidden}
+.daybrick .b i{position:absolute;inset:0 auto 0 0;background:var(--green);width:0}
+.daybrick span{font-family:var(--mono);font-size:10px;letter-spacing:.06em}
+.daybrick[aria-current="true"] span{color:var(--ink)}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.btn{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--ink);border-radius:var(--r);padding:7px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn:hover{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.btn.primary{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.btn.primary:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.ghost{border-color:var(--line)}
+
+/* values panel */
+.values{border-bottom:1px solid var(--line);background:var(--panel);padding-block:20px}
+.values-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 18px}
+.field{display:grid;gap:6px;min-width:0}
+.field input{font:inherit;font-size:15px;font-family:var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;width:100%;min-width:0}
+.field input:focus{border-color:var(--ink);outline:none}
+.values p.hint{color:var(--muted);font-size:14px;margin-top:12px;max-width:80ch}
+
+/* frame: sidebar + main */
+.frame{display:grid;grid-template-columns:250px minmax(0,1fr);gap:48px;padding-block:32px 80px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;display:grid;gap:2px;max-height:calc(100vh - 32px);overflow:auto}
+.nav-item{display:grid;gap:6px;padding:10px 12px;border-radius:var(--r);text-decoration:none;color:var(--ink);border:1px solid transparent}
+.nav-item:hover{background:var(--panel)}
+.nav-item[aria-current="page"]{background:var(--panel);border-color:var(--line)}
+.nav-item .nh{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.nav-item .nt{font-size:16px;line-height:1.2}
+.nav-item .nc{font-family:var(--mono);font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.labbricks{display:flex;gap:3px;flex-wrap:wrap}
+.labbricks i{width:14px;height:6px;background:var(--brick-empty);position:relative;overflow:hidden;display:block}
+.labbricks i b{position:absolute;inset:0 auto 0 0;background:var(--green)}
+.labbricks i.opt{opacity:.55}
+.side .sep{height:1px;background:var(--line);margin:8px 12px}
+
+main{min-width:0}
+[data-page]{display:grid;gap:28px;max-width:860px}
+.page-head{display:grid;gap:12px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.page-head h2{font-size:clamp(30px,4vw,42px);line-height:1.06;letter-spacing:-.02em}
+.page-head .lede{font-size:19px;color:var(--muted);max-width:68ch}
+.module{display:grid;gap:18px}
+.module-head{display:grid;gap:8px;padding-top:6px}
+.module-head h3{font-size:28px;line-height:1.1}
+.goal{font-size:18px;max-width:68ch}
+.explain{color:var(--ink);max-width:68ch}
+.readfirst{display:grid;gap:8px;padding:16px 18px;border:1px solid var(--line);border-radius:var(--r)}
+.readfirst ul{margin:0;padding-left:18px;display:grid;gap:4px}
+
+/* lab cards */
+.lab{border:1px solid var(--line);border-radius:var(--r);display:grid;scroll-margin-top:20px}
+.lab-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.lab-num{font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:4px 8px;background:var(--panel);border-radius:3px;white-space:nowrap}
+.lab.done .lab-num{background:var(--green);color:var(--on-green)}
+.lab-head h4{font-size:21px;line-height:1.15}
+.lab-count{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 7px;margin-left:8px;vertical-align:3px;color:var(--muted)}
+.lab-body{display:grid;gap:16px;padding:16px 18px 18px;min-width:0}
+.lab-body > p,.lab-body > .explain{max-width:68ch}
+
+/* tasks */
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.task{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;align-items:start}
+.tb{display:grid;gap:10px;min-width:0}
+.tb > ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.tick{appearance:none;-webkit-appearance:none;width:22px;height:22px;margin:1px 0 0;border:1.5px solid var(--ink);border-radius:4px;background:var(--bg);cursor:pointer;display:grid;place-content:center}
+.tick::after{content:"";width:11px;height:6px;border-left:2px solid var(--on-green);border-bottom:2px solid var(--on-green);transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.tick:checked{background:var(--green);border-color:var(--green)}
+.tick:checked::after{opacity:1}
+.task.is-done > .tb > p:first-child{color:var(--muted)}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{background:var(--green)}100%{background:transparent}}
+
+.checkpoint,.selfcheck{border-radius:var(--r);padding:14px 16px}
+.checkpoint{border:1.5px solid var(--green);}
+.selfcheck{background:var(--panel)}
+.checkpoint .label,.selfcheck .label{color:var(--ink)}
+
+/* callouts */
+.note,.known{display:grid;grid-template-columns:6px minmax(0,1fr);gap:14px;padding:12px 14px 12px 0;max-width:72ch}
+.note::before,.known::before{content:"";background:var(--blue)}
+.known::before{background:var(--yellow)}
+.note > div,.known > div{display:grid;gap:6px;min-width:0}
+.known .label::before{content:"Known issue"}
+.note .label::before{content:attr(data-l)}
+
+/* code */
+.code{position:relative;min-width:0}
+.code pre{margin:0;background:var(--panel);border-radius:var(--r);padding:38px 16px 14px;font-size:13.5px;line-height:1.55;overflow-x:auto;white-space:pre}
+.copy{position:absolute;top:8px;right:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:4px 8px;cursor:pointer}
+.copy:hover{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.ph{border-bottom:1.5px dashed var(--link);color:inherit}
+.ph.filled{background:var(--green);color:var(--on-green);border-bottom:0;padding:0 2px;border-radius:2px}
+.cm{color:var(--muted)}
+
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--sans);font-size:14px;color:var(--muted);font-weight:400;background:var(--panel)}
+td code{white-space:nowrap}
+td.wrap code{white-space:normal}
+
+/* overview */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.how{margin:0;padding-left:18px;display:grid;gap:8px;max-width:72ch}
+
+/* learning log */
+
+/* team */
+.team-row-name{display:flex;align-items:center;gap:10px;min-width:160px}
+.team-row-name img{width:28px;height:28px;border-radius:50%}
+.minibricks{display:grid;grid-template-columns:repeat(8,22px);gap:3px}
+.minibricks i{height:12px;background:var(--brick-empty);position:relative;overflow:hidden;display:block}
+.minibricks i b{position:absolute;inset:0 auto 0 0;background:var(--green)}
+.empty{padding:28px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);max-width:68ch}
+.foot{color:var(--muted);font-size:14px;max-width:72ch;border-top:1px solid var(--line);padding-top:16px}
+
+/* responsive */
+
+/* rebuild: content generated from the Google Doc */
+[data-page] > p,[data-page] > .block,[data-page] > ul{max-width:72ch}
+[data-page] > .block ul,[data-page] > ul{margin:0;padding-left:18px;display:grid;gap:6px}
+h2.mod{font-size:clamp(26px,3.4vw,34px);line-height:1.1;letter-spacing:-.015em;padding-top:18px;border-top:1px solid var(--line)}
+[data-page] > h2.mod:first-child{border-top:0;padding-top:0}
+h3.sub{font-size:20px;line-height:1.2}
+.lab-head h3{font-size:21px;line-height:1.2;font-weight:400}
+.lab-head{display:flex;align-items:center;gap:14px}
+.lab-head h3{flex:1;min-width:0}
+.lab-head .labtick{display:contents}
+.lab-body ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.lab-body > p{max-width:72ch}
+.tb > p + p{margin-top:0}
+td.tickcell{white-space:nowrap}
+td.tickcell .tick{display:inline-grid;vertical-align:middle;margin-right:8px}
+.celltick{white-space:nowrap}
+.foot{font-style:normal}
+.values .hint{color:var(--muted);font-size:14px;margin-top:12px}
+
+@media (max-width:900px){
+  .frame{grid-template-columns:minmax(0,1fr);gap:20px;padding-block:16px 64px}
+  .side{position:static;max-height:none;display:flex;overflow-x:auto;gap:6px;padding-bottom:6px;margin-inline:-4px}
+  .side .sep{display:none}
+  .nav-item{flex:0 0 auto;min-width:150px}
+  }
+@media (max-width:520px){
+  .wrap{padding-inline:16px}
+  body{font-size:16px}
+  .lab-head{padding:12px 14px}
+  .lab-body{padding:14px}
+  .meter-pct{font-size:36px}
+  .daybrick span{font-size:9px}
+}
+.backlink{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.backlink:hover{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}}
+.rightcol{display:grid;gap:14px;min-width:min(100%,420px)}
+.top-row{align-items:flex-start}
+.mascot-slot{min-width:0}
+.rightcol .onb-mascot{max-width:none}
+.linkpop{position:absolute;z-index:45;display:flex;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--ink);border-radius:6px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.linkpop input{font:inherit;font-size:13px;font-family:var(--mono);border:1px solid var(--line);border-radius:4px;padding:3px 6px;width:min(420px,60vw)}
+.linkpop button{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);padding:3px 8px;cursor:pointer}
+</style>
+<link rel="stylesheet" href="../assets/common.css">
+<script src="../assets/common.js"></script>
+<style>
+[hidden]{display:none!important}
+.backlink{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.backlink:hover{color:var(--ink)}
+.adm{display:grid;gap:8px;padding-block:20px 80px}
+.adm > *{min-width:0}
+.mascot-mini{display:inline-flex;width:22px;height:22px}
+.mascot-mini img{width:100%;height:100%;object-fit:contain}
+.admin h2{font-size:30px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-top:14px;flex-wrap:wrap}
+.tabs a{font-size:16px;color:var(--muted);text-decoration:none;padding:10px 14px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tabs .count{font-family:var(--mono);font-size:11px;background:var(--yellow);color:#0B0B0B;border-radius:999px;padding:1px 7px;margin-left:6px}
+.panel{padding-top:18px;display:grid;gap:14px}
+.panel > *,.panel > * > *{min-width:0}
+.filters{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.filters select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:7px 10px}
+.filters label{display:flex;gap:6px;align-items:center;font-size:15px}
+.cellbar{display:grid;gap:5px;min-width:170px}
+.cellbar .ln{display:flex;align-items:center;gap:8px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cellbar span.b{width:90px;height:8px;background:var(--brick-empty);position:relative;overflow:hidden;display:inline-block}
+.cellbar span.b i{position:absolute;inset:0 auto 0 0;background:var(--green)}
+.cellbar a{color:var(--ink)}
+.cellbar .mini-badge svg{width:18px;height:18px;vertical-align:-4px}
+.cellbar .onb-chip{justify-self:start}
+
+.report{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:8px}
+.report.resolved{background:var(--panel)}
+.report .meta{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:14px;color:var(--muted);align-items:center}
+.report .msg{white-space:pre-wrap;max-width:80ch}
+.report .about a{color:var(--ink)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.content-card{border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:12px}
+.content-card h3{font-size:22px}
+.content-card .src{color:var(--muted);font-size:15px}
+.content-card .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.diff{border-radius:var(--r);background:var(--panel);padding:14px 16px;display:grid;gap:10px}
+.diff ul{margin:0;padding-left:18px;display:grid;gap:3px;font-size:14px;max-height:240px;overflow:auto}
+.diff .warn{background:var(--yellow);color:#0B0B0B;border-radius:var(--r);padding:8px 10px;font-size:15px}
+.err{color:#B00020}
+
+/* dashboard: chart roles (validated: blue/orange, light on #fff, dark on #0b0b0b) */
+.viz{--s1:#2a78d6;--s2:#eb6834;--grid:#e1e0d9;--axis:#c3c2b7;--surface:var(--bg)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .viz{--s1:#3987e5;--s2:#d95926;--grid:#2c2c2a;--axis:#383835}}
+:root[data-theme="dark"] .viz{--s1:#3987e5;--s2:#d95926;--grid:#2c2c2a;--axis:#383835}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px}
+.tile{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:4px;align-content:start}
+.tile .label{color:var(--muted)}
+.tile .v{font-size:34px;line-height:1.05;letter-spacing:-.01em}
+.tile .d{font-size:14px;color:var(--muted)}
+.pathgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:14px}
+.pathcard{border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;gap:12px}
+.pathcard h3{font-size:22px;display:flex;align-items:center;gap:10px}
+.pathcard h3 i{display:inline-block;width:14px;height:3px;border-radius:2px}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 14px}
+.kv div{display:grid;gap:2px}
+.kv b{font-weight:400;font-size:24px;line-height:1.1}
+.kv span{font-size:13px;color:var(--muted)}
+.pacebar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--brick-empty);gap:2px}
+.pacebar i{display:block;height:100%}
+.pacelegend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.pacelegend span{display:inline-flex;gap:6px;align-items:center}
+.pacelegend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:14px}
+.chart{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:8px;position:relative;min-width:0}
+.chart h3{font-size:18px}
+.chart .sub{font-size:13px;color:var(--muted)}
+.legend{display:flex;gap:2px 16px;flex-wrap:wrap;font-size:13px;color:var(--muted);line-height:1.4}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:14px;height:2px;border-radius:1px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart svg:focus{outline:none}
+.chart svg:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:4px}
+.chart .tip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--line);border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.12);padding:8px 10px;font-size:13px;display:grid;gap:4px;min-width:130px;z-index:5}
+.chart .tip .t{color:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+.chart .tip .r{display:flex;align-items:center;gap:8px}
+.chart .tip .r i{width:12px;height:2px;border-radius:1px;display:inline-block}
+.chart .tip .r b{font-weight:500;font-size:15px;min-width:2ch}
+.chart .tablebtn{justify-self:start;font:inherit;font-size:13px;color:var(--link);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.chart table{font-size:13px}
+.chart td,.chart th{padding:5px 8px;font-variant-numeric:tabular-nums}
+#reports-out,#users-out,#content-out{display:grid;gap:12px}
+#reports-out > *,#users-out > *,#content-out > *{min-width:0}
+.viz{--s3:#1f9e89;--s4:#9b59d0;--s5:#d1495b;--s6:#6b7280}
+
+/* reports */
+.rbar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.small{font-size:14px;color:var(--muted)}
+.jline{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.key{font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--link)}
+.js{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;border:1px solid var(--line)}
+.js.indeterminate{background:var(--blue);border-color:var(--blue);color:#0B0B0B}
+.js.done{background:var(--green);border-color:var(--green);color:#0B0B0B}
+.files{display:flex;gap:8px;flex-wrap:wrap;font-size:14px}
+
+/* content: list and create flows */
+.plist td,.plist th{vertical-align:middle}
+.pill{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;border:1px solid var(--line)}
+.pill.pub{background:var(--green);border-color:var(--green);color:#0B0B0B}
+.pill.dr{background:var(--panel)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.onb-dialog.flat{box-shadow:none;border:1px solid var(--line);max-width:none}
+.choices{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.fork{all:unset;box-sizing:border-box;display:grid;gap:4px;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;cursor:pointer;color:var(--ink)}
+.fork:hover,.fork:focus-visible{border-color:var(--ink);background:var(--panel)}
+.fork b{font-weight:400;font-size:19px}
+.fork span{color:var(--muted);font-size:15px}
+.form{max-width:860px;display:grid;gap:14px}
+.form .field input,.form .field textarea,.form .field select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;width:100%;min-width:0}
+.form .field textarea{min-height:84px;resize:vertical}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px}
+.srcs{display:grid;gap:6px}
+.srcs > *{min-width:0}
+.src{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;border:1px solid var(--line);border-radius:var(--r);padding:8px 10px}
+.src .u{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src .ok{grid-column:2;font-size:13px;color:var(--muted)}
+.src button{grid-row:1;grid-column:3;border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer}
+.lnkin{display:flex;gap:8px;flex-wrap:wrap}
+.lnkin input{flex:1 1 220px;font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;min-width:0}
+.found{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
+.found .fh{display:grid;gap:2px}
+.found label{display:flex;gap:8px;align-items:flex-start;font-size:15px}
+.found .fi{padding-left:24px}
+.warnrow{display:grid;gap:2px;background:var(--yellow);color:#0B0B0B;border-radius:var(--r);padding:8px 10px;margin-left:24px;font-size:15px}
+.warnrow .small{color:#0B0B0B}
+.more{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;border:1px dashed var(--muted);border-radius:var(--r);padding:12px 14px}
+.more>div:first-child{display:grid;gap:2px}
+.steps{display:grid;gap:8px}
+.st{font-size:16px;padding-left:26px;position:relative}
+.st.done::before{content:"✓";position:absolute;left:0;width:18px;height:18px;border-radius:50%;background:var(--green);color:#0B0B0B;font-size:12px;display:grid;place-items:center;top:2px}
+.st.now::before{content:"";position:absolute;left:0;top:3px;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* users */
+.ptop{display:flex;gap:12px 20px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.invite{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 320px;min-width:0;max-width:100%}
+.emailin{flex:1 1 260px;display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;min-width:0}
+.emailin input{flex:1;border:0;font:inherit;font-size:15px;color:var(--ink);background:var(--bg);padding:8px 10px;min-width:0;outline:none}
+.emailin span{font-family:var(--mono);font-size:14px;color:var(--muted);background:var(--panel);padding:8px 10px;display:flex;align-items:center;border-left:1px solid var(--line)}
+.rp{margin-top:22px}
+.ptable{border:1px solid var(--line);border-radius:var(--r)}
+.pgh{display:flex;gap:8px;align-items:baseline;padding:12px 14px;background:var(--panel);flex-wrap:wrap;border-radius:var(--r) var(--r) 0 0}
+.pgh h3{font-size:20px}.pgh .sp{flex:1}
+.pgh .seg button{font-size:13px;padding:4px 10px}
+.prow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.3fr) minmax(0,1.6fr) minmax(0,1fr) 200px;gap:6px 14px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);font-size:15px}
+.phead{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-block:6px}
+.pp{display:grid;gap:1px;min-width:0}.pp span{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.roles{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.act{display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.act .btn{font-size:14px;padding:5px 10px}
+.lock{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.onb-chip.locked::before{content:"🔒 ";font-size:9px}
+.prow.new{background:color-mix(in srgb,var(--green) 18%,var(--bg));grid-template-columns:minmax(0,2fr) minmax(0,5fr)}
+.justin{font-family:var(--mono);font-size:10.5px!important;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)!important;margin-top:4px}
+.pick{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;position:relative}
+.pick .label{width:100%}
+.pick label{display:inline-flex;gap:6px;align-items:center;font-size:15px;border:1px solid var(--ink);border-radius:var(--r);padding:5px 10px;background:var(--bg);cursor:pointer}
+.pick .small{flex:1 1 220px}
+.tip{position:relative}
+.tip::after{content:attr(data-tip);position:absolute;z-index:20;left:0;top:calc(100% + 8px);width:max-content;max-width:min(260px,calc(100vw - 48px));background:var(--ink);color:var(--bg);font-family:var(--sans);font-size:13px;line-height:1.35;letter-spacing:0;text-transform:none;text-align:left;padding:8px 10px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.2);display:none;pointer-events:none;white-space:normal}
+.tip:hover::after,.tip:focus-visible::after,.tip.show::after{display:block}
+@media (max-width:640px){
+  .phead{display:none}
+  .prow,.prow.new{grid-template-columns:1fr}
+  .prow [data-l]::before{content:attr(data-l) ": ";font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .act{justify-content:flex-start}
+  .rp{margin-top:0}
+  .pick{position:relative}.pick .tip{position:static}.pick .tip::after{left:0;right:auto;top:72px;width:auto;max-width:100%}
+}
+.paste{border:1px dashed var(--muted);border-radius:var(--r);padding:12px;display:grid;gap:10px}
+.paste.over{border-color:var(--ink);background:var(--panel)}
+.paste p{font-size:14px;color:var(--muted)}
+.thumbs{display:flex;gap:10px;flex-wrap:wrap}
+.thumbs:empty{display:none}
+.thumbs figure{margin:0;display:grid;gap:4px;width:92px;position:relative}
+.thumbs figure.up{opacity:.5}
+.thumbs img,.thumbs .doc{height:64px;width:92px;object-fit:cover;border:1px solid var(--line);border-radius:4px;background:var(--panel)}
+.thumbs .doc{display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.thumbs figcaption{font-family:var(--mono);font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.thumbs .x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;font-size:13px;line-height:1;padding:0}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="backlink" href="../">&larr; Learning paths</a>
+    <div class="top-row" style="margin-top:10px">
+      <div class="title-block">
+        <span class="eyebrow">DataRobot onboarding</span>
+        <h1>Admin</h1>
+        <div class="who"><span id="who-name"></span><span class="save-state" id="who-state" data-s="init">Loading</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+<main class="wrap adm" id="admin">
+  <nav class="tabs" aria-label="Admin">
+    <a href="#dashboard" data-tab="dashboard">Dashboard</a>
+    <a href="#team" data-tab="team">Team progress</a>
+    <a href="#reports" data-tab="reports">Problem reports<span class="count" id="rep-count" hidden></span></a>
+    <a href="#content" data-tab="content">Content</a>
+    <a href="#users" data-tab="users" hidden>Users</a>
+  </nav>
+  <div class="panel" data-panel="dashboard"><div id="dash-out" class="viz"><div class="empty">Loading…</div></div></div>
+  <div class="panel" data-panel="team" hidden><div id="team-out"><div class="empty">Loading…</div></div></div>
+  <div class="panel" data-panel="reports" hidden><div id="reports-out"><div class="empty">Loading…</div></div></div>
+  <div class="panel" data-panel="content" hidden><div id="content-out"><div class="empty">Loading…</div></div></div>
+  <div class="panel" data-panel="users" hidden><div id="users-out"><div class="empty">Loading…</div></div></div>
+</main>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var BASE = location.pathname.replace(/\/?$/, "/");
+  var ROOT = BASE + "../";
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v == null || v === false) return;
+      if (k === "class") el.className = v; else if (k === "text") el.textContent = v; else if (k === "html") el.innerHTML = v;
+      else if (k.slice(0, 2) === "on") el.addEventListener(k.slice(2), v); else el.setAttribute(k, v === true ? "" : v);
+    });
+    function put(c) { if (c == null || c === false) return; if (Array.isArray(c)) { c.forEach(put); return; } el.appendChild(typeof c === "string" ? document.createTextNode(c) : c); }
+    for (var i = 2; i < arguments.length; i++) put(arguments[i]);
+    return el;
+  }
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function s(tag, attrs) { var el = document.createElementNS(SVGNS, tag); Object.keys(attrs || {}).forEach(function (k) { el.setAttribute(k, attrs[k]); }); return el; }
+  function pct(d, t) { return t ? Math.round(100 * d / t) : 0; }
+  function rel(ts) {
+    if (!ts) return "—";
+    var diff = (ts - Date.now()) / 1000, a = Math.abs(diff), f = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+    if (a < 3600) return f.format(Math.round(diff / 60), "minute");
+    if (a < 86400) return f.format(Math.round(diff / 3600), "hour");
+    return f.format(Math.round(diff / 86400), "day");
+  }
+  function chip(p) { return p ? h("span", { class: "onb-chip", "data-s": p.status }, p.label) : null; }
+  function badge() { return h("span", { class: "mini-badge", title: "Completed", html: DROnb.badgeSvg() }); }
+  function mascotThumb(k) { return k ? h("span", { class: "mascot-mini", title: "Skill growth: stage " + k + " of 10" }, h("img", { src: ROOT + "assets/mascots/year-" + (k < 10 ? "0" : "") + k + ".png", alt: "" })) : null; }
+  function api(path, opts) {
+    return fetch(ROOT + path, opts).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.detail || ("Request failed (" + r.status + ")")); return j; });
+    });
+  }
+  function showTab() {
+    var t = (location.hash || "#dashboard").slice(1);
+    if (t === "create") t = "content";
+    if (!/^(dashboard|team|reports|content|users)$/.test(t) || (t === "users" && !(ME && ME.isManager))) t = "dashboard";
+    $$("[data-tab]").forEach(function (a) { if (a.dataset.tab === t) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    $$("[data-panel]").forEach(function (p) { p.hidden = p.dataset.panel !== t; });
+    if (t === "dashboard" && dash) renderDashboard();
+  }
+
+  /* ---------------------------------------------------------------- dashboard */
+  var dash = null;
+  var SERIES = [];
+  var VARS = ["--s1", "--s2", "--s3", "--s4", "--s5", "--s6"];
+  function fmtWeek(iso) { return new Date(iso + "T12:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short" }); }
+  function tile(label, value, detail) { return h("div", { class: "tile" }, h("span", { class: "label" }, label), h("span", { class: "v" }, String(value)), detail ? h("span", { class: "d" }, detail) : null); }
+  function niceMax(m) { if (m <= 4) return 4; var p = Math.pow(10, Math.floor(Math.log10(m))); var n = m / p; return (n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; }
+  function lineChart(title, sub, key) {
+    var series = SERIES.map(function (x) { return { id: x.id, v: x.v, name: dash.paths[x.id].title.replace(/ Learning (Plan|Path)$/, ""), values: dash.paths[x.id][key] }; });
+    var weeks = dash.weeks;
+    var box = h("div", { class: "chart" });
+    var legend = h("div", { class: "legend" }, series.map(function (x) { return h("span", null, h("i", { style: "background:var(" + x.v + ")" }), x.name); }));
+    var tip = h("div", { class: "tip", hidden: true });
+    var tableBtn = h("button", { type: "button", class: "tablebtn" }, "Show as table");
+    var tbl = h("div", { class: "tbl", hidden: true }, h("table", null,
+      h("thead", null, h("tr", null, h("th", null, "Week of"), series.map(function (x) { return h("th", null, x.name); }))),
+      h("tbody", null, weeks.map(function (w, i) { return h("tr", null, h("td", null, fmtWeek(w)), series.map(function (x) { return h("td", null, String(x.values[i])); })); }))));
+    tableBtn.addEventListener("click", function () { tbl.hidden = !tbl.hidden; tableBtn.textContent = tbl.hidden ? "Show as table" : "Hide table"; });
+    var svgHost = h("div");
+    add(box, [h("h3", null, title), h("p", { class: "sub" }, sub), legend, svgHost, tip, tableBtn, tbl]);
+    function draw() {
+      svgHost.textContent = "";
+      var W = Math.max(300, svgHost.clientWidth || 520), H = 220, ml = 34, mr = 110, mt = 14, mb = 26;
+      var iw = W - ml - mr, ih = H - mt - mb;
+      var max = niceMax(Math.max.apply(null, series.map(function (x) { return Math.max.apply(null, x.values); }).concat([1])));
+      var X = function (i) { return ml + (weeks.length === 1 ? iw / 2 : i * iw / (weeks.length - 1)); };
+      var Y = function (v) { return mt + ih - v / max * ih; };
+      var svg = s("svg", { viewBox: "0 0 " + W + " " + H, role: "img", tabindex: "0", "aria-label": title + ", last " + weeks.length + " weeks. Use left and right arrow keys to read values." });
+      [0, max / 2, max].forEach(function (t) {
+        svg.appendChild(s("line", { x1: ml, x2: ml + iw, y1: Y(t), y2: Y(t), stroke: t === 0 ? "var(--axis)" : "var(--grid)", "stroke-width": 1 }));
+        var tx = s("text", { x: ml - 8, y: Y(t) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)", "font-family": "var(--mono)" }); tx.textContent = String(Math.round(t)); svg.appendChild(tx);
+      });
+      var every = Math.max(1, Math.ceil(weeks.length / Math.max(2, Math.floor(iw / 64))));
+      weeks.forEach(function (w, i) {
+        var lastI = weeks.length - 1;
+        if ((lastI - i) % every) return;  // keep the latest week labeled
+        var tx = s("text", { x: X(i), y: H - 6, "text-anchor": i === 0 ? "start" : i === lastI ? "end" : "middle", "font-size": 11, fill: "var(--muted)", "font-family": "var(--mono)" }); tx.textContent = fmtWeek(w); svg.appendChild(tx);
+      });
+      var cross = s("line", { y1: mt, y2: mt + ih, stroke: "var(--muted)", "stroke-width": 1, visibility: "hidden" });
+      svg.appendChild(cross);
+      var dots = [];
+      var ends = [];
+      series.forEach(function (x) {
+        var d = x.values.map(function (v, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); }).join(" ");
+        svg.appendChild(s("path", { d: d, fill: "none", stroke: "var(" + x.v + ")", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+        var last = x.values.length - 1;
+        svg.appendChild(s("circle", { cx: X(last), cy: Y(x.values[last]), r: 4, fill: "var(" + x.v + ")", stroke: "var(--surface)", "stroke-width": 2 }));
+        ends.push({ y: Y(x.values[last]), text: x.name + " " + x.values[last] });
+        var hd = s("circle", { r: 4, fill: "var(" + x.v + ")", stroke: "var(--surface)", "stroke-width": 2, visibility: "hidden" });
+        svg.appendChild(hd); dots.push(hd);
+      });
+      // end labels: nudge apart only by the minimum, with a leader line when moved
+      ends.sort(function (a, b) { return a.y - b.y; });
+      for (var k = 1; k < ends.length; k++) if (ends[k].y - ends[k - 1].y < 14) ends[k].ly = (ends[k - 1].ly || ends[k - 1].y) + 14;
+      ends.forEach(function (e) {
+        var ly = e.ly || e.y;
+        if (e.ly) svg.appendChild(s("line", { x1: ml + iw + 5, y1: e.y, x2: ml + iw + 9, y2: ly, stroke: "var(--muted)", "stroke-width": 1 }));
+        var tx = s("text", { x: ml + iw + 10, y: ly + 4, "font-size": 12, fill: "var(--ink)" }); tx.textContent = e.text; svg.appendChild(tx);
+      });
+      var hit = s("rect", { x: ml - 10, y: mt, width: iw + 20, height: ih, fill: "transparent" });
+      svg.appendChild(hit);
+      var cur = -1;
+      function at(i) {
+        if (i < 0) { cross.setAttribute("visibility", "hidden"); dots.forEach(function (d) { d.setAttribute("visibility", "hidden"); }); tip.hidden = true; return; }
+        cur = i;
+        cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("visibility", "visible");
+        series.forEach(function (x, j) { dots[j].setAttribute("cx", X(i)); dots[j].setAttribute("cy", Y(x.values[i])); dots[j].setAttribute("visibility", "visible"); });
+        tip.textContent = "";
+        tip.appendChild(h("span", { class: "t" }, "Week of " + fmtWeek(weeks[i])));
+        series.forEach(function (x) { tip.appendChild(h("span", { class: "r" }, h("i", { style: "background:var(" + x.v + ")" }), h("b", null, String(x.values[i])), h("span", null, x.name))); });
+        tip.hidden = false;
+        var scale = svgHost.clientWidth / W;
+        var left = X(i) * scale + 16, top = svgHost.offsetTop + mt * scale;
+        if (left + 200 > box.clientWidth) left = X(i) * scale - 200 + 16 - 24;
+        tip.style.left = Math.max(8, left) + "px"; tip.style.top = top + "px";
+      }
+      svg.addEventListener("pointermove", function (e) {
+        var r = svg.getBoundingClientRect(); var px = (e.clientX - r.left) * W / r.width;
+        var i = Math.round((px - ml) / (iw / Math.max(1, weeks.length - 1)));
+        at(Math.max(0, Math.min(weeks.length - 1, i)));
+      });
+      svg.addEventListener("pointerleave", function () { at(-1); });
+      svg.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight") { e.preventDefault(); at(Math.min(weeks.length - 1, cur < 0 ? weeks.length - 1 : cur + 1)); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); at(Math.max(0, cur < 0 ? weeks.length - 1 : cur - 1)); }
+        if (e.key === "Escape") at(-1);
+      });
+      svg.addEventListener("blur", function () { at(-1); });
+      svgHost.appendChild(svg);
+    }
+    box._draw = draw;
+    return box;
+  }
+  function add(el, kids) { kids.forEach(function (k) { if (k) el.appendChild(k); }); }
+  var charts = [];
+  function renderDashboard() {
+    var out = $("#dash-out"); out.textContent = "";
+    SERIES = (dash.order || Object.keys(dash.paths)).map(function (id, i) { return { id: id, v: VARS[i % VARS.length] }; });
+    if (!SERIES.length) { out.appendChild(h("div", { class: "empty" }, "No published paths yet.")); return; }
+    var o = dash.overall, P = dash.paths;
+    var completed = Object.keys(P).reduce(function (n, k) { return n + P[k].tiles.completed; }, 0);
+    var completed30 = Object.keys(P).reduce(function (n, k) { return n + P[k].tiles.completed30; }, 0);
+    add(out, [
+      h("div", { class: "tiles" },
+        tile("Learners enrolled", o.learners, "in at least one path"),
+        tile("Active in the last 7 days", o.active7, o.learners ? pct(o.active7, o.learners) + "% of enrolled learners" : ""),
+        tile("Paths completed", completed, completed30 + " in the last 30 days"),
+        tile("Open problem reports", o.openReports, o.openReports ? "see Problem reports" : "all clear")),
+      h("div", { class: "pathgrid", style: "margin-top:14px" }, SERIES.map(function (x) {
+        var t = P[x.id].tiles;
+        var tot = Math.max(1, t.onTrack + t.behind + t.ahead + t.notStarted);
+        var seg = [["On track", t.onTrack, "#0ca30c"], ["Ahead", t.ahead, "var(--s1)"], ["Behind", t.behind, "#fab219"], ["Not started", t.notStarted, "var(--brick-empty)"]];
+        return h("article", { class: "pathcard" },
+          h("h3", null, h("i", { style: "background:var(" + x.v + ")" }), P[x.id].title),
+          h("div", { class: "kv" },
+            h("div", null, h("b", null, String(t.enrolled)), h("span", null, "enrolled · +" + t.newThisMonth + " in 30 days")),
+            h("div", null, h("b", null, String(t.active7)), h("span", null, "active in 7 days")),
+            h("div", null, h("b", null, String(t.completed)), h("span", null, "completed")),
+            h("div", null, h("b", null, t.avgRequiredPct + "%"), h("span", null, "average required progress")),
+            h("div", null, h("b", null, String(t.behind)), h("span", null, "behind pace")),
+            h("div", null, h("b", null, String(t.notStarted)), h("span", null, "enrolled, no ticks yet"))),
+          t.enrolled ? h("div", { class: "pacebar", role: "img", "aria-label": seg.map(function (z) { return z[0] + " " + z[1]; }).join(", ") },
+            seg.filter(function (z) { return z[1]; }).map(function (z) { return h("i", { style: "width:" + (100 * z[1] / tot) + "%;background:" + z[2], title: z[0] + ": " + z[1] }); })) : null,
+          t.enrolled ? h("div", { class: "pacelegend" }, seg.map(function (z) { return h("span", null, h("i", { style: "background:" + z[2] }), z[0] + " " + z[1]); })) : h("p", { class: "d" }, "No one enrolled yet."));
+      })),
+      h("div", { class: "charts", style: "margin-top:14px" },
+        (charts = [
+          lineChart("Weekly active learners", "Learners who ticked at least one step that week", "activeLearners"),
+          lineChart("Steps ticked per week", "All steps ticked that week, required and stretch", "ticks"),
+          lineChart("New enrollments per week", "Learners who enrolled that week", "enrollments")
+        ]))
+    ]);
+    charts.forEach(function (c) { c._draw(); });
+  }
+  window.addEventListener("resize", function () { clearTimeout(window.__rz); window.__rz = setTimeout(function () { charts.forEach(function (c) { if (c.isConnected) c._draw(); }); }, 150); });
+  function loadDashboard() { return api("api/dashboard").then(function (j) { dash = j; if (!$('[data-panel="dashboard"]').hidden) renderDashboard(); }, function (e) { $("#dash-out").textContent = e.message; }); }
+
+  /* ---------------------------------------------------------------- admin: team */
+  var team = null, fCohort = "", fInactive = false;
+  function renderTeam() {
+    var out = $("#team-out"); out.textContent = "";
+    var sel = h("select", { "aria-label": "Cohort" }, h("option", { value: "" }, "All cohorts"), team.cohorts.map(function (c) { return h("option", { value: c, selected: c === fCohort }, c + " cohort"); }));
+    sel.addEventListener("change", function () { fCohort = sel.value; renderTeam(); });
+    var ina = h("input", { type: "checkbox", checked: fInactive });
+    ina.addEventListener("change", function () { fInactive = ina.checked; renderTeam(); });
+    out.appendChild(h("div", { class: "filters" }, sel, h("label", null, ina, "Only inactive for " + team.inactiveAfterDays + "+ days"),
+      h("a", { class: "btn ghost", href: ROOT + "api/export.csv" + (fCohort ? "?cohort=" + encodeURIComponent(fCohort) : "") }, "Export CSV")));
+    var list = team.learners.filter(function (l) { return (!fCohort || l.cohort === fCohort) && (!fInactive || l.inactiveDays); });
+    if (!team.learners.length) { out.appendChild(h("div", { class: "empty" }, "No one has enrolled in a path yet.")); return; }
+    if (!list.length) { out.appendChild(h("div", { class: "empty" }, "No learners match these filters.")); return; }
+    var tb = h("tbody");
+    list.forEach(function (l) {
+      tb.appendChild(h("tr", null,
+        h("td", { title: l.email }, l.name || l.email),
+        h("td", { style: "white-space:nowrap" }, l.cohort || "—"),
+        team.paths.map(function (p) {
+          var s = l.paths[p.id];
+          if (!s.enrolled) return h("td", null, "—");
+          var rm = h("button", { type: "button", class: "onb-linkbtn", style: "font-size:13px", title: "Remove " + (l.name || l.email) + " from this path" }, "Remove");
+          rm.addEventListener("click", function () {
+            if (!confirm("Remove " + (l.name || l.email) + " from the " + p.title + "? Their ticks are kept and come back if they enroll again.")) return;
+            api(p.id + "/api/enroll", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ learner: l.id, remove: true }) }).then(function () { loadTeam(); loadDashboard(); }, function (e) { alert(e.message); });
+          });
+          return h("td", null, h("div", { class: "cellbar" },
+            h("div", { class: "ln" }, h("span", { class: "b" }, h("i", { style: "width:" + pct(s.done, s.total) + "%" })),
+              h("a", { href: ROOT + p.id + "/#team" }, pct(s.done, s.total) + "%"), s.badge.earned ? badge() : null, mascotThumb(s.mascot)),
+            h("div", { class: "ln" }, chip(s.pace), rm)));
+        }),
+        h("td", { style: "white-space:nowrap" }, l.inactiveDays ? h("span", { class: "onb-chip", "data-s": "inactive" }, l.inactiveDays + " days idle") : rel(l.lastActive))));
+    });
+    out.appendChild(h("div", { class: "tbl" }, h("table", null,
+      h("thead", null, h("tr", null, h("th", null, "Learner"), h("th", null, "Cohort"), team.paths.map(function (p) { return h("th", null, p.title); }), h("th", null, "Last active"))), tb)));
+    out.appendChild(h("p", { class: "foot" }, "Cohort = the month a learner started their first path. Start dates can be changed in each path's Team progress page. Pace compares the first open required step with where the learner should be by now."));
+  }
+  function loadTeam() { return api("api/team-summary").then(function (j) { team = j; renderTeam(); }, function (e) { $("#team-out").textContent = e.message; }); }
+
+  /* ---------------------------------------------------------------- admin: reports */
+  var reports = [], rFilter = "open", lastSync = null, jiraOn = false;
+  var KIND = { bug: "DataRobot bug", path: "Learning path", system: "To system admins" };
+  function fmtWhen(ts) { return new Date(ts).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
+  function fmtDate(s) { if (!s) return ""; var d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString(undefined, { day: "numeric", month: "short" }); }
+  function jiraLine(r) {
+    var j = r.jira || {};
+    if (!j.key) return h("div", { class: "small" }, "Not sent to Jira: " + (j.error || "unknown error"));
+    var cls = j.category === "done" ? "done" : j.category === "indeterminate" ? "indeterminate" : "";
+    var label = j.visible === false ? "Can't see this issue in Jira" : (j.status || "Open") + (j.category === "done" && j.resolution ? " · " + j.resolution : "");
+    var detail;
+    if (j.visible === false) detail = null;
+    else if (j.duplicateOf && j.duplicateOf.key) detail = h("span", { class: "small" }, "Duplicate of ", h("a", { class: "key", href: j.duplicateOf.url, target: "_blank", rel: "noopener" }, j.duplicateOf.key + " ↗"), j.duplicateOf.status ? " (" + j.duplicateOf.status + ")" : "", j.resolved ? " · resolved " + fmtDate(j.resolved) : "");
+    else if (j.category === "done") detail = h("span", { class: "small" }, (j.fixVersions && j.fixVersions.length ? "Fix version " + j.fixVersions.join(", ") + " · " : "") + (j.resolved ? "resolved " + fmtDate(j.resolved) : ""));
+    else detail = h("span", { class: "small" }, (j.assignee ? "Assigned to " + j.assignee : "Unassigned") + (j.updated ? " · updated " + rel(new Date(j.updated).getTime()) : ""));
+    return h("div", { class: "jline" }, h("a", { class: "key", href: j.url, target: "_blank", rel: "noopener" }, j.key + " ↗"), h("span", { class: "js " + cls }, label), detail);
+  }
+  function renderReports() {
+    var out = $("#reports-out"); out.textContent = "";
+    var open = reports.filter(function (r) { return r.status === "open"; }).length;
+    var c = $("#rep-count"); c.textContent = open; c.hidden = !open;
+    var seg = h("div", { class: "seg", role: "group", "aria-label": "Show" });
+    [["open", "Open " + open], ["resolved", "Resolved " + (reports.length - open)], ["all", "All " + reports.length]].forEach(function (x) {
+      var b = h("button", { type: "button", "aria-pressed": String(rFilter === x[0]) }, x[1]);
+      b.addEventListener("click", function () { rFilter = x[0]; renderReports(); });
+      seg.appendChild(b);
+    });
+    var hasJira = reports.some(function (r) { return r.jira && r.jira.key; });
+    var sync = null;
+    if (hasJira || jiraOn) {
+      var now = h("button", { type: "button", class: "onb-linkbtn" }, "Sync now");
+      sync = h("span", { class: "small" }, lastSync ? "Last sync " + new Date(lastSync).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) + " · " : "", now);
+      now.addEventListener("click", function () {
+        now.disabled = true; now.textContent = "Syncing…";
+        api("api/jira/sync", { method: "POST" }).then(function () { return loadReports(); }, function (e) { now.disabled = false; now.textContent = "Sync now"; alert(e.message); });
+      });
+    }
+    out.appendChild(h("div", { class: "rbar" }, seg, sync));
+    var list = reports.filter(function (r) { return rFilter === "all" || r.status === rFilter; });
+    if (!list.length) { out.appendChild(h("div", { class: "empty" }, rFilter === "open" ? "No open reports." : "Nothing here yet.")); return; }
+    list.forEach(function (r) {
+      var kind = r.kind || "path";
+      var actions = null;
+      if (kind !== "bug" || !(r.jira && r.jira.key)) {
+        var btn = h("button", { type: "button", class: "btn ghost" }, r.status === "open" ? "Mark resolved" : "Reopen");
+        btn.addEventListener("click", function () {
+          btn.disabled = true;
+          api("api/reports/" + r.id, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: r.status === "open" ? "resolved" : "open" }) })
+            .then(function (j) { Object.assign(r, j.report); renderReports(); }, function (e) { btn.disabled = false; alert(e.message); });
+        });
+        var edit = kind === "path" && r.path !== "admin" ? h("a", { class: "btn ghost", href: ROOT + r.path + "/#" + (r.anchor || "") }, "Edit this step") : null;
+        var mail = r.email ? h("a", { class: "btn ghost", href: "mailto:" + r.email + "?subject=" + encodeURIComponent("Your onboarding report: " + (r.itemLabel || r.pathTitle)) }, "Reply by email") : null;
+        actions = h("div", { class: "row" }, btn, edit, mail);
+      }
+      var files = (r.files || []).length && !(r.jira && r.jira.key) ? h("div", { class: "files" }, r.files.map(function (f, i) { return h("a", { href: ROOT + "api/reports/" + r.id + "/files/" + i }, f.name); })) : null;
+      out.appendChild(h("article", { class: "report" + (r.status === "resolved" ? " resolved" : "") },
+        h("div", { class: "meta" }, h("span", { class: "onb-chip" }, KIND[kind] || kind), h("b", null, r.name || r.email),
+          h("a", { href: kind === "system" ? "#users" : ROOT + r.path + "/#" + (r.anchor || ""), style: "color:inherit" }, (kind === "system" ? "" : r.pathTitle + " · ") + (r.itemLabel || "general")),
+          h("span", null, fmtWhen(r.createdAt))),
+        h("p", { class: "msg" }, r.message),
+        (r.links || []).length ? h("div", { class: "files" }, r.links.map(function (l) { return h("a", { href: l, target: "_blank", rel: "noopener" }, l.replace(/^https?:\/\//, "").slice(0, 60)); })) : null,
+        files,
+        kind === "bug" ? jiraLine(r) : null,
+        actions));
+    });
+  }
+  function loadReports() { return api("api/reports").then(function (j) { reports = j.reports; lastSync = j.lastSync; jiraOn = j.jira; renderReports(); }, function (e) { $("#reports-out").textContent = e.message; }); }
+
+  /* ---------------------------------------------------------------- shared: uploads, jobs, little controls */
+  function uploader(opts) {
+    opts = opts || {};
+    var files = [];
+    var thumbs = h("div", { class: "thumbs" });
+    var picker = h("input", { type: "file", multiple: true, hidden: true, accept: opts.accept || null });
+    var browse = h("button", { type: "button", class: "onb-linkbtn" }, "browse");
+    var box = h("div", { class: "paste", tabindex: "0" }, thumbs, h("p", null, opts.text || "Drop files or ", browse, opts.after || "."), picker);
+    function upload(file) {
+      if (file.size > 20000000) { alert(file.name + " is larger than 20 MB."); return; }
+      var name = file.name && file.name !== "image.png" ? file.name : "screenshot-" + (files.length + 1) + ".png";
+      var f = { name: name, id: null, state: "up" };
+      files.push(f);
+      var rm = h("button", { type: "button", class: "x", "aria-label": "Remove " + name }, "×");
+      var fig = h("figure", { class: "up" }, /^image\//.test(file.type) ? h("img", { src: URL.createObjectURL(file), alt: "" }) : h("div", { class: "doc" }, (name.split(".").pop() || "file").toUpperCase().slice(0, 4)), h("figcaption", null, name), rm);
+      rm.addEventListener("click", function () { files.splice(files.indexOf(f), 1); fig.remove(); if (opts.onChange) opts.onChange(); });
+      thumbs.appendChild(fig);
+      fetch(ROOT + "api/uploads", { method: "POST", headers: { "content-type": file.type || "application/octet-stream", "x-file-name": encodeURIComponent(name) }, body: file })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.detail || r.status); return j; }); })
+        .then(function (j) { f.id = j.id; f.state = "ok"; fig.classList.remove("up"); if (opts.onChange) opts.onChange(); }, function (e) { f.state = "err"; fig.title = e.message; fig.style.outline = "2px solid #B00020"; });
+      if (opts.onChange) opts.onChange();
+    }
+    browse.addEventListener("click", function () { picker.click(); });
+    picker.addEventListener("change", function () { Array.prototype.forEach.call(picker.files, upload); picker.value = ""; });
+    ["dragover", "dragenter"].forEach(function (ev) { box.addEventListener(ev, function (e) { e.preventDefault(); box.classList.add("over"); }); });
+    ["dragleave", "drop"].forEach(function (ev) { box.addEventListener(ev, function () { box.classList.remove("over"); }); });
+    box.addEventListener("drop", function (e) { e.preventDefault(); Array.prototype.forEach.call(e.dataTransfer.files || [], upload); });
+    box.addEventListener("paste", function (e) { var fs = (e.clipboardData && e.clipboardData.files) || []; if (fs.length) { e.preventDefault(); Array.prototype.forEach.call(fs, upload); } });
+    return { el: box, upload: upload, pick: function () { picker.click(); }, ids: function () { return files.filter(function (f) { return f.id; }).map(function (f) { return f.id; }); },
+      busy: function () { return files.some(function (f) { return f.state === "up"; }); }, count: function () { return files.length; }, names: function () { return files.map(function (f) { return f.name; }); } };
+  }
+  function poll(jid, onProgress) {
+    return new Promise(function (resolve, reject) {
+      function go() {
+        api("api/admin/jobs/" + jid).then(function (j) {
+          if (onProgress) onProgress(j);
+          if (j.status === "done") resolve(j); else if (j.status === "error") reject(new Error(j.error || "Something went wrong.")); else setTimeout(go, 1500);
+        }, reject);
+      }
+      go();
+    });
+  }
+  function drawSteps(el, job) {
+    el.textContent = "";
+    (job.progress || []).forEach(function (p) { el.appendChild(h("div", { class: "st " + (p.done ? "done" : "now") }, p.text)); });
+  }
+  function seg(opts, val, onChange) {
+    var box = h("div", { class: "seg" }); box._v = val;
+    opts.forEach(function (o) {
+      var b = h("button", { type: "button", "aria-pressed": String(o[0] === val) }, o[1]);
+      b.addEventListener("click", function () { box._v = o[0]; $$("button", box).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); if (onChange) onChange(o[0]); });
+      box.appendChild(b);
+    });
+    return box;
+  }
+  function field(label, control) { return h("label", { class: "field" }, h("span", { class: "label" }, label), control); }
+  function fieldDiv(label, control, extra) { return h("div", { class: "field" }, h("span", { class: "label" }, label), control, extra || null); }
+
+  /* ---------------------------------------------------------------- admin: content */
+  var contentView = "list", contentData = null;
+  function srcText(s) {
+    if (!s) return "";
+    if (s.kind === "uploaded") return "Live: uploaded " + new Date(s.at).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) + " by " + s.by + (s.file ? " (" + s.file + ")" : "") + ".";
+    return "Live: the version deployed with the app" + (s.at ? " (sheet read " + s.at + ")" : "") + "." + (s.note ? " " + s.note : "");
+  }
+  function contentHome() {
+    var out = $("#content-out"); out.textContent = "";
+    var d = contentData;
+    var create = d.canCreate ? h("button", { type: "button", class: "btn primary" }, "+ Create learning path") : null;
+    if (create) create.addEventListener("click", chooseView);
+    out.appendChild(h("div", { class: "row", style: "justify-content:space-between" }, h("h2", { style: "font-size:26px" }, "Learning paths"), create));
+    if (!d.paths.length) out.appendChild(h("div", { class: "empty" }, d.canCreate ? "You haven't created a learning path yet." : "You don't own any learning paths yet."));
+    else {
+      var tb = h("tbody");
+      d.paths.forEach(function (p) {
+        var st = p.status === "published" ? h("span", { class: "pill pub" }, "Published") : h("span", { class: "pill dr" }, "Draft");
+        var edit = p.custom ? h("a", { class: "btn ghost", href: ROOT + p.id + "/" + (p.status === "published" ? "#edit" : "") }, p.status === "published" ? "Edit" : "Open draft")
+          : h("a", { class: "btn ghost", href: ROOT + p.id + "/#edit" }, "Edit");
+        tb.appendChild(h("tr", null, h("td", null, h("a", { href: ROOT + p.id + "/", style: "color:var(--ink)" }, p.title), p.unpublished ? h("div", { class: "small" }, "Unpublished changes") : null),
+          h("td", null, st), h("td", { style: "font-variant-numeric:tabular-nums" }, String(p.steps)), h("td", { style: "font-variant-numeric:tabular-nums" }, p.status === "published" ? String(p.enrolled) : "–"),
+          h("td", { class: "small" }, p.custom ? (p.owners || []).join(", ") : "Built in"), h("td", null, edit)));
+      });
+      out.appendChild(h("div", { class: "tbl plist" }, h("table", null, h("thead", null, h("tr", null, ["Path", "Status", "Steps", "Enrolled", "Owners", ""].map(function (t) { return h("th", null, t); }))), tb)));
+    }
+    if (ME.isManager) api("api/admin/content").then(function (j) { builtinCards(j.paths, out); }, function () {});
+  }
+  function builtinCards(paths, out) {
+    paths.forEach(function (p) {
+      var isAi = p.id === "ai-engineer";
+      var file = h("input", { type: "file", accept: isAi ? ".xlsx" : ".html,.htm", hidden: true });
+      var up = h("button", { type: "button", class: "btn ghost" }, isAi ? "Upload a sheet (.xlsx)" : "Upload an edited page (.html)");
+      var revert = p.source.kind === "uploaded" ? h("button", { type: "button", class: "btn ghost" }, "Go back to the deployed version") : null;
+      var dl = !isAi ? h("a", { class: "btn ghost", href: ROOT + "api/admin/content/agentic/page" }, "Download the live page")
+        : h("a", { class: "btn ghost", href: ROOT + "api/admin/content/ai-engineer/export.xlsx" }, "Download as .xlsx");
+      var ed = h("a", { class: "btn primary", href: ROOT + p.id + "/#edit" }, "Edit in the app");
+      var diffBox = h("div");
+      var card = h("article", { class: "content-card" },
+        h("h3", null, p.title), h("p", { class: "src" }, srcText(p.source) + " " + p.steps + " steps that count."),
+        h("div", { class: "actions" }, ed, dl, up, revert, file), diffBox);
+      up.addEventListener("click", function () { file.click(); });
+      file.addEventListener("change", function () {
+        var f = file.files[0]; if (!f) return;
+        diffBox.textContent = ""; diffBox.appendChild(h("p", null, "Reading " + f.name + "…"));
+        f.arrayBuffer().then(function (buf) {
+          return api("api/admin/content/" + p.id + "/preview", { method: "POST", headers: { "content-type": "application/octet-stream", "x-file-name": f.name }, body: buf });
+        }).then(function (j) { showDiff(p, j, diffBox); }, function (e) { diffBox.textContent = ""; diffBox.appendChild(h("p", { class: "err" }, e.message)); })
+          .then(function () { file.value = ""; });
+      });
+      if (revert) revert.addEventListener("click", function () {
+        if (!confirm("Go back to the content deployed with the app? The uploaded version stops being live.")) return;
+        api("api/admin/content/" + p.id + "/revert", { method: "POST" }).then(loadContent, function (e) { alert(e.message); });
+      });
+      out.appendChild(card);
+    });
+  }
+  function showDiff(p, j, box) {
+    var s = j.summary;
+    box.textContent = "";
+    var pub = h("button", { type: "button", class: "btn primary" }, "Publish");
+    var cancel = h("button", { type: "button", class: "btn ghost" }, "Cancel");
+    function list(title, rows) { return rows.length ? [h("b", null, title + " (" + rows.length + ")"), h("ul", null, rows.map(function (r) { return h("li", null, r.label); }))] : null; }
+    box.appendChild(h("div", { class: "diff" },
+      h("b", null, "Ready to publish: " + s.counts + "."),
+      h("p", null, "Steps that count: " + s.stepsBefore + " now → " + s.stepsAfter + " after publishing."),
+      !s.added.length && !s.removed.length ? h("p", null, "No steps added or removed; only wording or links may have changed.") : null,
+      list("New steps", s.added), list("Removed steps", s.removed),
+      s.learnersAffected ? h("div", { class: "warn" }, s.learnersAffected + " learner(s) ticked a step that will be removed. Their ticks stay saved but stop counting.") : null,
+      h("div", { class: "actions", style: "display:flex;gap:8px" }, pub, cancel)));
+    cancel.addEventListener("click", function () { box.textContent = ""; });
+    pub.addEventListener("click", function () {
+      pub.disabled = true; pub.textContent = "Publishing…";
+      api("api/admin/content/" + p.id + "/publish", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ token: j.token }) })
+        .then(function () { loadContent(); loadTeam(); loadDashboard(); }, function (e) { pub.disabled = false; pub.textContent = "Publish"; box.appendChild(h("p", { class: "err" }, e.message)); });
+    });
+  }
+
+  /* ---------- create: choose ---------- */
+  function chooseView() {
+    var out = $("#content-out"); out.textContent = "";
+    var a = h("button", { type: "button", class: "fork" }, h("b", null, "Create from source (LLM assisted)"),
+      h("span", null, "Paste links (Jira/PBMP, Confluence, GitHub, docs) and upload files (PDF, Word, Google Docs downloads, HTML, the .xlsx template), in any mix. The LLM builds the path."));
+    var b = h("button", { type: "button", class: "fork" }, h("b", null, "Build in the app"), h("span", null, "Start empty and add weeks, days and steps yourself."));
+    var back = h("button", { type: "button", class: "btn ghost" }, "Cancel");
+    a.addEventListener("click", function () { sourceView(); }); b.addEventListener("click", buildView); back.addEventListener("click", contentHome);
+    out.appendChild(h("div", { class: "onb-dialog flat" }, h("h2", null, "Create a learning path"),
+      h("p", null, "Both options make a draft. Only you and the admins can see it until you publish it."), h("div", { class: "choices" }, a, b), h("div", { class: "row" }, back)));
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- create: build in the app ---------- */
+  function buildView() {
+    var out = $("#content-out"); out.textContent = "";
+    var title = h("input", { placeholder: "For example Support Engineer Ramp-up" }), blurb = h("input", { placeholder: "For example new support engineers" });
+    var pace = seg([["weeks", "Calendar weeks"], ["days", "Working days"]], "weeks");
+    var custom = h("input", { placeholder: "Name for the top level", hidden: true, style: "margin-top:8px" });
+    var level = seg([["Week", "Week"], ["Module", "Module"], ["Phase", "Phase"], ["custom", "Custom…"]], "Week", function (v) { custom.hidden = v !== "custom"; lbl.textContent = "Days inside each " + (v === "custom" ? "group" : v.toLowerCase()); });
+    var lbl = h("span", { class: "label" }, "Days inside each week");
+    var days = seg([["yes", "Yes"], ["no", "No"]], "yes");
+    var skillName = h("input", { placeholder: "Skill name, for example support engineering", hidden: true, style: "margin-top:8px" });
+    var skill = seg([["now", "Add now"], ["later", "Decide later"]], "later", function (v) { skillName.hidden = v !== "now"; });
+    var owners = h("input", { value: "you" });
+    var err = h("p", { class: "err", hidden: true });
+    var go = h("button", { type: "button", class: "btn primary" }, "Create draft"), cancel = h("button", { type: "button", class: "btn ghost" }, "Cancel");
+    cancel.addEventListener("click", contentHome);
+    go.addEventListener("click", function () {
+      if (!title.value.trim()) { err.textContent = "Give the path a name."; err.hidden = false; title.focus(); return; }
+      go.disabled = true;
+      api("api/admin/paths", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ title: title.value.trim(), blurb: blurb.value.trim(), pace: pace._v,
+        level: level._v === "custom" ? (custom.value.trim() || "Section") : level._v, useDays: days._v === "yes", skillEnabled: skill._v === "now", skillName: skillName.value.trim(), owners: owners.value }) })
+        .then(function (j) { location.href = ROOT + j.id + "/"; }, function (e) { go.disabled = false; err.textContent = e.message; err.hidden = false; });
+    });
+    out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "Build in the app")));
+    out.appendChild(h("div", { class: "form" },
+      h("div", { class: "grid2" }, field("Path name", title), field("Who it's for", blurb)),
+      fieldDiv("Pace", pace), fieldDiv("Top level is called", level, custom),
+      h("div", { class: "field" }, lbl, days),
+      h("div", { class: "grid2" }, fieldDiv("Skill growth", skill, skillName), field("Owners: they see this path's progress and problems", owners)),
+      err, h("div", { class: "row end" }, cancel, go)));
+    title.focus();
+  }
+
+  /* ---------- create: from source ---------- */
+  var SRC = null;  // the form state, kept while going back and forth
+  function kindOf(link) {
+    var s = link.trim();
+    if (/^[A-Z][A-Z0-9_]+-\d+$/i.test(s)) return "Jira";
+    if (/atlassian\.net\/wiki/.test(s)) return "Confluence";
+    if (/atlassian\.net\/(browse|jira)/.test(s) || /selectedIssue=/.test(s)) return "Jira";
+    if (/github\.com/.test(s)) return "GitHub";
+    if (/docs\.google\.com|drive\.google\.com/.test(s)) return "Google";
+    return "Docs";
+  }
+  function sourceView() {
+    if (!SRC) SRC = { links: [], up: null, title: "", audience: "", length: "1 week", notes: "", skill: "later", skillName: "", owners: "you", gh: "" };
+    var out = $("#content-out"); out.textContent = "";
+    var title = h("input", { value: SRC.title, placeholder: "For example Agent Workforce Monitoring" });
+    var list = h("div", { class: "srcs" });
+    var ghRow = h("div", { class: "field", hidden: true }, h("span", { class: "label" }, "Your GitHub token (for private repos: used for this run only, not saved)"), h("input", { type: "password", value: SRC.gh, autocomplete: "off", placeholder: "github_pat_…" }));
+    var ghIn = ghRow.querySelector("input");
+    function drawLinks() {
+      list.textContent = "";
+      SRC.links.forEach(function (l, i) {
+        var k = kindOf(l);
+        var rm = h("button", { type: "button", "aria-label": "Remove" }, "×");
+        rm.addEventListener("click", function () { SRC.links.splice(i, 1); drawLinks(); });
+        var note = { Jira: "The app follows its child and linked issues, comments, attachments and links", Confluence: "Plus its child pages", GitHub: "README, docs and examples. Private repos need your GitHub token.",
+          Google: "The app can't open Google Docs: download it as PDF or Word and add it under Files", Docs: "The page itself" }[k];
+        list.appendChild(h("div", { class: "src" }, h("span", { class: "onb-chip" }, k), h("span", { class: "u" }, l), h("span", { class: "ok" }, note), rm));
+      });
+      var inp = h("input", { placeholder: "Paste a Jira key or a Jira, Confluence, GitHub or docs link" }), addB = h("button", { type: "button", class: "btn ghost" }, "Add");
+      function addLink() { var v = inp.value.trim(); if (!v) return; v.split(/\s+/).forEach(function (x) { if (x) SRC.links.push(x); }); drawLinks(); list.querySelector("input").focus(); }
+      addB.addEventListener("click", addLink);
+      inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addLink(); } });
+      list.appendChild(h("div", { class: "lnkin" }, inp, addB));
+      ghRow.hidden = !SRC.links.some(function (l) { return kindOf(l) === "GitHub"; });
+    }
+    drawLinks();
+    if (!SRC.up) SRC.up = uploader({ text: "Drop files or ", after: ": PDF, Word, PowerPoint, HTML, Markdown, .xlsx or .csv. For a Google Doc, use File → Download. If you upload the .xlsx template, it's imported exactly as it is, without the LLM." });
+    var tpl = h("a", { href: ROOT + "api/admin/paths/template.xlsx", class: "onb-linkbtn" }, "Download the .xlsx template");
+    var aud = h("input", { value: SRC.audience, placeholder: "For example support engineers and solution architects" });
+    var len = seg([["1 day", "1 day"], ["1 week", "1 week"], ["2 weeks", "2 weeks"], ["", "Let the LLM decide"]], SRC.length);
+    var notes = h("textarea", { placeholder: "For example: focus on hands-on labs; skip internal architecture; end with a gate." }); notes.value = SRC.notes;
+    var skillName = h("input", { value: SRC.skillName, placeholder: "Skill name, for example agent monitoring", hidden: SRC.skill !== "now", style: "margin-top:8px" });
+    var skill = seg([["now", "Add now"], ["later", "Decide later"]], SRC.skill, function (v) { skillName.hidden = v !== "now"; });
+    var owners = h("input", { value: SRC.owners });
+    var err = h("p", { class: "err", hidden: true });
+    var go = h("button", { type: "button", class: "btn primary" }, "Find sources"), cancel = h("button", { type: "button", class: "btn ghost" }, "Cancel");
+    function keep() { SRC.title = title.value.trim(); SRC.audience = aud.value.trim(); SRC.length = len._v; SRC.notes = notes.value.trim(); SRC.skill = skill._v; SRC.skillName = skillName.value.trim(); SRC.owners = owners.value; SRC.gh = ghIn.value.trim(); }
+    cancel.addEventListener("click", function () { SRC = null; contentHome(); });
+    go.addEventListener("click", function () {
+      keep();
+      var pending = list.querySelector(".lnkin input"); if (pending && pending.value.trim()) { SRC.links.push(pending.value.trim()); }
+      if (!SRC.links.length && !SRC.up.count()) { err.textContent = "Add at least one link or file."; err.hidden = false; return; }
+      if (SRC.up.busy()) { err.textContent = "Wait until the files have uploaded."; err.hidden = false; return; }
+      findSources(go, err);
+    });
+    out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "Create from source"), h("p", { class: "small" }, "LLM assisted")));
+    out.appendChild(h("div", { class: "form" },
+      field("Path name", title),
+      fieldDiv("Links", list), ghRow,
+      fieldDiv("Files", SRC.up.el, h("div", { style: "margin-top:6px" }, tpl)),
+      h("div", { class: "grid2" }, field("Who it's for", aud), fieldDiv("Length", len)),
+      field("Notes for the LLM (optional)", notes),
+      h("div", { class: "grid2" }, fieldDiv("Skill growth", skill, skillName), field("Owners: they see this path's progress and problems", owners)),
+      err, h("div", { class: "row end" }, cancel, go)));
+    window.scrollTo(0, 0);
+  }
+  function settingsOf() { return { title: SRC.title, audience: SRC.audience, length: SRC.length, notes: SRC.notes, skillEnabled: SRC.skill === "now", skillName: SRC.skillName, owners: SRC.owners }; }
+  function findSources(btn, err) {
+    btn.disabled = true; btn.textContent = "Reading…"; err.hidden = true;
+    var out = $("#content-out");
+    var prog = h("div", { class: "steps" });
+    api("api/admin/paths/find", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ links: SRC.links, uploads: SRC.up.ids(), githubToken: SRC.gh, settings: settingsOf() }) })
+      .then(function (j) {
+        if (j.imported) { location.href = ROOT + j.imported + "/"; return; }
+        out.textContent = "";
+        out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "Reading your sources")));
+        out.appendChild(h("div", { class: "form" }, prog));
+        return poll(j.job, function (job) { drawSteps(prog, job); }).then(function (job) { foundView(j.job, job.result); });
+      })
+      .catch(function (e) { btn.disabled = false; btn.textContent = "Find sources"; if (err.isConnected) { err.textContent = e.message; err.hidden = false; } else { sourceView(); setTimeout(function () { var x = $("#content-out .err"); if (x) { x.textContent = e.message; x.hidden = false; } }, 0); } });
+  }
+  function foundView(jobId, found) {
+    var out = $("#content-out"); out.textContent = "";
+    var unchecked = {};
+    out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "What we found")));
+    var form = h("div", { class: "form" }, h("p", { class: "small" }, "Before generating, check what the LLM will read. Untick anything that's out of date or not relevant."));
+    (found.groups || []).forEach(function (g) {
+      var box = h("div", { class: "found" });
+      var head = h("div", { class: "fh" }, h("b", null, g.title), g.summary ? h("span", { class: "small" }, g.summary) : null);
+      box.appendChild(head);
+      g.items.forEach(function (it) {
+        if (!it.checked) unchecked[it.id] = true;
+        var cb = h("input", { type: "checkbox", checked: it.checked, disabled: !it.count });
+        cb.addEventListener("change", function () { if (cb.checked) delete unchecked[it.id]; else unchecked[it.id] = true; });
+        box.appendChild(h("label", { class: "fi" }, cb, h("span", null, it.label + (it.count ? "" : " (nothing readable)"))));
+      });
+      g.warnings.forEach(function (w) { box.appendChild(h("div", { class: "warnrow" }, h("b", null, w.title), h("span", { class: "small" }, w.text))); });
+      form.appendChild(box);
+    });
+    var more = uploader({ text: "", after: "" });
+    var addLink = h("input", { placeholder: "Paste another link", hidden: true }), addLinkGo = h("button", { type: "button", class: "btn ghost", hidden: true }, "Add");
+    var upMore = h("button", { type: "button", class: "btn" }, "Upload more files"), linkMore = h("button", { type: "button", class: "btn ghost" }, "Add a link");
+    var rerun = h("button", { type: "button", class: "btn primary", hidden: true }, "Read them too");
+    more.el.hidden = true;
+    var extraLinks = [];
+    function refresh() { rerun.hidden = !(more.count() || extraLinks.length); more.el.hidden = !more.count(); }
+    more.el.addEventListener("click", function () {});
+    upMore.addEventListener("click", function () { more.pick(); });
+    var origUpload = more.upload;
+    linkMore.addEventListener("click", function () { addLink.hidden = false; addLinkGo.hidden = false; addLink.focus(); });
+    addLinkGo.addEventListener("click", function () { var v = addLink.value.trim(); if (!v) return; extraLinks.push(v); addLink.value = ""; refresh(); linkList.appendChild(h("div", { class: "small" }, "+ " + v)); });
+    var linkList = h("div");
+    var watch = setInterval(function () { if (!more.el.isConnected) { clearInterval(watch); return; } refresh(); }, 400);
+    rerun.addEventListener("click", function () {
+      if (more.busy()) { alert("Wait until the files have uploaded."); return; }
+      SRC.links = SRC.links.concat(extraLinks);
+      more.ids().forEach(function (id) { SRC.extra = (SRC.extra || []).concat([id]); });
+      var ids = SRC.up.ids().concat(SRC.extra || []);
+      rerun.disabled = true; rerun.textContent = "Reading…";
+      var prog = h("div", { class: "steps" });
+      form.appendChild(prog);
+      api("api/admin/paths/find", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ links: SRC.links, uploads: ids, githubToken: SRC.gh, settings: settingsOf() }) })
+        .then(function (j) { if (j.imported) { location.href = ROOT + j.imported + "/"; return; } return poll(j.job, function (job) { drawSteps(prog, job); }).then(function (job) { foundView(j.job, job.result); }); })
+        .catch(function (e) { rerun.disabled = false; rerun.textContent = "Read them too"; alert(e.message); });
+    });
+    form.appendChild(h("div", { class: "more" },
+      h("div", null, h("b", null, "Missing something?"), h("span", { class: "small" }, "Upload more files or add another link. They're added to this list before generating.")),
+      h("div", { class: "row" }, upMore, linkMore)));
+    form.appendChild(more.el);
+    form.appendChild(h("div", { class: "lnkin" }, addLink, addLinkGo));
+    form.appendChild(linkList);
+    form.appendChild(h("div", { class: "row end" }, rerun));
+    form.appendChild(h("div", { class: "tile" }, h("span", { class: "label" }, "Total to read"), h("b", null, "About " + (found.pages || 0) + " page" + (found.pages === 1 ? "" : "s") + " of material" + (found.images ? ", " + found.images + " image" + (found.images === 1 ? "" : "s") : "") + "."),
+      h("span", { class: "small" }, "The LLM summarizes each source first, then builds the path from all the summaries, so nothing is cut off for length.")));
+    var err = h("p", { class: "err", hidden: true });
+    var back = h("button", { type: "button", class: "btn ghost" }, "Back"), go = h("button", { type: "button", class: "btn primary" }, "Generate draft");
+    back.addEventListener("click", function () { sourceView(); });
+    go.addEventListener("click", function () { generate(jobId, Object.keys(unchecked), go, err); });
+    form.appendChild(err);
+    form.appendChild(h("div", { class: "row end" }, back, go));
+    out.appendChild(form);
+    window.scrollTo(0, 0);
+  }
+  function generate(jobId, unchecked, btn, err) {
+    btn.disabled = true; err.hidden = true;
+    var out = $("#content-out");
+    api("api/admin/paths/generate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ job: jobId, unchecked: unchecked, settings: settingsOf() }) })
+      .then(function (j) {
+        out.textContent = "";
+        out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "Generating your draft")));
+        var prog = h("div", { class: "steps" }), after = h("div");
+        out.appendChild(h("div", { class: "form" }, prog, after));
+        return poll(j.job, function (job) { drawSteps(prog, job); }).then(function (job) {
+          var r = job.result, items = [];
+          (r.warnings || []).forEach(function (w) { items.push(h("div", { class: "warn" }, w)); });
+          if ((r.broken || []).length) items.push(h("div", { class: "warn" }, r.broken.length + " link" + (r.broken.length === 1 ? "" : "s") + " didn't open: " + r.broken.slice(0, 5).join(", ")));
+          var cov = r.coverage || {};
+          var li = [h("li", null, "Coverage: " + cov.used + " of " + cov.total + " sources are used in at least one step." + ((cov.unused || []).length ? " Not used: " + cov.unused.slice(0, 6).map(function (u) { return u.title + (u.reason ? " (" + u.reason + ")" : ""); }).join("; ") : ""))];
+          li.push(h("li", null, "Every step lists the source it came from, so you can check it."));
+          var open = h("a", { class: "btn primary", href: ROOT + r.id + "/" }, "Open the draft");
+          SRC = null;
+          add(after, [h("div", { class: "diff" }, h("b", null, "Check before you publish"), items, h("ul", null, li)), h("div", { class: "row", style: "margin-top:12px" }, open)]);
+        });
+      })
+      .catch(function (e) {
+        btn.disabled = false;
+        if (err.isConnected) { err.textContent = e.message; err.hidden = false; }
+        else { var box = h("div", { class: "form" }, h("p", { class: "err" }, e.message), h("div", { class: "row" }, h("button", { type: "button", class: "btn primary", onclick: function () { sourceView(); } }, "Back to the sources"))); out.appendChild(box); }
+      });
+  }
+  var WANT_CREATE = location.hash === "#create";  // from the welcome banner's "Create a learning path"
+  function loadContent() {
+    return api("api/admin/paths").then(function (j) {
+      contentData = j;
+      if (!SRC) contentHome();
+      if (WANT_CREATE) { WANT_CREATE = false; history.replaceState(null, "", "#content"); if (j.canCreate && !SRC) chooseView(); }
+    }, function (e) { $("#content-out").textContent = e.message; });
+  }
+
+  /* ---------------------------------------------------------------- admin: users */
+  var TIP = { admin: "Sees and manages every path, the dashboard and problem reports, and invites people.",
+    author: "Creates learning paths and owns what they create. Sees only those paths' progress, problem reports and content." };
+  var usersData = null, uFilter = "all", justInvited = null, editing = null;
+  function roleChip(r, locked) { return h("span", { class: "onb-chip tip" + (locked ? " locked" : ""), tabindex: "0", "data-tip": TIP[r] }, r === "admin" ? "Admin" : "Author"); }
+  function renderUsers() {
+    var out = $("#users-out"); out.textContent = "";
+    var em = h("input", { placeholder: "first.last", "aria-label": "Email (before @datarobot.com)", autocomplete: "off" });
+    var inv = h("button", { type: "button", class: "btn primary" }, "Invite");
+    var rp = h("button", { type: "button", class: "btn ghost rp", html: '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3 1v14M3 2h9l-2 3 2 3H3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Report a problem' });
+    var ierr = h("p", { class: "err", hidden: true, style: "width:100%" });
+    function invite() {
+      var v = em.value.trim(); if (!v) { em.focus(); return; }
+      inv.disabled = true;
+      api("api/admin/users", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: v.replace(/@datarobot\.com$/i, "") }) })
+        .then(function (j) { justInvited = j.user.email; loadUsers(); }, function (e) { inv.disabled = false; ierr.textContent = e.message; ierr.hidden = false; });
+    }
+    inv.addEventListener("click", invite);
+    em.addEventListener("keydown", function (e) { if (e.key === "Enter") invite(); });
+    em.addEventListener("input", function () { if (/@/.test(em.value)) em.value = em.value.replace(/@.*$/, ""); });
+    rp.addEventListener("click", systemReport);
+    out.appendChild(h("div", { class: "ptop" }, h("div", { class: "invite" }, h("span", { class: "label", style: "width:100%" }, "Step 1: invite"), h("div", { class: "emailin" }, em, h("span", null, "@datarobot.com")), inv, ierr), rp));
+    var U = usersData.users;
+    var n = { all: U.length, admin: 0, author: 0, none: 0 };
+    U.forEach(function (u) { if (u.roles.indexOf("admin") >= 0) n.admin++; if (u.roles.indexOf("author") >= 0) n.author++; if (!u.roles.length) n.none++; });
+    var filt = seg([["all", "All"], ["admin", "Admins " + n.admin], ["author", "Authors " + n.author], ["none", "No role " + n.none]], uFilter, function (v) { uFilter = v; renderUsers(); });
+    var table = h("div", { class: "ptable" }, h("div", { class: "pgh" }, h("h3", null, "Users"), h("span", { class: "small" }, String(U.length)), h("span", { class: "sp" }), filt),
+      h("div", { class: "prow phead" }, h("span", null, "User"), h("span", null, "Roles"), h("span", null, "Owns"), h("span", null, "Added"), h("span")));
+    var list = U.filter(function (u) { return uFilter === "all" || (uFilter === "none" ? !u.roles.length : u.roles.indexOf(uFilter) >= 0); });
+    list.sort(function (x, y) { return (y.email === justInvited) - (x.email === justInvited) || (y.system - x.system) || x.name.localeCompare(y.name); });
+    list.forEach(function (u) { table.appendChild(u.email === justInvited || u.email === editing ? pickRow(u) : userRow(u)); });
+    out.appendChild(table);
+    out.appendChild(h("p", { class: "small" }, "Removing someone keeps their paths. An admin can give each path a new owner. System admins (set in the app's runtime parameters) can't lose the Admin role here, so nobody gets locked out."));
+  }
+  function seenText(u) { return u.lastSeen ? "Last seen " + rel(u.lastSeen) : "Hasn't opened the app yet"; }
+  function userRow(u) {
+    var roles = u.roles.length ? u.roles.map(function (r) { return roleChip(r, r === "admin" && u.system); }) : [h("span", { class: "small" }, "No role yet")];
+    var edit = h("button", { type: "button", class: "btn ghost" }, u.roles.length ? "Edit roles" : "Assign roles");
+    edit.addEventListener("click", function () { editing = u.email; renderUsers(); });
+    var act;
+    if (u.system) act = [edit, h("span", { class: "lock", title: "Set in the app's runtime parameters (MANAGER_EMAILS)" }, "🔒 System admin")];
+    else {
+      var rm = h("button", { type: "button", class: "btn ghost" }, "Remove");
+      rm.addEventListener("click", function () {
+        if (!confirm("Remove " + (u.name || u.email) + "? Their paths are kept.")) return;
+        api("api/admin/users/" + encodeURIComponent(u.email), { method: "DELETE" }).then(loadUsers, function (e) { alert(e.message); });
+      });
+      act = [edit, rm];
+    }
+    var owns = (u.owns || []).length ? u.owns.map(function (p, i) { return [i ? ", " : "", h("a", { href: ROOT + p.id + "/", style: "color:var(--ink)" }, p.title), p.status !== "published" ? [" ", h("span", { class: "onb-chip" }, "Draft")] : null]; }) : [h("span", { class: "small" }, "—")];
+    return h("div", { class: "prow" },
+      h("span", { class: "pp" }, h("b", null, u.name || u.email), h("span", null, u.email), h("span", null, seenText(u))),
+      h("span", { "data-l": "Roles", class: "roles" }, roles),
+      h("span", { "data-l": "Owns" }, owns),
+      h("span", { "data-l": "Added" }, u.system && !u.addedAt ? "Runtime parameters" : (u.addedAt ? new Date(u.addedAt).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : "—") + (u.addedBy && u.addedBy !== "Runtime parameters" ? " · " + u.addedBy.split(" ")[0] : "")),
+      h("span", { class: "act" }, act));
+  }
+  function pickRow(u) {
+    var adm = h("input", { type: "checkbox", checked: u.roles.indexOf("admin") >= 0, disabled: u.system });
+    var aut = h("input", { type: "checkbox", checked: u.roles.indexOf("author") >= 0 });
+    var save = h("button", { type: "button", class: "btn primary" }, "Save roles"), later = h("button", { type: "button", class: "btn ghost" }, "Later");
+    var err = h("p", { class: "err", hidden: true });
+    later.addEventListener("click", function () { justInvited = null; editing = null; renderUsers(); });
+    save.addEventListener("click", function () {
+      var roles = []; if (adm.checked) roles.push("admin"); if (aut.checked) roles.push("author");
+      save.disabled = true;
+      api("api/admin/users/" + encodeURIComponent(u.email), { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ roles: roles }) })
+        .then(function () { justInvited = null; editing = null; loadUsers(); }, function (e) { save.disabled = false; err.textContent = e.message; err.hidden = false; });
+    });
+    return h("div", { class: "prow new" },
+      h("span", { class: "pp" }, h("b", null, u.name || u.email), h("span", null, u.email), u.email === justInvited ? h("span", { class: "justin" }, "Just invited") : null),
+      h("div", { class: "pick" }, h("span", { class: "label" }, (u.email === justInvited ? "Step 2: " : "") + "assign roles"),
+        h("label", { class: "tip", "data-tip": TIP.admin }, adm, "Admin"), h("label", { class: "tip", "data-tip": TIP.author }, aut, "Author"),
+        h("span", { class: "small" }, "Pick one, both, or none for now. With no role they can still use the hub as a learner."),
+        h("div", { class: "row" }, later, save), err));
+  }
+  function systemReport() {
+    var ta = h("textarea", { "aria-label": "What's wrong?", placeholder: "What's wrong with the app?" });
+    var up = uploader({ text: "Paste screenshots with ⌘V / Ctrl+V, drop files here, or ", after: "." });
+    var send = h("button", { type: "button", class: "btn primary" }, "Send to system admins"), cancel = h("button", { type: "button", class: "btn ghost" }, "Cancel");
+    var err = h("p", { class: "err", hidden: true });
+    var dlg = h("div", { class: "onb-dialog", role: "dialog", "aria-modal": "true", "aria-label": "Report a problem to the system admins" },
+      h("span", { class: "label" }, "Admin"), h("h2", null, "Report a problem to the system admins"), h("div", { class: "about" }, "About: Admin → Users"),
+      h("p", null, "For problems with the app itself: roles not working, someone can't get in, something broken on the admin pages."),
+      h("span", { class: "onb-fl" }, "What's wrong?"), ta, up.el, err, h("div", { class: "row" }, cancel, send));
+    var wrap = h("div", { class: "onb-modal" }, dlg);
+    document.body.appendChild(wrap);
+    dlg.addEventListener("paste", function (e) { var fs = (e.clipboardData && e.clipboardData.files) || []; if (fs.length) { e.preventDefault(); Array.prototype.forEach.call(fs, up.upload); } });
+    function close() { wrap.remove(); }
+    wrap.addEventListener("click", function (e) { if (e.target === wrap) close(); });
+    cancel.addEventListener("click", close);
+    send.addEventListener("click", function () {
+      var msg = ta.value.trim(); if (!msg) { ta.focus(); return; }
+      if (up.busy()) { err.textContent = "Wait until the files have uploaded."; err.hidden = false; return; }
+      send.disabled = true;
+      api("api/admin/system-report", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ message: msg, uploads: up.ids(), about: "Admin → Users" }) })
+        .then(function () { dlg.textContent = ""; var ok = h("button", { type: "button", class: "btn primary" }, "Close"); ok.addEventListener("click", close); add(dlg, [h("h2", null, "Thanks, it's sent"), h("p", null, "The system admins have your report."), h("div", { class: "row" }, ok)]); loadReports(); },
+          function (e) { send.disabled = false; err.textContent = e.message; err.hidden = false; });
+    });
+    ta.focus();
+  }
+  function loadUsers() { return api("api/admin/users").then(function (j) { usersData = j; renderUsers(); }, function (e) { $("#users-out").textContent = e.message; }); }
+
+  /* ---------------------------------------------------------------- boot */
+  var ME = null;
+  api("api/me").then(function (me) {
+    ME = me;
+    $("#who-name").textContent = me.name || me.email || "";
+    $("#who-state").hidden = true;
+    if (!me.canAdmin) { $("#admin").textContent = ""; $("#admin").appendChild(h("div", { class: "empty" }, "This page is for onboarding admins and path authors. Ask an admin to invite you.")); return; }
+    if (me.isManager) $('[data-tab="users"]').hidden = false;
+    showTab();
+    window.addEventListener("hashchange", showTab);
+    loadDashboard(); loadTeam(); loadReports(); loadContent();
+    if (me.isManager) loadUsers();
+    setInterval(function () { if (!document.hidden) { loadTeam(); loadReports(); loadDashboard(); } }, 120000);
+  }, function (e) { var st = $("#who-state"); st.dataset.s = "local"; st.textContent = "Couldn't load: " + e.message; });
+})();
+</script>
+</body>
+</html>

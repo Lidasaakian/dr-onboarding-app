@@ -1,0 +1,64 @@
+runtimeParameterDefinitions:
+  - fieldName: PROGRESS_FILES_ID
+    type: string
+    description: >-
+      ID of the DataRobot Files catalog item that stores learners' progress, problem reports, uploaded content, users and roles, and paths made in the app.
+      Leave unset on the very first run; the app creates one and shows its ID at api/health. Then set it here.
+  - fieldName: MANAGER_EMAILS
+    type: string
+    description: >-
+      Comma-separated emails of the system admins. They are always admins, can't lose the Admin role in the app, invite
+      other admins and authors on the Users tab, and get problem reports sent to the system admins.
+  - fieldName: SLACK_WEBHOOK_URL
+    type: string
+    description: >-
+      Optional. Slack incoming-webhook URL. Problem reports are posted as they arrive, and a summary of inactive
+      learners every Monday from 09:00 Europe/Dublin.
+  - fieldName: SLACK_BOT_TOKEN
+    type: credential
+    description: >-
+      Optional. A Slack bot token (xoxb-…) saved as an API-token credential. The app DMs people when they're given the
+      Admin or Author role, and shows path authors' Slack photos. The bot needs the chat:write, users:read and
+      users:read.email scopes.
+  - fieldName: LINKEDIN_ORGANIZATION_ID
+    type: string
+    description: >-
+      Optional. DataRobot's LinkedIn company ID. With it, "Add to LinkedIn" on a certificate links the entry to the
+      DataRobot company page (with its logo); without it, LinkedIn shows "DataRobot" as plain text.
+  - fieldName: APP_URL
+    type: string
+    description: Optional. The app's own URL (for example https://app.datarobot.com/custom_applications/<id>/), used for links in Slack messages.
+  - fieldName: JIRA_EMAIL
+    type: string
+    description: >-
+      Email of the Atlassian service account (can be left empty when JIRA_API_TOKEN is a basic credential with it as username) the app uses for Jira and Confluence: filing learners' DataRobot bugs,
+      reading issue status for Problem reports, and reading PBMP issues and Confluence pages when a path is created from sources.
+  - fieldName: JIRA_API_TOKEN
+    type: credential
+    description: >-
+      DataRobot credential with the service account's Atlassian API token (id.atlassian.com → Security → API tokens):
+      an API token credential, or a basic credential with the service account email as username and the token as password.
+  - fieldName: JIRA_URL
+    type: string
+    description: Optional. The Atlassian site. Default https://datarobot.atlassian.net.
+  - fieldName: JIRA_ROUTING_PAGE
+    type: string
+    description: >-
+      Optional. Confluence page that lists the engineering pillars, pods and their Jira projects. The app reads it
+      (every 3 hours) and the LLM picks the owning pod's Jira project for each learner's bug. Default: the ENG space
+      overview, https://datarobot.atlassian.net/wiki/spaces/ENG/overview.
+  - fieldName: JIRA_FALLBACK_PROJECT
+    type: string
+    description: The Jira project key used when the LLM can't work out the owning project, or the project it picks can't take Bugs.
+  - fieldName: JIRA_PROJECTS
+    type: string
+    description: >-
+      Optional. Extra projects on top of the routing page, one per line or separated by semicolons, as "KEY: what it owns".
+  - fieldName: LLM_MODEL_GENERATE
+    type: string
+    description: >-
+      Optional. LLM Gateway model for creating paths from sources and editing drafts with the LLM. Empty = the strongest
+      Claude model in the gateway catalog (api/health lists the catalog).
+  - fieldName: LLM_MODEL_REPORTS
+    type: string
+    description: Optional. LLM Gateway model for turning bug reports into Jira issues. Empty = a fast Claude model from the catalog.
