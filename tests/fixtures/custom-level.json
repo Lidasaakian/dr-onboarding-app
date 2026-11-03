@@ -1,0 +1,273 @@
+{
+ "id": "custom-level",
+ "status": "published",
+ "owners": [
+  "author@datarobot.com"
+ ],
+ "createdBy": "Author",
+ "createdByEmail": "author@datarobot.com",
+ "createdAt": 1,
+ "origin": "app",
+ "draft": {
+  "title": "Phases",
+  "blurb": "",
+  "length": "",
+  "pace": "weeks",
+  "level": "Sprint",
+  "useDays": false,
+  "skill": {
+   "enabled": false,
+   "name": ""
+  },
+  "groups": [
+   {
+    "id": "g1",
+    "title": "",
+    "days": [
+     {
+      "id": "d1",
+      "title": "",
+      "steps": [
+       {
+        "id": "s1",
+        "title": "Step 1",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s2",
+        "title": "Step 2",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s3",
+        "title": "Step 3",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "g2",
+    "title": "",
+    "days": [
+     {
+      "id": "d2",
+      "title": "",
+      "steps": [
+       {
+        "id": "s4",
+        "title": "Step 4",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s5",
+        "title": "Step 5",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s6",
+        "title": "Step 6",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "g3",
+    "title": "",
+    "days": [
+     {
+      "id": "d3",
+      "title": "",
+      "steps": [
+       {
+        "id": "s7",
+        "title": "Step 7",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s8",
+        "title": "Step 8",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s9",
+        "title": "Step 9",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "live": {
+  "title": "Phases",
+  "blurb": "",
+  "length": "",
+  "pace": "weeks",
+  "level": "Sprint",
+  "useDays": false,
+  "skill": {
+   "enabled": false,
+   "name": ""
+  },
+  "groups": [
+   {
+    "id": "g1",
+    "title": "",
+    "days": [
+     {
+      "id": "d1",
+      "title": "",
+      "steps": [
+       {
+        "id": "s1",
+        "title": "Step 1",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s2",
+        "title": "Step 2",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s3",
+        "title": "Step 3",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "g2",
+    "title": "",
+    "days": [
+     {
+      "id": "d2",
+      "title": "",
+      "steps": [
+       {
+        "id": "s4",
+        "title": "Step 4",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s5",
+        "title": "Step 5",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s6",
+        "title": "Step 6",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "g3",
+    "title": "",
+    "days": [
+     {
+      "id": "d3",
+      "title": "",
+      "steps": [
+       {
+        "id": "s7",
+        "title": "Step 7",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s8",
+        "title": "Step 8",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s9",
+        "title": "Step 9",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

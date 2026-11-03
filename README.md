@@ -99,33 +99,70 @@ straight to Jira.
 
 ## Creating a learning path (Admin → Content → + Create learning path)
 
-Both options make a **draft** that only its owners and the admins can see until it's published.
+One guided flow makes every new path. The result is a **draft** that only its owners and the admins can see until
+it's published. The steps are shown at the top; **Back** keeps what you entered.
 
-- **Create from source (LLM assisted):** paste links and upload files, in any mix:
-  - **Jira / PBMP** (key or link): the issue, its child and linked issues, descriptions, comments, attachments
-    (PDF, Word, screenshots, which the LLM can see too), and the Confluence pages, GitHub PRs and docs linked from them.
-    Issues that aren't done yet are listed separately and left out by default.
-  - **Confluence** pages and their child pages (two levels), with attached PDFs and Word files.
-  - **GitHub** repos (README, docs and guides; example files are listed; source code is skipped) and pull requests.
-    Private repos need the author's own GitHub token, which is used for that run only and never saved.
-  - **Web pages** (for example docs.datarobot.com) and **files**: PDF, Word, PowerPoint, Excel/CSV, HTML, Markdown.
-    Google Docs can't be read by the app: download them (File → Download) and upload the file.
-  - **The .xlsx template** (download it from the form): it's imported exactly as it is, without the LLM.
-  - **What we found** lists everything before generating; untick what's out of date, or upload more files and links.
-    Restricted pages and Google Docs are flagged. The LLM summarizes each source first, then builds the path from all
-    the summaries, so nothing is cut off for length. The result lists which sources weren't used, and links that
-    didn't open. Every step keeps the source it came from.
-- **Build in the app:** start empty with your structure: pace (calendar weeks or working days), what the top level is
-  called (Week, Module, Phase or your own name), and whether it has days inside.
+1. **Basics:** the path name and who it's for. **More options** has skill growth and owners (you by default); both
+   can be changed later in Settings.
+2. **Structure:** cadence, what sections are called and what's inside them, approximate length, and whether to start
+   with a **Before you start** section (see "Path structure" below). A preview shows how learners will see it.
+3. **Sources:** paste links and upload files, in any mix, or **Skip and start empty** for an empty draft with that
+   structure.
+   - **Jira / PBMP** (key or link): the issue, its child and linked issues, descriptions, comments, attachments
+     (PDF, Word, screenshots, which the LLM can see too), and the Confluence pages, GitHub PRs and docs linked from them.
+     Issues that aren't done yet are listed separately and left out by default.
+   - **Confluence** pages and their child pages (two levels), with attached PDFs and Word files.
+   - **GitHub** repos (README, docs and guides; example files are listed; source code is skipped) and pull requests.
+     Private repos need the author's own GitHub token, which is used for that run only and never saved.
+   - **Web pages** (for example docs.datarobot.com) and **files**: PDF, Word, PowerPoint, Excel/CSV, HTML, Markdown.
+     Google Docs can't be read by the app: download them (File → Download) and upload the file.
+   - **The .xlsx template** (download it from this step): it's imported exactly as it is, without the LLM, with the
+     structure in the file.
+4. **Review:** what was found, before the LLM writes anything. Untick what's out of date; **Missing something?** reads
+   more links and files on top (only the new ones are read, and your ticks stay). Restricted pages and Google Docs
+   are flagged.
+5. **Generate:** runs in the background. You can leave the page: Admin → Content shows the path as **Generating…**,
+   and a notice on the hub or the admin pages (plus a Slack DM when `SLACK_BOT_TOKEN` is set) says when the draft is
+   ready. The LLM follows the structure you chose; it decides only how many sections and steps there are and what
+   they say. It summarizes each source first, then builds the path from all the summaries, so nothing is cut off for
+   length. Every step keeps the source it came from, and the draft's **Generation report** lists the sources that
+   weren't used and the links that didn't open.
+
+If generation fails, or the app restarts while it runs, the path shows as **Failed** with the reason; **Try again**
+reopens the flow on Sources with your answers, and **Delete** removes it. If the LLM Gateway isn't available, the
+flow says so before starting. An unfinished flow is kept in the browser: Admin → Content offers **Continue
+creating** after a refresh. Uploaded files are kept for 3 hours; after that, the flow asks you to upload them again.
+
 - **Skill growth:** "Add now" with a skill name, or "Decide later" and turn it on in Settings any time. Progress is
   tracked from the start, so the right stage shows straight away.
-- **Editing a draft:** click any text; each step has Day, Type, Gate and Link controls, move up and down, delete;
-  add steps, days and groups. **Ask the LLM to change the draft** works on the whole path, or on one group, day or step
+- **Editing a draft:** click any text; each step has Day (or your second-level name), Type, Gate and Link controls, move up and down, delete;
+  add steps and sections; a section's menu can remove its number. **Ask the LLM to change the draft** works on the whole path, or on one group, day or step
   (the ✦ buttons). It shows the suggested changes; **Apply** or **Discard**. **Undo** covers both kinds of edit.
-  **Preview as learner**, **Download as .xlsx**, **Settings** (name, who it's for, length, pace, structure, skill
+  **Preview as learner**, **Download as .xlsx**, **Settings** (name, who it's for, length, cadence, level names, skill
   growth, owners; delete a draft) and **Publish**. A published path is edited the same way: learners keep seeing the
   published version until you publish again (**Discard changes** goes back to it).
 - A published path can't be deleted in the app.
+
+### Path structure
+
+Every path made in the app has a structure, set when it's created and changeable in the draft's **Settings**:
+
+- **Cadence:** **Calendar weeks**, **Working days** or **Self-paced**. It decides the learner's schedule: each
+  numbered section is one week; or each second-level section (each numbered section if there's no second level) is
+  one working day; or, for self-paced, there's no schedule and learners see their progress ("12 of 40 steps")
+  instead of on track or behind. Self-paced learners aren't counted as on track or behind in the dashboard.
+- **Level names:** the top level (Week, Day, Module, Phase or your own name) and an optional second level inside
+  each section (Days, Modules, your own name, or none). Changing the cadence also changes a level name that's still
+  the default for the old cadence (Week + Day for weeks, Day for working days, Module for self-paced); names you
+  typed yourself stay. Removing the second level moves all its steps into their section, in order.
+- **Unnumbered sections:** any section can be shown by its title instead of a number, such as **Before you start**
+  or **Prerequisites**. It doesn't count in the numbering of the others and is scheduled with the next numbered
+  section (or the last one when it's at the end).
+- The .xlsx export and template carry the structure on their **Path** sheet: Cadence, Top level is called, Second
+  level is called, and Unnumbered sections (Group numbers). Files made before these rows existed still import.
+- Paths saved before cadence existed open with the same structure (their pace, level and days) and every section
+  numbered; learners' progress doesn't change. The old fields are still saved next to the new ones, so an older
+  version of the app can still read the paths.
 
 ## Certificates
 
@@ -276,6 +313,8 @@ The first week after Slack is set up is skipped, so a new deploy never posts a s
   bug that couldn't go to Jira, and of reports to the system admins, are stored in the Files item (`blobs/`).
 - **Jobs** (reading sources, generating, LLM edits) run in the background and are kept in memory for an hour, so the
   app must run as a single instance.
+  A path being generated is saved as soon as generation starts (status `generating`, with the answers from the
+  creation flow), so a restart can't lose it silently: on startup it becomes `failed` and its owners can try again.
 - **Other data:** problem reports, uploaded content and bookkeeping are JSON files under `docs/` in the same Files item.
 - **Old links:** the first version of the app served the Agentic path at `/`. That URL now opens the hub; the
   Agentic path is one click away, and its saved progress is unchanged.

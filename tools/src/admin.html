@@ -122,6 +122,20 @@
 .fork b{font-weight:400;font-size:19px}
 .fork span{color:var(--muted);font-size:15px}
 .form{max-width:860px;display:grid;gap:14px}
+.wsteps{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
+.wsteps li{display:flex;align-items:center;gap:6px}
+.wsteps .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:999px;border:1px solid var(--line);font-family:var(--mono);font-size:11px}
+.wsteps li.done .n{background:var(--green);border-color:var(--green);color:#0B0B0B}
+.wsteps li[aria-current="step"]{color:var(--ink)}
+.wsteps li[aria-current="step"] .n{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+details.more summary{cursor:pointer;font-size:15px;color:var(--link)}
+label.check{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+label.check > span{display:grid;gap:2px}
+.shape{display:grid;gap:4px;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;font-size:15px}
+.callout{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:10px 12px;margin:12px 0;font-size:15px}
+.callout .sp{flex:1 1 auto}
+.pill.gen{background:var(--blue);border-color:var(--blue);color:#0B0B0B}
+.pill.fail{background:#FFD3D3;border-color:#FFD3D3;color:#0B0B0B}
 .form .field input,.form .field textarea,.form .field select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;width:100%;min-width:0}
 .form .field textarea{min-height:84px;resize:vertical}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px}
@@ -532,9 +546,17 @@
       thumbs.appendChild(fig);
       fetch(ROOT + "api/uploads", { method: "POST", headers: { "content-type": file.type || "application/octet-stream", "x-file-name": encodeURIComponent(name) }, body: file })
         .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.detail || r.status); return j; }); })
-        .then(function (j) { f.id = j.id; f.state = "ok"; fig.classList.remove("up"); if (opts.onChange) opts.onChange(); }, function (e) { f.state = "err"; fig.title = e.message; fig.style.outline = "2px solid #B00020"; });
+        .then(function (j) { f.id = j.id; f.state = "ok"; f.at = Date.now(); fig.classList.remove("up"); if (opts.onChange) opts.onChange(); }, function (e) { f.state = "err"; fig.title = e.message; fig.style.outline = "2px solid #B00020"; });
       if (opts.onChange) opts.onChange();
     }
+    (opts.initial || []).forEach(function (u) {  // files uploaded earlier (the wizard after a refresh)
+      var f = { name: u.name, id: u.id, state: "ok", at: u.at };
+      files.push(f);
+      var rm = h("button", { type: "button", class: "x", "aria-label": "Remove " + u.name }, "×");
+      var fig = h("figure", null, h("div", { class: "doc" }, (u.name.split(".").pop() || "file").toUpperCase().slice(0, 4)), h("figcaption", null, u.name), rm);
+      rm.addEventListener("click", function () { files.splice(files.indexOf(f), 1); fig.remove(); if (opts.onChange) opts.onChange(); });
+      thumbs.appendChild(fig);
+    });
     browse.addEventListener("click", function () { picker.click(); });
     picker.addEventListener("change", function () { Array.prototype.forEach.call(picker.files, upload); picker.value = ""; });
     ["dragover", "dragenter"].forEach(function (ev) { box.addEventListener(ev, function (e) { e.preventDefault(); box.classList.add("over"); }); });
@@ -542,7 +564,8 @@
     box.addEventListener("drop", function (e) { e.preventDefault(); Array.prototype.forEach.call(e.dataTransfer.files || [], upload); });
     box.addEventListener("paste", function (e) { var fs = (e.clipboardData && e.clipboardData.files) || []; if (fs.length) { e.preventDefault(); Array.prototype.forEach.call(fs, upload); } });
     return { el: box, upload: upload, pick: function () { picker.click(); }, ids: function () { return files.filter(function (f) { return f.id; }).map(function (f) { return f.id; }); },
-      busy: function () { return files.some(function (f) { return f.state === "up"; }); }, count: function () { return files.length; }, names: function () { return files.map(function (f) { return f.name; }); } };
+      busy: function () { return files.some(function (f) { return f.state === "up"; }); }, count: function () { return files.length; }, names: function () { return files.map(function (f) { return f.name; }); },
+      list: function () { return files.filter(function (f) { return f.id; }).map(function (f) { return { id: f.id, name: f.name, at: f.at || Date.now() }; }); } };
   }
   function poll(jid, onProgress) {
     return new Promise(function (resolve, reject) {
@@ -582,16 +605,38 @@
     var out = $("#content-out"); out.textContent = "";
     var d = contentData;
     var create = d.canCreate ? h("button", { type: "button", class: "btn primary" }, "+ Create learning path") : null;
-    if (create) create.addEventListener("click", chooseView);
+    if (create) create.addEventListener("click", function () { startWizard(); });
     out.appendChild(h("div", { class: "row", style: "justify-content:space-between" }, h("h2", { style: "font-size:26px" }, "Learning paths"), create));
+    var left = d.canCreate ? wStored() : null;  // a wizard left unfinished (refresh, another tab, another page)
+    if (left) {
+      var cont = btn("Continue creating " + (left.title || "your path"), true, function () { W = left; GH = ""; wizard(); });
+      var drop = btn("Discard", false, function () { if (confirm("Discard what you entered for " + (left.title || "this path") + "?")) { wClear(); contentHome(); } });
+      out.appendChild(h("div", { class: "callout" }, h("span", null, "You didn't finish creating " + (left.title ? "“" + left.title + "”" : "a path") + "."), h("span", { class: "sp" }), drop, cont));
+    }
+    if (justStarted && d.paths.some(function (p) { return p.id === justStarted.id && p.status === "generating"; })) {
+      out.appendChild(h("div", { class: "callout" }, h("span", null, "Generating “" + justStarted.title + "”. It takes a few minutes and you can leave this page: you'll get a notice here or on the hub when the draft is ready" + (d.slackDm ? ", and a Slack message" : "") + ".")));
+      justStarted = null;
+    }
     if (!d.paths.length) out.appendChild(h("div", { class: "empty" }, d.canCreate ? "You haven't created a learning path yet." : "You don't own any learning paths yet."));
     else {
       var tb = h("tbody");
       d.paths.forEach(function (p) {
-        var st = p.status === "published" ? h("span", { class: "pill pub" }, "Published") : h("span", { class: "pill dr" }, "Draft");
+        var st = { published: h("span", { class: "pill pub" }, "Published"), generating: h("span", { class: "pill gen" }, "Generating…"),
+          failed: h("span", { class: "pill fail" }, "Failed") }[p.status] || h("span", { class: "pill dr" }, "Draft");
         var edit = p.custom ? h("a", { class: "btn ghost", href: ROOT + p.id + "/" + (p.status === "published" ? "#edit" : "") }, p.status === "published" ? "Edit" : "Open draft")
           : h("a", { class: "btn ghost", href: ROOT + p.id + "/#edit" }, "Edit");
-        tb.appendChild(h("tr", null, h("td", null, h("a", { href: ROOT + p.id + "/", style: "color:var(--ink)" }, p.title), p.unpublished ? h("div", { class: "small" }, "Unpublished changes") : null),
+        var note = p.unpublished ? h("div", { class: "small" }, "Unpublished changes") : null;
+        if (p.status === "generating") { edit = null; note = h("div", { class: "small" }, "Started " + fmtWhen(p.createdAt) + ". You can leave this page."); }
+        if (p.status === "failed") {
+          note = h("div", { class: "small err" }, p.error || "Generating the draft failed.");
+          var again = p.wizard ? btn("Try again", false, function () { startWizard({ settings: p.wizard.settings, links: p.wizard.links, uploads: p.wizard.uploads, retryOf: p.id }); }) : null;
+          var del = btn("Delete", false, function () {
+            if (!confirm("Delete " + p.title + "?")) return;
+            api("api/admin/paths/" + p.id, { method: "DELETE" }).then(loadContent, function (e) { alert(e.message); });
+          });
+          edit = h("span", { class: "row" }, again, del);
+        }
+        tb.appendChild(h("tr", null, h("td", null, p.status === "generating" || p.status === "failed" ? h("span", null, p.title) : h("a", { href: ROOT + p.id + "/", style: "color:var(--ink)" }, p.title), note),
           h("td", null, st), h("td", { style: "font-variant-numeric:tabular-nums" }, String(p.steps)), h("td", { style: "font-variant-numeric:tabular-nums" }, p.status === "published" ? String(p.enrolled) : "–"),
           h("td", { class: "small" }, p.custom ? (p.owners || []).join(", ") : "Built in"), h("td", null, edit)));
       });
@@ -649,53 +694,129 @@
     });
   }
 
-  /* ---------- create: choose ---------- */
-  function chooseView() {
-    var out = $("#content-out"); out.textContent = "";
-    var a = h("button", { type: "button", class: "fork" }, h("b", null, "Create from source (LLM assisted)"),
-      h("span", null, "Paste links (Jira/PBMP, Confluence, GitHub, docs) and upload files (PDF, Word, Google Docs downloads, HTML, the .xlsx template), in any mix. The LLM builds the path."));
-    var b = h("button", { type: "button", class: "fork" }, h("b", null, "Build in the app"), h("span", null, "Start empty and add weeks, days and steps yourself."));
-    var back = h("button", { type: "button", class: "btn ghost" }, "Cancel");
-    a.addEventListener("click", function () { sourceView(); }); b.addEventListener("click", buildView); back.addEventListener("click", contentHome);
-    out.appendChild(h("div", { class: "onb-dialog flat" }, h("h2", null, "Create a learning path"),
-      h("p", null, "Both options make a draft. Only you and the admins can see it until you publish it."), h("div", { class: "choices" }, a, b), h("div", { class: "row" }, back)));
+  /* ---------- create: the wizard ---------- */
+  // One flow for every new path: Basics -> Structure -> Sources -> Review -> Generate. The answers are kept in
+  // localStorage (per user), so a refresh or a visit elsewhere can continue; the GitHub token stays in memory only.
+  var STEPS = [["basics", "Basics"], ["structure", "Structure"], ["sources", "Sources"], ["review", "Review"], ["generate", "Generate"]];
+  var DEF_LEVELS = { weeks: ["Week", "Day"], days: ["Day", ""], self: ["Module", ""] };
+  var UPLOAD_TTL = 3 * 3600 * 1000;  // the server keeps uploaded files for up to 3 hours
+  var W = null, GH = "";
+  function wKey() { return "onb.wizard." + ((ME && ME.id) || ""); }
+  function wSave() { if (!W) return; W.savedAt = Date.now(); try { localStorage.setItem(wKey(), JSON.stringify(W)); } catch (e) { /* storage blocked: no resume */ } }
+  function wStored() { try { var w = JSON.parse(localStorage.getItem(wKey()) || "null"); return w && typeof w.step === "string" ? w : null; } catch (e) { return null; } }
+  function wClear() { W = null; GH = ""; try { localStorage.removeItem(wKey()); } catch (e) {} }
+  function wNew(prev) {
+    var s = (prev && prev.settings) || {};
+    return { step: prev ? "sources" : "basics", title: s.title || "", audience: s.audience || "", skill: s.skillEnabled ? "now" : "later", skillName: s.skillName || "",
+      owners: s.owners || "you", cadence: s.cadence || "weeks", top: s.top || DEF_LEVELS[s.cadence || "weeks"][0],
+      sub: s.sub != null ? s.sub : DEF_LEVELS[s.cadence || "weeks"][1], length: s.length != null ? s.length : "1 week",
+      beforeStart: !!s.beforeStart, notes: s.notes || "", links: (prev && prev.links) || [], uploads: (prev && prev.uploads) || [],
+      findJob: null, found: null, unchecked: {}, seen: {}, retryOf: (prev && prev.retryOf) || null };
+  }
+  function settingsOf() {
+    return { title: W.title, audience: W.audience, length: W.length, notes: W.notes, skillEnabled: W.skill === "now", skillName: W.skillName,
+      owners: W.owners, cadence: W.cadence, top: W.top, sub: W.sub, beforeStart: W.beforeStart };
+  }
+  function startWizard(prev) { W = wNew(prev); GH = ""; wizard(); }
+  function wizard(step) {
+    if (step) W.step = step;
+    wSave();
+    ({ basics: wBasics, structure: wStructure, sources: wSources, review: wReview })[W.step]();
     window.scrollTo(0, 0);
   }
-
-  /* ---------- create: build in the app ---------- */
-  function buildView() {
+  // The page around every step: title, stepper, the step's fields, then Cancel on the left and Back / Continue.
+  function wFrame(title, intro, fields, buttons) {
     var out = $("#content-out"); out.textContent = "";
-    var title = h("input", { placeholder: "For example Support Engineer Ramp-up" }), blurb = h("input", { placeholder: "For example new support engineers" });
-    var pace = seg([["weeks", "Calendar weeks"], ["days", "Working days"]], "weeks");
-    var custom = h("input", { placeholder: "Name for the top level", hidden: true, style: "margin-top:8px" });
-    var level = seg([["Week", "Week"], ["Module", "Module"], ["Phase", "Phase"], ["custom", "Custom…"]], "Week", function (v) { custom.hidden = v !== "custom"; lbl.textContent = "Days inside each " + (v === "custom" ? "group" : v.toLowerCase()); });
-    var lbl = h("span", { class: "label" }, "Days inside each week");
-    var days = seg([["yes", "Yes"], ["no", "No"]], "yes");
-    var skillName = h("input", { placeholder: "Skill name, for example support engineering", hidden: true, style: "margin-top:8px" });
-    var skill = seg([["now", "Add now"], ["later", "Decide later"]], "later", function (v) { skillName.hidden = v !== "now"; });
-    var owners = h("input", { value: "you" });
-    var err = h("p", { class: "err", hidden: true });
-    var go = h("button", { type: "button", class: "btn primary" }, "Create draft"), cancel = h("button", { type: "button", class: "btn ghost" }, "Cancel");
-    cancel.addEventListener("click", contentHome);
-    go.addEventListener("click", function () {
-      if (!title.value.trim()) { err.textContent = "Give the path a name."; err.hidden = false; title.focus(); return; }
-      go.disabled = true;
-      api("api/admin/paths", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ title: title.value.trim(), blurb: blurb.value.trim(), pace: pace._v,
-        level: level._v === "custom" ? (custom.value.trim() || "Section") : level._v, useDays: days._v === "yes", skillEnabled: skill._v === "now", skillName: skillName.value.trim(), owners: owners.value }) })
-        .then(function (j) { location.href = ROOT + j.id + "/"; }, function (e) { go.disabled = false; err.textContent = e.message; err.hidden = false; });
+    var at = STEPS.map(function (s) { return s[0]; }).indexOf(W.step);
+    var cancel = h("button", { type: "button", class: "btn ghost", style: "margin-right:auto" }, "Cancel");
+    cancel.addEventListener("click", function () {
+      if ((W.title || W.links.length || W.uploads.length) && !confirm("Stop creating this path? What you entered is discarded.")) return;
+      wClear(); contentHome();
     });
-    out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "Build in the app")));
-    out.appendChild(h("div", { class: "form" },
-      h("div", { class: "grid2" }, field("Path name", title), field("Who it's for", blurb)),
-      fieldDiv("Pace", pace), fieldDiv("Top level is called", level, custom),
-      h("div", { class: "field" }, lbl, days),
-      h("div", { class: "grid2" }, fieldDiv("Skill growth", skill, skillName), field("Owners: they see this path's progress and problems", owners)),
-      err, h("div", { class: "row end" }, cancel, go)));
+    out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Create a learning path" + (W.title && W.step !== "basics" ? ": " + W.title : "")), h("h2", { style: "font-size:30px" }, title)));
+    out.appendChild(h("ol", { class: "wsteps", "aria-label": "Steps" }, STEPS.map(function (s, k) {
+      return h("li", { class: k < at ? "done" : "", "aria-current": k === at ? "step" : null }, h("span", { class: "n" }, String(k + 1)), s[1]);
+    })));
+    out.appendChild(h("div", { class: "form" }, intro ? h("p", { class: "small" }, intro) : null, fields, h("div", { class: "row end" }, cancel, buttons)));
+  }
+  function btn(text, primary, onClick) { var b = h("button", { type: "button", class: "btn " + (primary ? "primary" : "ghost") }, text); b.addEventListener("click", onClick); return b; }
+  function errBox() { return h("p", { class: "err", hidden: true }); }
+  function showErr(el, msg) { el.textContent = msg; el.hidden = false; }
+
+  /* step 1: basics */
+  function wBasics() {
+    var title = h("input", { value: W.title, placeholder: "For example Agent Workforce Monitoring" });
+    var aud = h("input", { value: W.audience, placeholder: "For example support engineers and solution architects" });
+    var skillName = h("input", { value: W.skillName, placeholder: "Skill name, for example agent monitoring", hidden: W.skill !== "now", style: "margin-top:8px" });
+    var skill = seg([["now", "Add now"], ["later", "Decide later"]], W.skill, function (v) { skillName.hidden = v !== "now"; });
+    var owners = h("input", { value: W.owners });
+    var more = h("details", { class: "more", open: W.skill === "now" || W.owners !== "you" ? true : null }, h("summary", null, "More options"),
+      h("div", { class: "grid2", style: "margin-top:10px" }, fieldDiv("Skill growth", skill, skillName), field("Owners: they see this path's progress and problems", owners)),
+      h("p", { class: "small" }, "You can change these later in the draft's Settings."));
+    var err = errBox();
+    function keep() { W.title = title.value.trim(); W.audience = aud.value.trim(); W.skill = skill._v; W.skillName = skillName.value.trim(); W.owners = owners.value; }
+    var next = btn("Continue", true, function () {
+      keep();
+      if (!W.title) { showErr(err, "Give the path a name."); title.focus(); wSave(); return; }
+      wizard("structure");
+    });
+    title.addEventListener("keydown", function (e) { if (e.key === "Enter") next.click(); });
+    wFrame("Basics", "Both a draft built from sources and an empty one stay private: only you and the admins see it until you publish.",
+      [h("div", { class: "grid2" }, field("Path name", title), field("Who it's for", aud)), more, err], next);
     title.focus();
   }
 
-  /* ---------- create: from source ---------- */
-  var SRC = null;  // the form state, kept while going back and forth
+  /* step 2: structure */
+  // A name picker: preset buttons plus "Custom…" with a text box.
+  function names(presets, val, onChange) {
+    var input = h("input", { value: presets.indexOf(val) >= 0 ? "" : val, placeholder: "Your own name", hidden: presets.indexOf(val) >= 0, style: "margin-top:8px" });
+    var box = seg(presets.map(function (x) { return [x, x || "None"]; }).concat([["custom", "Custom…"]]), presets.indexOf(val) >= 0 ? val : "custom", function (v) {
+      input.hidden = v !== "custom"; if (v === "custom") input.focus(); if (onChange) onChange();
+    });
+    input.addEventListener("input", function () { if (onChange) onChange(); });
+    return { el: [box, input],
+      get: function () { return box._v === "custom" ? (input.value.trim() || "Section") : box._v; },
+      set: function (v) { var b = $$("button", box).filter(function (x) { return x.textContent === (v || "None"); })[0]; if (b) b.click(); else { input.value = v; $$("button", box).pop().click(); } } };
+  }
+  function wStructure() {
+    var help = h("span", { class: "small" });
+    var lastCad = W.cadence;
+    var cad = seg([["weeks", "Calendar weeks"], ["days", "Working days"], ["self", "Self-paced"]], W.cadence, function (v) {
+      var was = DEF_LEVELS[lastCad], now = DEF_LEVELS[v];  // a name that's still the old default follows the cadence
+      if (top.get() === was[0]) top.set(now[0]);
+      if (sub.get() === was[1]) sub.set(now[1]);
+      lastCad = v; preview();
+    });
+    var top = names(["Week", "Day", "Module", "Phase"], W.top, function () { preview(); });
+    var sub = names(["", "Day", "Module"], W.sub, function () { preview(); });
+    var len = seg([["1 day", "1 day"], ["1 week", "1 week"], ["2 weeks", "2 weeks"], ["4 weeks", "4 weeks"], ["", "Whatever fits the material"]], W.length);
+    var before = h("input", { type: "checkbox", checked: W.beforeStart || null });
+    before.addEventListener("change", preview);
+    var shape = h("div", { class: "shape", "aria-label": "How learners will see it" });
+    function preview() {
+      var t = top.get(), s = sub.get();
+      help.textContent = { weeks: "Each numbered section is one calendar week of the learner's schedule.",
+        days: "Each " + (s ? s.toLowerCase() : "numbered section") + " is one working day of the learner's schedule.",
+        self: "No schedule: learners see their progress instead of on track or behind." }[cad._v];
+      shape.textContent = "";
+      var rows = (before.checked ? ["Before you start"] : []).concat([t + " 1", t + " 2", "…"]);
+      rows.forEach(function (r, i) {
+        var numberedRow = !(before.checked && i === 0) && r !== "…";
+        shape.appendChild(h("div", { class: "sr" }, r, numberedRow && s ? h("span", { class: "small" }, " · " + s + " 1, " + s + " 2…") : null));
+      });
+    }
+    preview();
+    function keep() { W.cadence = cad._v; W.top = top.get(); W.sub = sub.get(); W.length = len._v; W.beforeStart = before.checked; }
+    wFrame("Structure", "How the path is organized and scheduled. You can change all of this later in the draft's Settings.",
+      [fieldDiv("Cadence", cad, help),
+       h("div", { class: "grid2" }, fieldDiv("Sections are called", top.el), fieldDiv("Inside each section", sub.el)),
+       fieldDiv("Approximate length", len),
+       h("label", { class: "check" }, before, h("span", null, h("b", null, "Start with a Before you start section"), h("span", { class: "small" }, " for access, setup and background, shown without a number"))),
+       fieldDiv("How learners will see it", shape)],
+      [btn("Back", false, function () { keep(); wizard("basics"); }), btn("Continue", true, function () { keep(); wizard("sources"); })]);
+  }
+
+  /* step 3: sources */
   function kindOf(link) {
     var s = link.trim();
     if (/^[A-Z][A-Z0-9_]+-\d+$/i.test(s)) return "Jira";
@@ -705,171 +826,150 @@
     if (/docs\.google\.com|drive\.google\.com/.test(s)) return "Google";
     return "Docs";
   }
-  function sourceView() {
-    if (!SRC) SRC = { links: [], up: null, title: "", audience: "", length: "1 week", notes: "", skill: "later", skillName: "", owners: "you", gh: "" };
-    var out = $("#content-out"); out.textContent = "";
-    var title = h("input", { value: SRC.title, placeholder: "For example Agent Workforce Monitoring" });
+  function linkList(links, onChange) {
     var list = h("div", { class: "srcs" });
-    var ghRow = h("div", { class: "field", hidden: true }, h("span", { class: "label" }, "Your GitHub token (for private repos: used for this run only, not saved)"), h("input", { type: "password", value: SRC.gh, autocomplete: "off", placeholder: "github_pat_…" }));
-    var ghIn = ghRow.querySelector("input");
-    function drawLinks() {
+    function draw() {
       list.textContent = "";
-      SRC.links.forEach(function (l, i) {
+      links.forEach(function (l, i) {
         var k = kindOf(l);
         var rm = h("button", { type: "button", "aria-label": "Remove" }, "×");
-        rm.addEventListener("click", function () { SRC.links.splice(i, 1); drawLinks(); });
+        rm.addEventListener("click", function () { links.splice(i, 1); draw(); onChange(); });
         var note = { Jira: "The app follows its child and linked issues, comments, attachments and links", Confluence: "Plus its child pages", GitHub: "README, docs and examples. Private repos need your GitHub token.",
           Google: "The app can't open Google Docs: download it as PDF or Word and add it under Files", Docs: "The page itself" }[k];
         list.appendChild(h("div", { class: "src" }, h("span", { class: "onb-chip" }, k), h("span", { class: "u" }, l), h("span", { class: "ok" }, note), rm));
       });
       var inp = h("input", { placeholder: "Paste a Jira key or a Jira, Confluence, GitHub or docs link" }), addB = h("button", { type: "button", class: "btn ghost" }, "Add");
-      function addLink() { var v = inp.value.trim(); if (!v) return; v.split(/\s+/).forEach(function (x) { if (x) SRC.links.push(x); }); drawLinks(); list.querySelector("input").focus(); }
+      function addLink() { var v = inp.value.trim(); if (!v) return; v.split(/\s+/).forEach(function (x) { if (x) links.push(x); }); draw(); onChange(); list.querySelector("input").focus(); }
       addB.addEventListener("click", addLink);
       inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addLink(); } });
       list.appendChild(h("div", { class: "lnkin" }, inp, addB));
-      ghRow.hidden = !SRC.links.some(function (l) { return kindOf(l) === "GitHub"; });
     }
-    drawLinks();
-    if (!SRC.up) SRC.up = uploader({ text: "Drop files or ", after: ": PDF, Word, PowerPoint, HTML, Markdown, .xlsx or .csv. For a Google Doc, use File → Download. If you upload the .xlsx template, it's imported exactly as it is, without the LLM." });
-    var tpl = h("a", { href: ROOT + "api/admin/paths/template.xlsx", class: "onb-linkbtn" }, "Download the .xlsx template");
-    var aud = h("input", { value: SRC.audience, placeholder: "For example support engineers and solution architects" });
-    var len = seg([["1 day", "1 day"], ["1 week", "1 week"], ["2 weeks", "2 weeks"], ["", "Let the LLM decide"]], SRC.length);
-    var notes = h("textarea", { placeholder: "For example: focus on hands-on labs; skip internal architecture; end with a gate." }); notes.value = SRC.notes;
-    var skillName = h("input", { value: SRC.skillName, placeholder: "Skill name, for example agent monitoring", hidden: SRC.skill !== "now", style: "margin-top:8px" });
-    var skill = seg([["now", "Add now"], ["later", "Decide later"]], SRC.skill, function (v) { skillName.hidden = v !== "now"; });
-    var owners = h("input", { value: SRC.owners });
-    var err = h("p", { class: "err", hidden: true });
-    var go = h("button", { type: "button", class: "btn primary" }, "Find sources"), cancel = h("button", { type: "button", class: "btn ghost" }, "Cancel");
-    function keep() { SRC.title = title.value.trim(); SRC.audience = aud.value.trim(); SRC.length = len._v; SRC.notes = notes.value.trim(); SRC.skill = skill._v; SRC.skillName = skillName.value.trim(); SRC.owners = owners.value; SRC.gh = ghIn.value.trim(); }
-    cancel.addEventListener("click", function () { SRC = null; contentHome(); });
-    go.addEventListener("click", function () {
-      keep();
-      var pending = list.querySelector(".lnkin input"); if (pending && pending.value.trim()) { SRC.links.push(pending.value.trim()); }
-      if (!SRC.links.length && !SRC.up.count()) { err.textContent = "Add at least one link or file."; err.hidden = false; return; }
-      if (SRC.up.busy()) { err.textContent = "Wait until the files have uploaded."; err.hidden = false; return; }
-      findSources(go, err);
-    });
-    out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "Create from source"), h("p", { class: "small" }, "LLM assisted")));
-    out.appendChild(h("div", { class: "form" },
-      field("Path name", title),
-      fieldDiv("Links", list), ghRow,
-      fieldDiv("Files", SRC.up.el, h("div", { style: "margin-top:6px" }, tpl)),
-      h("div", { class: "grid2" }, field("Who it's for", aud), fieldDiv("Length", len)),
-      field("Notes for the LLM (optional)", notes),
-      h("div", { class: "grid2" }, fieldDiv("Skill growth", skill, skillName), field("Owners: they see this path's progress and problems", owners)),
-      err, h("div", { class: "row end" }, cancel, go)));
-    window.scrollTo(0, 0);
+    draw();
+    // A link typed but not added yet still counts.
+    return { el: list, flush: function () { var p = list.querySelector(".lnkin input"); if (p && p.value.trim()) { links.push(p.value.trim()); p.value = ""; } } };
   }
-  function settingsOf() { return { title: SRC.title, audience: SRC.audience, length: SRC.length, notes: SRC.notes, skillEnabled: SRC.skill === "now", skillName: SRC.skillName, owners: SRC.owners }; }
-  function findSources(btn, err) {
-    btn.disabled = true; btn.textContent = "Reading…"; err.hidden = true;
-    var out = $("#content-out");
+  function freshUploads(list) { var now = Date.now(); return (list || []).filter(function (u) { return u.id && now - (u.at || 0) < UPLOAD_TTL; }); }
+  function readingView(title) {
     var prog = h("div", { class: "steps" });
-    api("api/admin/paths/find", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ links: SRC.links, uploads: SRC.up.ids(), githubToken: SRC.gh, settings: settingsOf() }) })
-      .then(function (j) {
-        if (j.imported) { location.href = ROOT + j.imported + "/"; return; }
-        out.textContent = "";
-        out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "Reading your sources")));
-        out.appendChild(h("div", { class: "form" }, prog));
-        return poll(j.job, function (job) { drawSteps(prog, job); }).then(function (job) { foundView(j.job, job.result); });
-      })
-      .catch(function (e) { btn.disabled = false; btn.textContent = "Find sources"; if (err.isConnected) { err.textContent = e.message; err.hidden = false; } else { sourceView(); setTimeout(function () { var x = $("#content-out .err"); if (x) { x.textContent = e.message; x.hidden = false; } }, 0); } });
+    wFrame(title, null, prog, []);
+    return prog;
   }
-  function foundView(jobId, found) {
-    var out = $("#content-out"); out.textContent = "";
-    var unchecked = {};
-    out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "What we found")));
-    var form = h("div", { class: "form" }, h("p", { class: "small" }, "Before generating, check what the LLM will read. Untick anything that's out of date or not relevant."));
-    (found.groups || []).forEach(function (g) {
-      var box = h("div", { class: "found" });
-      var head = h("div", { class: "fh" }, h("b", null, g.title), g.summary ? h("span", { class: "small" }, g.summary) : null);
-      box.appendChild(head);
+  function wSources() {
+    var expired = (W.uploads || []).filter(function (u) { return freshUploads([u]).length === 0; });
+    W.uploads = freshUploads(W.uploads);
+    var ghIn = h("input", { type: "password", value: GH, autocomplete: "off", placeholder: "github_pat_…" });
+    var ghRow = h("div", { class: "field" }, h("span", { class: "label" }, "Your GitHub token (for private repos: used for this run only, not saved)"), ghIn);
+    function onLinks() { ghRow.hidden = !W.links.some(function (l) { return kindOf(l) === "GitHub"; }); wSave(); }
+    var links = linkList(W.links, onLinks);
+    onLinks();
+    var up = uploader({ text: "Drop files or ", after: ": PDF, Word, PowerPoint, HTML, Markdown, .xlsx or .csv. For a Google Doc, use File → Download. If you upload the .xlsx template, it's imported exactly as it is, without the LLM.",
+      initial: W.uploads, onChange: function () { W.uploads = up ? up.list() : W.uploads; wSave(); } });
+    var tpl = h("a", { href: ROOT + "api/admin/paths/template.xlsx", class: "onb-linkbtn" }, "Download the .xlsx template");
+    var notes = h("textarea", { placeholder: "For example: focus on hands-on labs; skip internal architecture; end with a gate." }); notes.value = W.notes;
+    var err = errBox();
+    function keep() { links.flush(); W.notes = notes.value.trim(); W.uploads = up.list(); GH = ghIn.value.trim(); wSave(); }
+    var skip = btn("Skip and start empty", false, function () {
+      keep(); skip.disabled = true;
+      var s = settingsOf();
+      api("api/admin/paths", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ title: s.title, blurb: s.audience, cadence: s.cadence, top: s.top, sub: s.sub,
+        beforeStart: s.beforeStart, skillEnabled: s.skillEnabled, skillName: s.skillName, owners: s.owners }) })
+        .then(function (j) { wClear(); location.href = ROOT + j.id + "/"; }, function (e) { skip.disabled = false; showErr(err, e.message); });
+    });
+    var read = btn("Read sources", true, function () {
+      keep();
+      if (!W.links.length && !W.uploads.length) { showErr(err, "Add at least one link or file, or start empty."); return; }
+      if (up.busy()) { showErr(err, "Wait until the files have uploaded."); return; }
+      readSources();
+    });
+    wFrame("Sources", "Paste links and upload files, in any mix. The app reads them and shows you what it found before the LLM writes anything. No sources? Start with an empty draft.",
+      [fieldDiv("Links", links.el), ghRow,
+       fieldDiv("Files", up.el, h("div", { style: "margin-top:6px" }, tpl),
+         expired.length ? h("div", { class: "warnrow", style: "margin:8px 0 0" }, h("b", null, "Upload again"), h("span", { class: "small" }, expired.map(function (u) { return u.name; }).join(", ") + ": these uploads expired after 3 hours.")) : null),
+       field("Notes for the LLM (optional)", notes), err],
+      [btn("Back", false, function () { keep(); wizard("structure"); }), skip, read]);
+  }
+  function readSources() {
+    var prog = readingView("Reading your sources");
+    api("api/admin/paths/find", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ links: W.links, uploads: W.uploads.map(function (u) { return u.id; }), githubToken: GH, settings: settingsOf() }) })
+      .then(function (j) {
+        if (j.imported) { wClear(); location.href = ROOT + j.imported + "/"; return; }
+        return poll(j.job, function (job) { drawSteps(prog, job); }).then(function (job) { W.findJob = j.job; W.found = job.result; wizard("review"); });
+      })
+      .catch(function (e) { wizard("sources"); var x = $("#content-out .err"); if (x) showErr(x, e.message); });
+  }
+
+  /* step 4: review */
+  function wReview() {
+    if (!W.findJob || !W.found) { wizard("sources"); return; }
+    // Sources are read into a job that lives for an hour on the server: read them again if it's gone.
+    api("api/admin/jobs/" + W.findJob).then(drawReview, function () { readSources(); });
+  }
+  function drawReview() {
+    var found = W.found;
+    var groups = (found.groups || []).map(function (g) {
+      var box = h("div", { class: "found" }, h("div", { class: "fh" }, h("b", null, g.title), g.summary ? h("span", { class: "small" }, g.summary) : null));
       g.items.forEach(function (it) {
-        if (!it.checked) unchecked[it.id] = true;
-        var cb = h("input", { type: "checkbox", checked: it.checked, disabled: !it.count });
-        cb.addEventListener("change", function () { if (cb.checked) delete unchecked[it.id]; else unchecked[it.id] = true; });
+        if (!W.seen[it.id]) { W.seen[it.id] = true; if (!it.checked) W.unchecked[it.id] = true; }
+        var cb = h("input", { type: "checkbox", checked: !W.unchecked[it.id] && it.count ? true : null, disabled: !it.count || null });
+        cb.addEventListener("change", function () { if (cb.checked) delete W.unchecked[it.id]; else W.unchecked[it.id] = true; wSave(); });
         box.appendChild(h("label", { class: "fi" }, cb, h("span", null, it.label + (it.count ? "" : " (nothing readable)"))));
       });
       g.warnings.forEach(function (w) { box.appendChild(h("div", { class: "warnrow" }, h("b", null, w.title), h("span", { class: "small" }, w.text))); });
-      form.appendChild(box);
+      return box;
     });
-    var more = uploader({ text: "", after: "" });
-    var addLink = h("input", { placeholder: "Paste another link", hidden: true }), addLinkGo = h("button", { type: "button", class: "btn ghost", hidden: true }, "Add");
-    var upMore = h("button", { type: "button", class: "btn" }, "Upload more files"), linkMore = h("button", { type: "button", class: "btn ghost" }, "Add a link");
-    var rerun = h("button", { type: "button", class: "btn primary", hidden: true }, "Read them too");
-    more.el.hidden = true;
-    var extraLinks = [];
-    function refresh() { rerun.hidden = !(more.count() || extraLinks.length); more.el.hidden = !more.count(); }
-    more.el.addEventListener("click", function () {});
-    upMore.addEventListener("click", function () { more.pick(); });
-    var origUpload = more.upload;
-    linkMore.addEventListener("click", function () { addLink.hidden = false; addLinkGo.hidden = false; addLink.focus(); });
-    addLinkGo.addEventListener("click", function () { var v = addLink.value.trim(); if (!v) return; extraLinks.push(v); addLink.value = ""; refresh(); linkList.appendChild(h("div", { class: "small" }, "+ " + v)); });
-    var linkList = h("div");
-    var watch = setInterval(function () { if (!more.el.isConnected) { clearInterval(watch); return; } refresh(); }, 400);
-    rerun.addEventListener("click", function () {
-      if (more.busy()) { alert("Wait until the files have uploaded."); return; }
-      SRC.links = SRC.links.concat(extraLinks);
-      more.ids().forEach(function (id) { SRC.extra = (SRC.extra || []).concat([id]); });
-      var ids = SRC.up.ids().concat(SRC.extra || []);
-      rerun.disabled = true; rerun.textContent = "Reading…";
+    wSave();
+    // Missing something: more links and files, read on top of what was found.
+    var extra = [];
+    var moreLinks = linkList(extra, function () {});
+    var more = uploader({ text: "Drop more files or ", after: "." });
+    var moreErr = errBox();
+    var readMore = btn("Read them too", false, function () {
+      moreLinks.flush();
+      if (!extra.length && !more.count()) { showErr(moreErr, "Add a link or a file first."); return; }
+      if (more.busy()) { showErr(moreErr, "Wait until the files have uploaded."); return; }
+      readMore.disabled = true; readMore.textContent = "Reading…"; moreErr.hidden = true;
       var prog = h("div", { class: "steps" });
-      form.appendChild(prog);
-      api("api/admin/paths/find", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ links: SRC.links, uploads: ids, githubToken: SRC.gh, settings: settingsOf() }) })
-        .then(function (j) { if (j.imported) { location.href = ROOT + j.imported + "/"; return; } return poll(j.job, function (job) { drawSteps(prog, job); }).then(function (job) { foundView(j.job, job.result); }); })
-        .catch(function (e) { rerun.disabled = false; rerun.textContent = "Read them too"; alert(e.message); });
+      moreBox.appendChild(prog);
+      api("api/admin/paths/find", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ addTo: W.findJob, links: extra, uploads: more.ids(), githubToken: GH }) })
+        .then(function (j) { return poll(j.job, function (job) { drawSteps(prog, job); }).then(function (job) {
+          W.findJob = j.job; W.found = job.result; W.links = W.links.concat(extra); W.uploads = W.uploads.concat(more.list()); wizard("review");
+        }); })
+        .catch(function (e) { readMore.disabled = false; readMore.textContent = "Read them too"; prog.remove(); showErr(moreErr, e.message); });
     });
-    form.appendChild(h("div", { class: "more" },
-      h("div", null, h("b", null, "Missing something?"), h("span", { class: "small" }, "Upload more files or add another link. They're added to this list before generating.")),
-      h("div", { class: "row" }, upMore, linkMore)));
-    form.appendChild(more.el);
-    form.appendChild(h("div", { class: "lnkin" }, addLink, addLinkGo));
-    form.appendChild(linkList);
-    form.appendChild(h("div", { class: "row end" }, rerun));
-    form.appendChild(h("div", { class: "tile" }, h("span", { class: "label" }, "Total to read"), h("b", null, "About " + (found.pages || 0) + " page" + (found.pages === 1 ? "" : "s") + " of material" + (found.images ? ", " + found.images + " image" + (found.images === 1 ? "" : "s") : "") + "."),
-      h("span", { class: "small" }, "The LLM summarizes each source first, then builds the path from all the summaries, so nothing is cut off for length.")));
-    var err = h("p", { class: "err", hidden: true });
-    var back = h("button", { type: "button", class: "btn ghost" }, "Back"), go = h("button", { type: "button", class: "btn primary" }, "Generate draft");
-    back.addEventListener("click", function () { sourceView(); });
-    go.addEventListener("click", function () { generate(jobId, Object.keys(unchecked), go, err); });
-    form.appendChild(err);
-    form.appendChild(h("div", { class: "row end" }, back, go));
-    out.appendChild(form);
-    window.scrollTo(0, 0);
+    var moreBox = h("details", { class: "more" }, h("summary", null, "Missing something? Add more links or files"),
+      h("div", { class: "form", style: "margin-top:10px" }, moreLinks.el, more.el, moreErr, h("div", { class: "row end" }, readMore)));
+    var total = h("div", { class: "tile" }, h("span", { class: "label" }, "Total to read"),
+      h("b", null, "About " + (found.pages || 0) + " page" + (found.pages === 1 ? "" : "s") + " of material" + (found.images ? ", " + found.images + " image" + (found.images === 1 ? "" : "s") : "") + "."),
+      h("span", { class: "small" }, "The LLM summarizes each source first, then builds the path from all the summaries, so nothing is cut off for length."));
+    var err = errBox();
+    var go = btn("Generate draft", true, function () { go.disabled = true; startGeneration(err, go); });
+    wFrame("Review what we found", "Before generating, check what the LLM will read. Untick anything that's out of date or not relevant.",
+      [groups, moreBox, total, err], [btn("Back", false, function () { wizard("sources"); }), go]);
   }
-  function generate(jobId, unchecked, btn, err) {
-    btn.disabled = true; err.hidden = true;
-    var out = $("#content-out");
-    api("api/admin/paths/generate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ job: jobId, unchecked: unchecked, settings: settingsOf() }) })
+
+  /* step 5: generate (in the background) */
+  function startGeneration(err, go) {
+    var title = W.title;
+    api("api/admin/paths/generate", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ job: W.findJob, unchecked: Object.keys(W.unchecked), settings: settingsOf(), retryOf: W.retryOf,
+        wizard: { links: W.links, uploads: W.uploads, step: "review" } }) })
       .then(function (j) {
-        out.textContent = "";
-        out.appendChild(h("div", { class: "ahead" }, h("span", { class: "eyebrow" }, "Content"), h("h2", { style: "font-size:30px" }, "Generating your draft")));
-        var prog = h("div", { class: "steps" }), after = h("div");
-        out.appendChild(h("div", { class: "form" }, prog, after));
-        return poll(j.job, function (job) { drawSteps(prog, job); }).then(function (job) {
-          var r = job.result, items = [];
-          (r.warnings || []).forEach(function (w) { items.push(h("div", { class: "warn" }, w)); });
-          if ((r.broken || []).length) items.push(h("div", { class: "warn" }, r.broken.length + " link" + (r.broken.length === 1 ? "" : "s") + " didn't open: " + r.broken.slice(0, 5).join(", ")));
-          var cov = r.coverage || {};
-          var li = [h("li", null, "Coverage: " + cov.used + " of " + cov.total + " sources are used in at least one step." + ((cov.unused || []).length ? " Not used: " + cov.unused.slice(0, 6).map(function (u) { return u.title + (u.reason ? " (" + u.reason + ")" : ""); }).join("; ") : ""))];
-          li.push(h("li", null, "Every step lists the source it came from, so you can check it."));
-          var open = h("a", { class: "btn primary", href: ROOT + r.id + "/" }, "Open the draft");
-          SRC = null;
-          add(after, [h("div", { class: "diff" }, h("b", null, "Check before you publish"), items, h("ul", null, li)), h("div", { class: "row", style: "margin-top:12px" }, open)]);
-        });
-      })
-      .catch(function (e) {
-        btn.disabled = false;
-        if (err.isConnected) { err.textContent = e.message; err.hidden = false; }
-        else { var box = h("div", { class: "form" }, h("p", { class: "err" }, e.message), h("div", { class: "row" }, h("button", { type: "button", class: "btn primary", onclick: function () { sourceView(); } }, "Back to the sources"))); out.appendChild(box); }
-      });
+        DROnb.addGenerating(ME.id, j.id);
+        DROnb.watchDrafts(ROOT, ME.id, loadContent);
+        wClear();
+        justStarted = { id: j.id, title: title };
+        return loadContent();
+      }, function (e) { go.disabled = false; showErr(err, e.message); });
   }
+  var justStarted = null;
   var WANT_CREATE = location.hash === "#create";  // from the welcome banner's "Create a learning path"
   function loadContent() {
     return api("api/admin/paths").then(function (j) {
       contentData = j;
-      if (!SRC) contentHome();
-      if (WANT_CREATE) { WANT_CREATE = false; history.replaceState(null, "", "#content"); if (j.canCreate && !SRC) chooseView(); }
+      if (!W) contentHome();
+      if (WANT_CREATE) { WANT_CREATE = false; history.replaceState(null, "", "#content"); if (j.canCreate && !W) { var left = wStored(); if (left) { W = left; wizard(); } else startWizard(); } }
     }, function (e) { $("#content-out").textContent = e.message; });
   }
 
@@ -987,6 +1087,7 @@
     showTab();
     window.addEventListener("hashchange", showTab);
     loadDashboard(); loadTeam(); loadReports(); loadContent();
+    DROnb.watchDrafts(ROOT, me.id, loadContent);
     if (me.isManager) loadUsers();
     setInterval(function () { if (!document.hidden) { loadTeam(); loadReports(); loadDashboard(); } }, 120000);
   }, function (e) { var st = $("#who-state"); st.dataset.s = "local"; st.textContent = "Couldn't load: " + e.message; });

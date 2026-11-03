@@ -58,7 +58,7 @@ import custom_paths as cp
 import generate as gen
 from atlassian import Atlassian, AtlassianError
 from llm import Gateway, LLMError
-from notify import Slack, SlackBot, welcome_text
+from notify import Slack, SlackBot, link as slack_link, welcome_text
 from paths import INACTIVE_DAYS, agentic_model, ai_engineer_model, cohort_of, inactive_days, validate_agentic_page
 from roles import Users
 from storage import DocStore, ProgressStore, make_storage
@@ -203,11 +203,16 @@ def custom_page(doc: dict, content: dict | None) -> str:
 
 
 def load_custom() -> None:
+    """Load the paths made in the app (at startup). Jobs live in memory, so a path still "generating" was cut off by
+    a restart: it becomes "failed" and its owners can try again."""
     global CUSTOM
     found = {}
     for name in docs.names("path-"):
         d = docs.get(name)
         if isinstance(d, dict) and d.get("id"):
+            if d.get("status") == "generating":
+                d["status"], d["error"] = "failed", "Generation was interrupted by an app restart."
+                docs.put(name, d)
             found[d["id"]] = d
     CUSTOM = found
 
@@ -1199,10 +1204,15 @@ async def api_system_report(request: Request) -> dict:
 
 # ------------------------------------------------------------------ paths created in the app (admins and authors)
 
-def path_doc(pid: str) -> dict:
+def path_doc(pid: str, editable: bool = False) -> dict:
+    """The stored path. editable: refuse a path that is still generating or whose generation failed."""
     doc = CUSTOM.get(pid)
     if not doc:
         raise HTTPException(status_code=404, detail="No such path.")
+    if editable and doc.get("status") == "generating":
+        raise HTTPException(status_code=409, detail="This draft is still being generated. Try again when it's ready.")
+    if editable and doc.get("status") == "failed":
+        raise HTTPException(status_code=409, detail="Generating this draft failed. Try again from Admin → Content, or delete it.")
     return doc
 
 
@@ -1229,10 +1239,10 @@ def parse_owners(raw, creator: str) -> list[str]:
     return out
 
 
-def new_path(me: dict, content: dict, owners_raw="", origin: str = "app") -> dict:
+def new_path(me: dict, content: dict, owners_raw="", origin: str = "app", status: str = "draft") -> dict:
     taken = set(CUSTOM) | set(PATHS)
     pid = cp.unique_slug(content.get("title") or "path", taken)
-    doc = {"id": pid, "status": "draft", "owners": parse_owners(owners_raw, me["email"]), "createdBy": me["name"],
+    doc = {"id": pid, "status": status, "owners": parse_owners(owners_raw, me["email"]), "createdBy": me["name"],
            "createdByEmail": me["email"].lower(), "createdAt": now_ms(), "origin": origin, "draft": cp.normalize(content), "live": None}
     save_path(doc)
     return doc
@@ -1244,16 +1254,25 @@ def path_row(pid: str, enrolled_counts: dict) -> dict:
         c = d.get("draft") or d.get("live") or {}
         return {"id": pid, "title": c.get("title") or pid, "status": d.get("status"), "custom": True,
                 "steps": cp.step_count(c), "enrolled": enrolled_counts.get(pid, 0), "owners": d.get("owners") or [],
-                "unpublished": d.get("status") == "published" and d.get("draft") != d.get("live"), "updatedAt": d.get("updatedAt")}
+                "unpublished": d.get("status") == "published" and d.get("draft") != d.get("live"), "updatedAt": d.get("updatedAt"),
+                "createdAt": d.get("createdAt"), "createdByEmail": d.get("createdByEmail"), "error": d.get("error") or "",
+                "wizard": d.get("wizard") if d.get("status") == "failed" else None}
     p = PATHS[pid]
     return {"id": pid, "title": p.title, "status": "published", "custom": False, "steps": len(p.items),
             "enrolled": enrolled_counts.get(pid, 0), "owners": [], "source": p.source}
 
 
 @app.get("/api/admin/paths")
-def api_paths(request: Request) -> dict:
+def api_paths(request: Request, generating: int = 0) -> dict:
+    """Paths you manage. generating=1: only the ones you started generating that are still running or just failed,
+    for the "draft is ready" notice (cheap enough to poll)."""
     me = identify(request)
     require_admin_page(me)
+    if generating:
+        mine = [d for d in CUSTOM.values() if (d.get("createdByEmail") or "") == me["email"].lower()
+                and d.get("status") in ("generating", "failed", "draft") and d.get("origin") == "sources"]
+        return {"paths": [{"id": d["id"], "title": (d.get("draft") or {}).get("title") or d["id"], "status": d["status"],
+                           "error": d.get("error") or ""} for d in mine]}
     counts: dict[str, int] = {}
     for rec in store.all().values():
         for pid in PATHS:
@@ -1261,7 +1280,8 @@ def api_paths(request: Request) -> dict:
                 counts[pid] = counts.get(pid, 0) + 1
     ids = [pid for pid in PATHS if not is_custom(pid) and me["isManager"]] + \
           [pid for pid, d in sorted(CUSTOM.items(), key=lambda kv: kv[1].get("createdAt") or 0) if can_manage(me, pid)]
-    return {"paths": [path_row(pid, counts) for pid in ids], "canCreate": me["isAuthor"], "jira": atl.enabled, "llm": llm.enabled}
+    return {"paths": [path_row(pid, counts) for pid in ids], "canCreate": me["isAuthor"], "jira": atl.enabled, "llm": llm.enabled,
+            "slackDm": slackbot.enabled}
 
 
 @app.get("/api/admin/paths/template.xlsx")
@@ -1278,7 +1298,7 @@ async def api_path_create(request: Request) -> dict:
     if not me["isAuthor"]:
         raise HTTPException(status_code=403, detail="Only admins and authors can create learning paths.")
     d = await json_body(request)
-    content = cp.blank_content(d.get("title") or "", d.get("level") or "Week", d.get("useDays", True), d.get("pace") or "weeks")
+    content = cp.blank_content(d.get("title") or "", **cp.structure_from(d))
     content["blurb"] = str(d.get("blurb") or "")[:600]
     content["skill"] = {"enabled": bool(d.get("skillEnabled")), "name": str(d.get("skillName") or "")[:60]}
     doc = new_path(me, content, d.get("owners") or "")
@@ -1308,6 +1328,13 @@ async def api_path_find(request: Request) -> dict:
     files = take_uploads(me, d.get("uploads") or [], limit=20)
     if not links and not files:
         raise HTTPException(status_code=400, detail="Add at least one link or file.")
+    if d.get("addTo"):  # "Read them too" on the review step: only the new links and files
+        base = _job(me, str(d["addTo"]))
+        col = base["data"].get("collector")
+        if base["status"] != "done" or not col:
+            raise HTTPException(status_code=400, detail="Wait until the sources have been read.")
+        job = gen.start("find", me["id"], gen.add_sources, col, links, [{"name": f["name"], "data": f["data"], "type": f["type"]} for f in files])
+        return {"job": job["id"]}
     for f in files:
         if f["name"].lower().endswith(".xlsx") and cp.is_template(f["data"]):
             try:
@@ -1334,17 +1361,57 @@ async def api_path_generate(request: Request) -> dict:
     col = found["data"].get("collector")
     if found["status"] != "done" or not col:
         raise HTTPException(status_code=400, detail="Wait until the sources have been read.")
+    if not llm.enabled:
+        raise HTTPException(status_code=503, detail="The LLM Gateway isn't available to the app, so it can't write a draft. Start empty instead, or try again later.")
     settings = d.get("settings") or {}
     parse_owners(settings.get("owners") or "", me["email"])  # fail now, not after a long run
+    retry = CUSTOM.get(str(d.get("retryOf") or ""))
+    if retry and retry.get("status") == "failed" and can_manage(me, retry["id"]):
+        docs.delete(f"path-{retry['id']}")
+        CUSTOM.pop(retry["id"], None)
+    # The path exists from the start (status "generating"), so Admin -> Content shows it while the job runs, and
+    # its answers are kept for "Try again" if the job fails or the app restarts.
+    placeholder = cp.blank_content(settings.get("title") or "", **cp.structure_from(settings))
+    placeholder["blurb"] = str(settings.get("audience") or "")[:600]
+    doc = new_path(me, placeholder, settings.get("owners") or "", origin="sources", status="generating")
+    doc["wizard"] = wizard_answers(d.get("wizard"), settings)
+    save_path(doc)
+    pid = doc["id"]
 
     def run(job):
-        res = gen.generate_path(job, llm, col, set(d.get("unchecked") or []), settings)
-        doc = new_path(me, res["content"], settings.get("owners") or "", origin="sources")
-        doc["generation"] = {"coverage": res["coverage"], "broken": res["broken"], "warnings": res["warnings"], "at": now_ms()}
-        save_path(doc)
-        return {"id": doc["id"], "coverage": res["coverage"], "broken": res["broken"], "warnings": res["warnings"]}
+        try:
+            res = gen.generate_path(job, llm, col, set(d.get("unchecked") or []), settings)
+        except Exception as e:
+            cur = CUSTOM.get(pid)
+            if cur and cur.get("status") == "generating":
+                cur["status"] = "failed"
+                cur["error"] = str(e) if isinstance(e, (LLMError, ValueError)) else "Something went wrong while generating the draft."
+                save_path(cur)
+            raise
+        cur = CUSTOM.get(pid)
+        if not cur or cur.get("status") != "generating":  # deleted while it ran
+            return {"id": None}
+        cur["draft"] = res["content"]
+        cur["status"] = "draft"
+        cur.pop("error", None)
+        cur["generation"] = {"coverage": res["coverage"], "broken": res["broken"], "warnings": res["warnings"], "at": now_ms()}
+        save_path(cur)
+        title = res["content"]["title"]
+        slackbot.dm(me["email"], f"Your learning path draft is ready: {slack_link(slackbot.url(pid + '/'), title)}")
+        return {"id": pid, "coverage": res["coverage"], "broken": res["broken"], "warnings": res["warnings"]}
     job = gen.start("generate", me["id"], run)
-    return {"job": job["id"]}
+    doc["job"] = job["id"]
+    save_path(doc)
+    return {"job": job["id"], "id": pid}
+
+
+def wizard_answers(wizard, settings: dict) -> dict:
+    """What the author entered in the wizard, kept on a generating path for "Try again". Tokens are never kept."""
+    w = wizard if isinstance(wizard, dict) else {}
+    w = {k: v for k, v in w.items() if k.lower() not in ("gh", "githubtoken", "token")}
+    if len(json.dumps(w, ensure_ascii=False)) > 20_000:
+        w = {}
+    return {**w, "settings": settings}
 
 
 @app.get("/api/admin/paths/{pid}")
@@ -1358,7 +1425,7 @@ def api_path_get(pid: str, request: Request) -> dict:
 async def api_path_save(pid: str, request: Request) -> dict:
     me = identify(request)
     require_manage(me, pid)
-    doc = path_doc(pid)
+    doc = path_doc(pid, editable=True)
     d = await json_body(request, 3_000_000)
     try:
         doc["draft"] = cp.normalize(d.get("content") or {})
@@ -1375,7 +1442,7 @@ async def api_path_save(pid: str, request: Request) -> dict:
 def api_path_publish(pid: str, request: Request) -> dict:
     me = identify(request)
     require_manage(me, pid)
-    doc = path_doc(pid)
+    doc = path_doc(pid, editable=True)
     content = cp.normalize(doc["draft"])
     if not cp.step_count(content):
         raise HTTPException(status_code=400, detail="Add at least one step before publishing.")
@@ -1417,7 +1484,7 @@ def api_path_export(pid: str, request: Request) -> Response:
 async def api_path_llm_edit(pid: str, request: Request) -> dict:
     me = identify(request)
     require_manage(me, pid)
-    path_doc(pid)
+    path_doc(pid, editable=True)
     d = await json_body(request, 3_000_000)
     instruction = str(d.get("instruction") or "").strip()
     if not instruction:

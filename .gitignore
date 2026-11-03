@@ -12,3 +12,5 @@ venv/
 # Local scratch output
 .lavish/
 Claude outputs/
+.venv/
+.pytest_cache/
