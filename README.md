@@ -71,6 +71,9 @@ straight to Jira.
   - AI Engineer: 10 calendar weeks. Week 0 is done during the first week, together with Week 1.
   - Agentic: 7 working days (Monday to Friday).
 - **Search** across the path (press `/`). Results jump straight to the step.
+- **Open DataRobot** (next to search) opens DataRobot in one window beside the path, and brings it back to the
+  front on later clicks. Step links to DataRobot pages open in that window too; docs links still open in a new tab.
+  Browsers may ignore the placement (on phones it opens as a tab).
 - **Report a problem**, on every step and in the header. The learner picks what kind of problem it is:
   - **Something is wrong in this learning path** (a broken link, an unclear step, stuck): goes to Admin → Problem reports
     for the path's owners and the admins, and to Slack if it's set up. Admins and owners mark it resolved.

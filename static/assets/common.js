@@ -688,6 +688,33 @@
     setTimeout(check, 20000);
   }
 
+  /* ---------------------------------------------------------------- DataRobot beside the path */
+  // "Open DataRobot" opens one window, named so the browser reuses it, placed beside the path where the browser
+  // allows. Links in steps to the DataRobot site open in that same window. The site is the one the app runs on
+  // (a DataRobot custom application), or app.datarobot.com when it runs elsewhere.
+  var DR_SITE = /(^|\.)datarobot\.com$/.test(location.hostname) && !/^(docs|www)\./.test(location.hostname) ? location.origin : "https://app.datarobot.com";
+  var drWin = null;
+  function openDataRobot(url) {
+    var sw = screen.availWidth || 1440, shh = screen.availHeight || 900;
+    var x = window.screenX || 0, w = window.outerWidth || sw;
+    var width, left;
+    if (x + w + 480 <= sw) { left = x + w; width = sw - left; }        // room to the right of the path window
+    else { width = Math.round(sw / 2); left = sw - width; }            // otherwise the right half of the screen
+    var features = "popup,width=" + width + ",height=" + shh + ",left=" + left + ",top=" + (screen.availTop || 0);
+    drWin = window.open(url || DR_SITE + "/", "datarobot", features) || drWin;
+    if (drWin) try { drWin.focus(); } catch (e) { /* another site: focus may be refused */ }
+  }
+  function isDataRobotLink(a) {
+    try { var u = new URL(a.href, location.href); return (u.protocol === "https:" || u.protocol === "http:") && u.origin === DR_SITE && !/\/custom_applications\//.test(u.pathname); } catch (e) { return false; }
+  }
+  document.addEventListener("click", function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest("a[href]");
+    if (!a || a.closest(".onb-editing [contenteditable]") || !isDataRobotLink(a)) return;
+    e.preventDefault();
+    openDataRobot(a.href);
+  }, true);
+
   /* ---------------------------------------------------------------- built-in paths: edit mode */
   // While the AI Engineer or Agentic path is in edit mode the back link returns to Admin -> Content, and when the
   // path has saved edits (an in-app edit or an old upload) admins can make the deployed files live again.
@@ -729,6 +756,9 @@
         var tools = h("div", { class: "onb-tools" });
         opts.toolsMount.appendChild(tools);
         buildSearch(tools);
+        var drb = h("button", { type: "button", class: "btn ghost", title: "Open DataRobot in a window beside this path" }, "Open DataRobot");
+        drb.addEventListener("click", function () { openDataRobot(); });
+        tools.appendChild(drb);
         var rb = h("button", { type: "button", class: "btn ghost", html: FLAG.replace("viewBox", 'style="width:12px;height:12px" viewBox') + "<span>Report a problem</span>" });
         rb.addEventListener("click", function () { openReport(); });
         tools.appendChild(rb);
