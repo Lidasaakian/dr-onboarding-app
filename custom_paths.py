@@ -4,7 +4,7 @@ Each path is one document, docs/path-<id>.json:
 
     {
       "id": "agent-workforce-monitoring",
-      "status": "draft" | "published",
+      "status": "generating" | "failed" | "draft" | "published",
       "owners": ["maria.pm@datarobot.com", ...],     # the creator first; owners see this path's admin views
       "createdBy", "createdAt", "updatedAt", "publishedAt", "publishedBy",
       "draft":   <content>,                          # what owners edit
@@ -15,12 +15,16 @@ Content:
 
     {
       "title", "blurb", "length",
-      "pace": "weeks" | "days",                      # calendar weeks or working days
-      "level": "Week" | "Module" | "Phase" | <custom>,
-      "useDays": true | false,                       # days inside each group
+      "cadence": "weeks" | "days" | "self",          # calendar weeks, working days or self-paced
+      "levels": {"top": "Week", "sub": "Day"},       # level names; sub "" = no second level
+      "pace", "level", "useDays",                    # the same structure in the old fields, kept for rollback
       "skill": {"enabled": bool, "name": str},       # skill growth ("Decide later" = enabled false)
-      "groups": [{"id", "title", "days": [{"id", "title", "steps": [<step>]}]}]
+      "groups": [{"id", "title", "numbered": bool, "days": [{"id", "title", "steps": [<step>]}]}]
     }
+
+"groups" are the top-level sections; "days" hold the second-level sections whatever they're called (a section
+without a second level has one untitled entry). An unnumbered section ("Before you start") shows its title instead
+of a number and doesn't count in the numbering of the others.
 
 Step: {"id", "title", "details", "link": {"url", "label"} | null, "type": "Required" | "Stretch" | "Optional",
        "gate": bool, "source": str}
@@ -38,7 +42,8 @@ import secrets
 from paths import Item, PathModel
 
 TYPES = ("Required", "Stretch", "Optional")
-LEVELS = ("Week", "Module", "Phase")
+CADENCES = ("weeks", "days", "self")
+DEFAULT_LEVELS = {"weeks": ("Week", "Day"), "days": ("Day", ""), "self": ("Module", "")}  # (top, sub) per cadence
 RESERVED = {"admin", "api", "assets", "static", "new", "path", "agentic", "ai-engineer", "p", "verify"}
 MAX_STEPS = 600
 
@@ -63,17 +68,52 @@ def unique_slug(title: str, taken: set[str]) -> str:
     return s
 
 
-def blank_content(title: str = "", level: str = "Week", use_days: bool = True, pace: str = "weeks") -> dict:
-    return {
+def blank_content(title: str = "", cadence: str = "weeks", top: str | None = None, sub: str | None = None,
+                  before_start: bool = False) -> dict:
+    """An empty path with this structure; level names default to the cadence's. before_start adds an unnumbered
+    "Before you start" section first."""
+    cadence = cadence if cadence in CADENCES else "weeks"
+    d_top, d_sub = DEFAULT_LEVELS[cadence]
+    groups = [{"id": new_id("g"), "title": "", "numbered": True, "days": [{"id": new_id("d"), "title": "", "steps": []}]}]
+    if before_start:
+        groups.insert(0, {"id": new_id("g"), "title": "Before you start", "numbered": False,
+                          "days": [{"id": new_id("d"), "title": "", "steps": []}]})
+    return normalize({
         "title": title or "Untitled learning path",
-        "blurb": "",
-        "length": "",
-        "pace": pace if pace in ("weeks", "days") else "weeks",
-        "level": level or "Week",
-        "useDays": bool(use_days),
-        "skill": {"enabled": False, "name": ""},
-        "groups": [{"id": new_id("g"), "title": "", "days": [{"id": new_id("d"), "title": "", "steps": []}]}],
-    }
+        "cadence": cadence,
+        "levels": {"top": d_top if top is None else top, "sub": d_sub if sub is None else sub},
+        "groups": groups,
+    })
+
+
+def structure_from(d: dict) -> dict:
+    """The structure the author chose (cadence, top, sub, beforeStart) as blank_content() arguments; None for a level
+    name means the cadence's default. Also reads the old form's pace, level and useDays."""
+    d = d or {}
+    cadence = d.get("cadence") if d.get("cadence") in CADENCES else ("days" if d.get("pace") == "days" else "weeks")
+    top = _txt(d.get("top") or d.get("level"), 24) or None
+    if "sub" in d:
+        sub = _txt(d.get("sub"), 24)
+    elif "useDays" in d:
+        sub = "Day" if d.get("useDays") else ""
+    else:
+        sub = None
+    return {"cadence": cadence, "top": top, "sub": sub, "before_start": bool(d.get("beforeStart"))}
+
+
+def levels_of(content: dict) -> tuple[str, str]:
+    """(top, sub) level names, from the new fields or, for content saved before them, the old ones."""
+    lv = content.get("levels")
+    if isinstance(lv, dict):
+        return (_txt(lv.get("top"), 24) or "Week", _txt(lv.get("sub"), 24))
+    return (_txt(content.get("level"), 24) or "Week", "Day" if content.get("useDays", True) else "")
+
+
+def cadence_of(content: dict) -> str:
+    c = content.get("cadence")
+    if c in CADENCES:
+        return c
+    return "days" if content.get("pace") == "days" else "weeks"
 
 
 def _txt(v, limit: int) -> str:
@@ -107,13 +147,17 @@ def normalize(content: dict, keep_ids: set[str] | None = None) -> dict:
         seen.add(v)
         return v
 
+    cadence = cadence_of(content)
+    top, sub = levels_of(content)
     out = {
         "title": _txt(content.get("title"), 140) or "Untitled learning path",
         "blurb": _txt(content.get("blurb"), 600),
         "length": _txt(content.get("length"), 40),
-        "pace": content.get("pace") if content.get("pace") in ("weeks", "days") else "weeks",
-        "level": _txt(content.get("level"), 24) or "Week",
-        "useDays": bool(content.get("useDays", True)),
+        "cadence": cadence,
+        "levels": {"top": top, "sub": sub},
+        "pace": "days" if cadence == "days" else "weeks",
+        "level": top,
+        "useDays": bool(sub),
         "skill": {"enabled": bool((content.get("skill") or {}).get("enabled")),
                   "name": _txt((content.get("skill") or {}).get("name"), 60)},
         "groups": [],
@@ -125,7 +169,8 @@ def normalize(content: dict, keep_ids: set[str] | None = None) -> dict:
         days = g.get("days")
         if days is None and isinstance(g.get("steps"), list):  # a flat group from the LLM or an import
             days = [{"title": "", "steps": g["steps"]}]
-        gd = {"id": ident(g.get("id"), "g"), "title": _txt(g.get("title"), 160), "days": []}
+        gd = {"id": ident(g.get("id"), "g"), "title": _txt(g.get("title"), 160), "numbered": g.get("numbered", True) is not False,
+              "days": []}
         for d in days or []:
             if not isinstance(d, dict):
                 continue
@@ -152,12 +197,12 @@ def normalize(content: dict, keep_ids: set[str] | None = None) -> dict:
             gd["days"].append(dd)
         if not gd["days"]:
             gd["days"].append({"id": ident(None, "d"), "title": "", "steps": []})
-        if not out["useDays"] and len(gd["days"]) > 1:  # no days: merge them
+        if not sub and len(gd["days"]) > 1:  # no second level: merge them, keeping the order and the step ids
             merged = [s for d in gd["days"] for s in d["steps"]]
             gd["days"] = [{**gd["days"][0], "title": "", "steps": merged}]
         out["groups"].append(gd)
     if not out["groups"]:
-        out["groups"].append({"id": ident(None, "g"), "title": "", "days": [{"id": ident(None, "d"), "title": "", "steps": []}]})
+        out["groups"].append({"id": ident(None, "g"), "title": "", "numbered": True, "days": [{"id": ident(None, "d"), "title": "", "steps": []}]})
     return out
 
 
@@ -173,30 +218,82 @@ def step_count(content: dict) -> int:
     return sum(1 for _ in steps(content))
 
 
+def section_label(content: dict, gi: int) -> str:
+    """ "Week 2" for a numbered section (counting only numbered ones), the title for an unnumbered one."""
+    groups = content["groups"]
+    g = groups[gi]
+    if g.get("numbered", True) is False:
+        return g.get("title") or "Section"
+    n = sum(1 for x in groups[:gi + 1] if x.get("numbered", True) is not False)
+    return f"{levels_of(content)[0]} {n}"
+
+
+def sub_label(content: dict, gi: int, di: int) -> str:
+    """ "Day 3" inside its section, or "" when the path has no second level."""
+    sub = levels_of(content)[1]
+    return f"{sub} {di + 1}" if sub else ""
+
+
 def where_label(content: dict, gi: int, di: int) -> str:
-    lvl = content.get("level") or "Week"
-    s = f"{lvl} {gi + 1}"
-    if content.get("useDays") and len((content["groups"][gi].get("days") or [])) > 0:
-        s += f" · Day {di + 1}"
+    s = section_label(content, gi)
+    sl = sub_label(content, gi, di)
+    if sl and len((content["groups"][gi].get("days") or [])) > 0:
+        s += f" · {sl}"
     return s
+
+
+def schedule_units(content: dict) -> tuple[list[list[int]], int]:
+    """The schedule unit (week or working day, from 1) of every second-level section, per section, and the number
+    of units. Weeks: each numbered section is a week. Days: each second-level section is a working day, or each
+    numbered section when there's no second level. An unnumbered section is scheduled with the next numbered
+    section, or the last one when none follows. Self-paced paths have one unit."""
+    cadence = cadence_of(content)
+    has_sub = bool(levels_of(content)[1])
+    groups = content["groups"]
+    units: list[list[int] | None] = []
+    n = 0
+    for g in groups:
+        if g.get("numbered", True) is False or cadence == "self":
+            units.append(None)
+            continue
+        if cadence == "weeks":
+            n += 1
+            units.append([n] * len(g["days"]))
+        elif has_sub:
+            units.append(list(range(n + 1, n + len(g["days"]) + 1)))
+            n += len(g["days"])
+        else:
+            n += 1
+            units.append([n] * len(g["days"]))
+    total = max(n, 1)
+    for gi in range(len(groups) - 1, -1, -1):
+        if units[gi] is None:
+            nxt = next((u[0] for u in units[gi + 1:] if u), total)
+            units[gi] = [nxt] * len(groups[gi]["days"])
+    return units, total
 
 
 def model(path_doc: dict, content: dict, page_html: str) -> PathModel:
     """The PathModel the rest of the app uses (progress, pace, badge, team views) for a custom path."""
     items: list[Item] = []
-    day_no = 0
+    per_day, units = schedule_units(content)
     for gi, g in enumerate(content["groups"]):
         for di, d in enumerate(g["days"]):
-            day_no += 1
-            unit = gi + 1 if content["pace"] == "weeks" else day_no
             for st in d["steps"]:
-                items.append(Item(id=st["id"], unit=unit, label=f"{where_label(content, gi, di)}: {st['title']}",
+                items.append(Item(id=st["id"], unit=per_day[gi][di], label=f"{where_label(content, gi, di)}: {st['title']}",
                                   anchor="s-" + st["id"], path=st["type"], gate=st["gate"]))
-    units = len(content["groups"]) if content["pace"] == "weeks" else max(day_no, 1)
     skill = content["skill"]["name"] if content["skill"]["enabled"] else ""
-    length = content.get("length") or (f"{units} week{'s' if units != 1 else ''}" if content["pace"] == "weeks" else f"{units} day{'s' if units != 1 else ''}")
-    m = PathModel(id=path_doc["id"], title=content["title"], blurb=content.get("blurb") or "", length=length,
-                  unit_name="Week" if content["pace"] == "weeks" else "Day", skill=skill, units=max(units, 1),
+    cadence = cadence_of(content)
+    if cadence == "self":
+        top = levels_of(content)[0]
+        n = sum(1 for g in content["groups"] if g.get("numbered", True) is not False)
+        length, unit_name = f"{n} {top.lower()}{'s' if n != 1 else ''}", ""
+    elif cadence == "weeks":
+        length, unit_name = f"{units} week{'s' if units != 1 else ''}", "Week"
+    else:
+        length, unit_name = f"{units} day{'s' if units != 1 else ''}", "Day"
+    m = PathModel(id=path_doc["id"], title=content["title"], blurb=content.get("blurb") or "", length=content.get("length") or length,
+                  unit_name=unit_name, skill=skill, units=units,
                   items=items, html=page_html, source={"kind": "custom"})
     m.custom = True
     m.skill_enabled = bool(content["skill"]["enabled"])
@@ -217,23 +314,23 @@ def diff(old: dict, new: dict) -> list[dict]:
     out = []
     old_groups = {g["id"]: (i, g) for i, g in enumerate(old.get("groups") or [])}
     new_groups = {g["id"]: (i, g) for i, g in enumerate(new.get("groups") or [])}
-    lvl = new.get("level") or "Week"
+    lvl, sub = levels_of(new)
     for gid, (i, g) in new_groups.items():
         if gid not in old_groups:
             n = sum(len(d["steps"]) for d in g["days"])
-            out.append({"kind": "add", "text": f"New {lvl.lower()}: {lvl} {i + 1}" + (f" — {g['title']}" if g["title"] else "") + f" ({n} step{'s' if n != 1 else ''})"})
+            out.append({"kind": "add", "text": f"New section: {section_label(new, i)}" + (f" — {g['title']}" if g["title"] and g.get("numbered", True) is not False else "") + f" ({n} step{'s' if n != 1 else ''})"})
         elif old_groups[gid][1]["title"] != g["title"]:
-            out.append({"kind": "upd", "text": f"{lvl} {i + 1} renamed: {g['title'] or '(no title)'}"})
+            out.append({"kind": "upd", "text": f"{section_label(old, old_groups[gid][0])} renamed: {g['title'] or '(no title)'}"})
     for gid, (i, g) in old_groups.items():
         if gid not in new_groups:
-            out.append({"kind": "del", "text": f"Removed {lvl.lower()}: {lvl} {i + 1}" + (f" — {g['title']}" if g["title"] else "")})
+            out.append({"kind": "del", "text": f"Removed section: {section_label(old, i)}" + (f" — {g['title']}" if g["title"] and g.get("numbered", True) is not False else "")})
     old_days = {d["id"] for g in old.get("groups") or [] for d in g["days"]}
     for gi, g in enumerate(new.get("groups") or []):
         if g["id"] not in old_groups:
             continue
         for di, d in enumerate(g["days"]):
-            if new.get("useDays") and d["id"] not in old_days:
-                out.append({"kind": "add", "text": f"New day: {lvl} {gi + 1} · Day {di + 1}" + (f" — {d['title']}" if d["title"] else "")})
+            if sub and d["id"] not in old_days:
+                out.append({"kind": "add", "text": f"New {sub.lower()}: {where_label(new, gi, di)}" + (f" — {d['title']}" if d["title"] else "")})
     moved = 0
     for sid, (gi, di, st, where) in b.items():
         if sid not in a:
@@ -245,7 +342,7 @@ def diff(old: dict, new: dict) -> list[dict]:
         elif any(ost.get(k) != st.get(k) for k in ("title", "details", "link", "type", "gate")):
             out.append({"kind": "upd", "text": f"Changed {where}: {st['title']}"})
     if moved:
-        out.append({"kind": "mov", "text": f"Moved {moved} step{'s' if moved != 1 else ''} to another day or {lvl.lower()}"})
+        out.append({"kind": "mov", "text": f"Moved {moved} step{'s' if moved != 1 else ''} to another {(sub or 'section').lower()} or {lvl.lower()}"})
     removed = [x for x in a if x not in b]
     for sid in removed[:20]:
         out.append({"kind": "del", "text": f"Removed {a[sid][3]}: {a[sid][2]['title']}"})
@@ -257,9 +354,13 @@ def diff(old: dict, new: dict) -> list[dict]:
 # --------------------------------------------------------------------------- .xlsx template
 
 TEMPLATE_HEADERS = ["Group", "Group title", "Day", "Day title", "Step", "Details", "Link", "Type", "Gate"]
-TEMPLATE_NOTE = ("One row per step. Group = the week, module or phase number (1, 2, 3…). Day = the day inside the group "
-                 "(leave empty if the path has no days). Type = Required, Stretch or Optional. Gate = yes for a checkpoint "
-                 "that has to be passed. Group title and Day title only need to be on the first row of each group or day.")
+TEMPLATE_NOTE = ("One row per step. Group = the section's position (1, 2, 3…), counting every section. Day = the "
+                 "second-level section inside it, such as the day or module (leave empty if the path has no second level). "
+                 "Type = Required, Stretch or Optional. Gate = yes for a checkpoint that has to be passed. Group title and Day "
+                 "title only need to be on the first row of each section. On the Path sheet, Cadence is Calendar weeks, Working "
+                 "days or Self-paced; leave \"Second level is called\" empty for no second level; \"Unnumbered sections\" lists the "
+                 "Group numbers of sections shown by their title instead of a number, such as a Before you start section.")
+CADENCE_NAMES = {"weeks": "Calendar weeks", "days": "Working days", "self": "Self-paced"}
 
 
 def export_xlsx(content: dict) -> bytes:
@@ -276,15 +377,17 @@ def export_xlsx(content: dict) -> bytes:
     for gi, g, di, d, st in steps(content):
         first_g = di == 0 and d["steps"] and d["steps"][0] is st
         first_d = d["steps"] and d["steps"][0] is st
-        ws.append([gi + 1, g["title"] if first_g else "", (di + 1) if content.get("useDays") else "",
+        ws.append([gi + 1, g["title"] if first_g else "", (di + 1) if levels_of(content)[1] else "",
                    d["title"] if first_d else "", st["title"], st["details"], (st["link"] or {}).get("url", ""),
                    st["type"], "yes" if st["gate"] else "", ])
     for col, w in zip("ABCDEFGHI", (8, 30, 6, 30, 60, 70, 50, 11, 7)):
         ws.column_dimensions[col].width = w
     info = wb.create_sheet("Path")
+    top, sub = levels_of(content)
+    unnumbered = ", ".join(str(gi + 1) for gi, g in enumerate(content["groups"]) if g.get("numbered", True) is False)
     for row in (["Title", content.get("title", "")], ["Who it's for", content.get("blurb", "")], ["Length", content.get("length", "")],
-                ["Pace", "Working days" if content.get("pace") == "days" else "Calendar weeks"], ["Top level is called", content.get("level", "Week")],
-                ["Days inside each group", "yes" if content.get("useDays") else "no"], [], ["How to fill in the Steps sheet", TEMPLATE_NOTE]):
+                ["Cadence", CADENCE_NAMES[cadence_of(content)]], ["Top level is called", top], ["Second level is called", sub],
+                ["Unnumbered sections", unnumbered], [], ["How to fill in the Steps sheet", TEMPLATE_NOTE]):
         info.append(row)
     info.column_dimensions["A"].width = 28
     info.column_dimensions["B"].width = 100
@@ -334,9 +437,17 @@ def import_xlsx(data: bytes, base: dict | None = None) -> dict:
         content["title"] = str(meta.get("Title") or content["title"])
         content["blurb"] = str(meta.get("Who it's for") or content.get("blurb") or "")
         content["length"] = str(meta.get("Length") or content.get("length") or "")
-        content["pace"] = "days" if str(meta.get("Pace") or "").lower().startswith("working") else "weeks"
-        content["level"] = str(meta.get("Top level is called") or content.get("level") or "Week")
-        content["useDays"] = str(meta.get("Days inside each group") or "yes").strip().lower() not in ("no", "false", "0")
+        cad = str(meta.get("Cadence") or meta.get("Pace") or "").strip().lower()  # "Pace" in files made before "Cadence"
+        content["cadence"] = "self" if cad.startswith("self") else "days" if cad.startswith("working") else "weeks"
+        top = str(meta.get("Top level is called") or "").strip() or levels_of(content)[0]
+        if "Second level is called" in meta:
+            sub = str(meta.get("Second level is called") or "").strip()
+        else:
+            sub = "Day" if str(meta.get("Days inside each group") or "yes").strip().lower() not in ("no", "false", "0") else ""
+        content["levels"] = {"top": top, "sub": sub}
+        unnumbered = {int(x) for x in re.findall(r"\d+", str(meta.get("Unnumbered sections") or ""))}
+    else:
+        unnumbered = set()
     groups: dict[int, dict] = {}
     any_day = False
     for r in rows[1:]:
@@ -366,6 +477,7 @@ def import_xlsx(data: bytes, base: dict | None = None) -> dict:
     if not groups:
         raise ValueError("The Steps sheet has no steps.")
     if "Path" not in wb.sheetnames:
-        content["useDays"] = any_day
-    content["groups"] = [{"title": groups[k]["title"], "days": [groups[k]["days"][dk] for dk in sorted(groups[k]["days"])]} for k in sorted(groups)]
+        content["levels"] = {"top": levels_of(content)[0], "sub": "Day" if any_day else ""}
+    content["groups"] = [{"title": groups[k]["title"], "numbered": k not in unnumbered,
+                          "days": [groups[k]["days"][dk] for dk in sorted(groups[k]["days"])]} for k in sorted(groups)]
     return normalize(content)

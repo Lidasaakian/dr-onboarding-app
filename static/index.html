@@ -402,6 +402,7 @@ td.tickcell .tick{display:inline-grid;vertical-align:middle;margin-right:8px}
       renderPaths(j.paths);
       renderStarred(j.paths);
       if (j.me.canAdmin) {
+        DROnb.watchDrafts(BASE, j.me.id);
         var n = j.openReports || 0;
         $("#topnav").appendChild(h("a", { class: "btn ghost", href: BASE + "admin/" }, "Admin", n ? h("span", { class: "onb-chip", "data-s": "behind", style: "margin-left:6px", title: n + " open problem reports" }, String(n)) : null));
       }

@@ -1,0 +1,240 @@
+{
+ "weeks-with-days": {
+  "unit_name": "Week",
+  "units": 2,
+  "length": "2 weeks",
+  "items": [
+   [
+    "s1",
+    1,
+    "Week 1 \u00b7 Day 1: Step 1",
+    false,
+    "Required"
+   ],
+   [
+    "s2",
+    1,
+    "Week 1 \u00b7 Day 1: Step 2",
+    false,
+    "Required"
+   ],
+   [
+    "s3",
+    1,
+    "Week 1 \u00b7 Day 2: Step 3",
+    false,
+    "Required"
+   ],
+   [
+    "s4",
+    1,
+    "Week 1 \u00b7 Day 2: Step 4",
+    false,
+    "Required"
+   ],
+   [
+    "s5",
+    1,
+    "Week 1 \u00b7 Day 3: Step 5",
+    false,
+    "Required"
+   ],
+   [
+    "s6",
+    1,
+    "Week 1 \u00b7 Day 3: Step 6",
+    false,
+    "Required"
+   ],
+   [
+    "s7",
+    2,
+    "Week 2 \u00b7 Day 1: Step 7",
+    false,
+    "Required"
+   ],
+   [
+    "s8",
+    2,
+    "Week 2 \u00b7 Day 1: Step 8",
+    false,
+    "Required"
+   ],
+   [
+    "s9",
+    2,
+    "Week 2 \u00b7 Day 2: Step 9",
+    false,
+    "Required"
+   ],
+   [
+    "s10",
+    2,
+    "Week 2 \u00b7 Day 2: Step 10",
+    false,
+    "Required"
+   ],
+   [
+    "s11",
+    2,
+    "Week 2 \u00b7 Day 3: Step 11",
+    false,
+    "Required"
+   ],
+   [
+    "s12",
+    2,
+    "Week 2 \u00b7 Day 3: Step 12",
+    true,
+    "Required"
+   ]
+  ]
+ },
+ "days-no-days": {
+  "unit_name": "Day",
+  "units": 5,
+  "length": "1 week",
+  "items": [
+   [
+    "s1",
+    1,
+    "Day 1: Step 1",
+    false,
+    "Required"
+   ],
+   [
+    "s2",
+    1,
+    "Day 1: Step 2",
+    false,
+    "Optional"
+   ],
+   [
+    "s3",
+    2,
+    "Day 2: Step 3",
+    false,
+    "Required"
+   ],
+   [
+    "s4",
+    2,
+    "Day 2: Step 4",
+    false,
+    "Optional"
+   ],
+   [
+    "s5",
+    3,
+    "Day 3: Step 5",
+    false,
+    "Required"
+   ],
+   [
+    "s6",
+    3,
+    "Day 3: Step 6",
+    false,
+    "Optional"
+   ],
+   [
+    "s7",
+    4,
+    "Day 4: Step 7",
+    false,
+    "Required"
+   ],
+   [
+    "s8",
+    4,
+    "Day 4: Step 8",
+    false,
+    "Optional"
+   ],
+   [
+    "s9",
+    5,
+    "Day 5: Step 9",
+    false,
+    "Required"
+   ],
+   [
+    "s10",
+    5,
+    "Day 5: Step 10",
+    false,
+    "Optional"
+   ]
+  ]
+ },
+ "custom-level": {
+  "unit_name": "Week",
+  "units": 3,
+  "length": "3 weeks",
+  "items": [
+   [
+    "s1",
+    1,
+    "Sprint 1: Step 1",
+    false,
+    "Required"
+   ],
+   [
+    "s2",
+    1,
+    "Sprint 1: Step 2",
+    false,
+    "Required"
+   ],
+   [
+    "s3",
+    1,
+    "Sprint 1: Step 3",
+    false,
+    "Required"
+   ],
+   [
+    "s4",
+    2,
+    "Sprint 2: Step 4",
+    false,
+    "Required"
+   ],
+   [
+    "s5",
+    2,
+    "Sprint 2: Step 5",
+    false,
+    "Required"
+   ],
+   [
+    "s6",
+    2,
+    "Sprint 2: Step 6",
+    false,
+    "Required"
+   ],
+   [
+    "s7",
+    3,
+    "Sprint 3: Step 7",
+    false,
+    "Required"
+   ],
+   [
+    "s8",
+    3,
+    "Sprint 3: Step 8",
+    false,
+    "Required"
+   ],
+   [
+    "s9",
+    3,
+    "Sprint 3: Step 9",
+    false,
+    "Required"
+   ]
+  ]
+ }
+}

@@ -32,7 +32,7 @@ class PathModel:
     title: str
     blurb: str
     length: str
-    unit_name: str       # "Week" / "Day"
+    unit_name: str       # "Week" / "Day"; "" for a self-paced path (no schedule)
     skill: str           # shown as "your <skill> skill"
     units: int           # 10 weeks / 7 days
     items: list[Item] = field(default_factory=list)
@@ -105,6 +105,9 @@ class PathModel:
         state = state or {}
         if self.badge(state)["earned"]:
             return {"status": "finished", "label": "Finished"}
+        if not self.unit_name:  # self-paced: progress instead of a schedule
+            s = self.summarize(state)
+            return {"status": "self_paced", "label": f"{s['done']} of {s['total']} steps"}
         if not start:
             return {"status": "not_started", "label": "Not started"}
         s = dt.date.fromisoformat(start)

@@ -623,7 +623,49 @@
     }, function (e) { preview.textContent = ""; err.textContent = e.message; err.hidden = false; });
   }
 
+  /* ---------------------------------------------------------------- generated drafts: "ready" notice */
+  // The creation wizard records the paths this browser started generating (per user). While there are any, the hub
+  // and admin pages ask every 20 seconds whether they're done, and show a notice with a link when they are.
+  function draftsKey(uid) { return "onb.generating." + uid; }
+  function draftsOf(uid) { try { return JSON.parse(localStorage.getItem(draftsKey(uid)) || "[]"); } catch (e) { return []; } }
+  function setDrafts(uid, ids) { try { if (ids.length) localStorage.setItem(draftsKey(uid), JSON.stringify(ids)); else localStorage.removeItem(draftsKey(uid)); } catch (e) {} }
+  function toast(text, href, label) {
+    var close = h("button", { type: "button", class: "x", "aria-label": "Close" }, "×");
+    var el = h("div", { class: "onb-toast", role: "status" }, h("span", null, text), href ? h("a", { href: href }, label || "Open") : null, close);
+    close.addEventListener("click", function () { el.remove(); });
+    var box = document.querySelector(".onb-toasts") || document.body.appendChild(h("div", { class: "onb-toasts" }));
+    box.appendChild(el);
+    return el;
+  }
+  var watching = null;
+  function watchDrafts(root, uid, onChange) {
+    if (!uid || watching) return;
+    watching = true;
+    function check() {
+      var ids = draftsOf(uid);
+      if (!ids.length) { watching = null; return; }
+      fetch(root + "api/admin/paths?generating=1").then(function (r) { return r.ok ? r.json() : { paths: [] }; }).then(function (j) {
+        var byId = {};
+        (j.paths || []).forEach(function (p) { byId[p.id] = p; });
+        var left = ids.filter(function (id) {
+          var p = byId[id];
+          if (!p) return false;
+          if (p.status === "draft") toast("Your draft " + p.title + " is ready.", root + id + "/", "Open the draft");
+          else if (p.status === "failed") toast("Generating " + p.title + " failed: " + (p.error || "unknown error").replace(/\.?$/, "."), root + "admin/#content", "See Content");
+          else return true;
+          return false;
+        });
+        setDrafts(uid, left);
+        if (left.length !== ids.length && onChange) onChange();
+      }, function () {}).then(function () { if (draftsOf(uid).length) setTimeout(check, 20000); else watching = null; });
+    }
+    setTimeout(check, 20000);
+  }
+
   window.DROnb = {
+    watchDrafts: watchDrafts,
+    addGenerating: function (uid, id) { var ids = draftsOf(uid); if (ids.indexOf(id) < 0) ids.push(id); setDrafts(uid, ids); },
+    toast: toast,
     init: function (opts) {
       O = Object.assign(O || {}, opts);
       if (opts.paceMount) paceEl = opts.paceMount;

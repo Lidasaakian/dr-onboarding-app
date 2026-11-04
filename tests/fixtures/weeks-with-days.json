@@ -1,0 +1,351 @@
+{
+ "id": "weeks-with-days",
+ "status": "published",
+ "owners": [
+  "author@datarobot.com"
+ ],
+ "createdBy": "Author",
+ "createdByEmail": "author@datarobot.com",
+ "createdAt": 1,
+ "origin": "app",
+ "draft": {
+  "title": "Two weeks",
+  "blurb": "",
+  "length": "",
+  "pace": "weeks",
+  "level": "Week",
+  "useDays": true,
+  "skill": {
+   "enabled": true,
+   "name": "support"
+  },
+  "groups": [
+   {
+    "id": "g1",
+    "title": "Week 1 title",
+    "days": [
+     {
+      "id": "d11",
+      "title": "",
+      "steps": [
+       {
+        "id": "s1",
+        "title": "Step 1",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s2",
+        "title": "Step 2",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     },
+     {
+      "id": "d12",
+      "title": "",
+      "steps": [
+       {
+        "id": "s3",
+        "title": "Step 3",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s4",
+        "title": "Step 4",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     },
+     {
+      "id": "d13",
+      "title": "",
+      "steps": [
+       {
+        "id": "s5",
+        "title": "Step 5",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s6",
+        "title": "Step 6",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "g2",
+    "title": "Week 2 title",
+    "days": [
+     {
+      "id": "d21",
+      "title": "",
+      "steps": [
+       {
+        "id": "s7",
+        "title": "Step 7",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s8",
+        "title": "Step 8",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     },
+     {
+      "id": "d22",
+      "title": "",
+      "steps": [
+       {
+        "id": "s9",
+        "title": "Step 9",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s10",
+        "title": "Step 10",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     },
+     {
+      "id": "d23",
+      "title": "",
+      "steps": [
+       {
+        "id": "s11",
+        "title": "Step 11",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s12",
+        "title": "Step 12",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": true,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "live": {
+  "title": "Two weeks",
+  "blurb": "",
+  "length": "",
+  "pace": "weeks",
+  "level": "Week",
+  "useDays": true,
+  "skill": {
+   "enabled": true,
+   "name": "support"
+  },
+  "groups": [
+   {
+    "id": "g1",
+    "title": "Week 1 title",
+    "days": [
+     {
+      "id": "d11",
+      "title": "",
+      "steps": [
+       {
+        "id": "s1",
+        "title": "Step 1",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s2",
+        "title": "Step 2",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     },
+     {
+      "id": "d12",
+      "title": "",
+      "steps": [
+       {
+        "id": "s3",
+        "title": "Step 3",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s4",
+        "title": "Step 4",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     },
+     {
+      "id": "d13",
+      "title": "",
+      "steps": [
+       {
+        "id": "s5",
+        "title": "Step 5",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s6",
+        "title": "Step 6",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "g2",
+    "title": "Week 2 title",
+    "days": [
+     {
+      "id": "d21",
+      "title": "",
+      "steps": [
+       {
+        "id": "s7",
+        "title": "Step 7",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s8",
+        "title": "Step 8",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     },
+     {
+      "id": "d22",
+      "title": "",
+      "steps": [
+       {
+        "id": "s9",
+        "title": "Step 9",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s10",
+        "title": "Step 10",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       }
+      ]
+     },
+     {
+      "id": "d23",
+      "title": "",
+      "steps": [
+       {
+        "id": "s11",
+        "title": "Step 11",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": false,
+        "source": ""
+       },
+       {
+        "id": "s12",
+        "title": "Step 12",
+        "details": "",
+        "link": null,
+        "type": "Required",
+        "gate": true,
+        "source": ""
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

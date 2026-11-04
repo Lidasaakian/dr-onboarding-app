@@ -88,6 +88,17 @@ def find_sources(job: dict, atl, links: list[str], files: list[dict], gh_token: 
     return found
 
 
+def add_sources(job: dict, col: Collector, links: list[str], files: list[dict]) -> dict:
+    """Read more links and files into sources already found. What was read before isn't read again, and its items
+    keep their ids, so the author's ticks still apply."""
+    step(job, "Reading the new links and files…")
+    col.progress = lambda m: note(job, m)
+    found = col.collect(links, files)
+    job["data"]["collector"] = col
+    finish(job, f"Found about {found['pages']} page{'s' if found['pages'] != 1 else ''} of material in all")
+    return found
+
+
 # --------------------------------------------------------------------------- 2. generate
 
 SYSTEM_GENERATE = """You design hands-on onboarding learning paths for DataRobot employees: support engineers, solution architects,
@@ -107,18 +118,20 @@ Rules:
 - Issues marked as not shipped describe work in progress: don't teach them as available features.
 - Write in plain American English, second person ("you"). No marketing language.
 
-Structure:
-- "level" names the top-level group ("Day", "Week", "Module" or "Phase"). "useDays" is true when a group has days inside.
-- "pace" is "days" (each group, or each day inside a group, is one working day) or "weeks" (each group is a calendar week).
-- About 1 day: pace "days", level "Day", useDays false, one group of 6-12 steps.
-- About 1 week: pace "days", level "Day", useDays false, 5 groups of 4-8 steps each.
-- About 2 weeks: pace "weeks", level "Week", useDays true, 2 groups of 5 days with 3-6 steps each.
-- "Let the LLM decide": pick what fits the material.
+Structure: the author has chosen it and it's given in the request. Follow it exactly.
+- "groups" are the top-level sections. Each group's "days" are its second-level sections. When the path has no second
+  level, give every group exactly one entry in "days" with an empty title.
+- Calendar weeks: each numbered group is one week (5 working days of work). Working days: each second-level section
+  is one working day, or each group when there's no second level (4-8 steps a day). Self-paced: no schedule; size the
+  sections by topic.
+- Use the approximate length to decide how many sections and steps to make.
+- "numbered": false only for a "Before you start" section, when the request asks for one. It comes first, is titled
+  "Before you start", holds what has to be in place before the path starts (access, setup, background) and has no gate.
+  Every other group is numbered.
 """
 
 SCHEMA = """{"title": str, "blurb": "one sentence: who it's for and what they'll be able to do", "length": "for example 1 week",
- "pace": "days"|"weeks", "level": str, "useDays": bool,
- "groups": [{"title": str, "days": [{"title": str, "steps": [{"title": str, "details": str, "link": {"url": str, "label": str} | null,
+ "groups": [{"title": str, "numbered": bool, "days": [{"title": str, "steps": [{"title": str, "details": str, "link": {"url": str, "label": str} | null,
    "type": "Required"|"Stretch"|"Optional", "gate": bool, "source": str}]}]}],
  "unused": [{"source": "S5", "reason": "why it wasn't used"}]}"""
 
@@ -194,8 +207,14 @@ def generate_path(job: dict, llm: Gateway, col: Collector, unchecked: set[str], 
                 material = "\n\n".join(ex.map(lambda c: llm.chat("generate", SYSTEM_NOTES + " Keep the source ids (S1, S2…) next to each fact.", c, max_tokens=3000), parts))
             finish(job, "Condensed the notes")
 
-    length = settings.get("length") or "Let the LLM decide"
-    request = (f"Length: {length}\nWho it's for: {settings.get('audience') or 'DataRobot employees new to this feature'}\n"
+    length = settings.get("length") or "Whatever fits the material"
+    shape_of = cp.structure_from(settings)
+    top, sub = cp.blank_content("", **shape_of)["levels"].values()
+    cadence = {"weeks": "Calendar weeks", "days": "Working days", "self": "Self-paced"}[shape_of["cadence"]]
+    shape = (f"Cadence: {cadence}\nTop-level sections are called: {top}\n"
+             f"Second level inside each section: {sub + ' (in days)' if sub else 'none (one untitled entry in days)'}\n"
+             f"Start with a \"Before you start\" section: {'yes' if shape_of['before_start'] else 'no'}\n")
+    request = (f"{shape}Approximate length: {length}\nWho it's for: {settings.get('audience') or 'DataRobot employees new to this feature'}\n"
                f"Path name: {settings.get('title') or '(suggest one)'}\n"
                f"Notes from the author: {settings.get('notes') or '(none)'}\n\n"
                f"Sources:\n{catalog}\n\nReturn JSON in this shape:\n{SCHEMA}\n\nSource material:\n\n{material}")
@@ -217,6 +236,14 @@ def generate_path(job: dict, llm: Gateway, col: Collector, unchecked: set[str], 
                 used |= set(refs)
                 st["source"] = ", ".join(ids[r]["title"] for r in refs if r in ids)[:300]
     raw["skill"] = {"enabled": bool(settings.get("skillEnabled")), "name": settings.get("skillName") or ""}
+    raw["cadence"], raw["levels"] = shape_of["cadence"], {"top": top, "sub": sub}  # the author's choice wins over the LLM's
+    raw.pop("pace", None), raw.pop("level", None), raw.pop("useDays", None)
+    groups = [g for g in raw.get("groups") or [] if isinstance(g, dict)]
+    if shape_of["before_start"] and not (groups and groups[0].get("numbered") is False):
+        groups.insert(0, {"title": "Before you start", "days": [{"title": "", "steps": []}]})
+    for gi, g in enumerate(groups):
+        g["numbered"] = not (shape_of["before_start"] and gi == 0)
+    raw["groups"] = groups
     if settings.get("title"):
         raw["title"] = settings["title"]
     if not raw.get("blurb") and settings.get("audience"):
@@ -225,7 +252,7 @@ def generate_path(job: dict, llm: Gateway, col: Collector, unchecked: set[str], 
     n = cp.step_count(content_out)
     gates = sum(1 for *_, st in cp.steps(content_out) if st["gate"])
     labs = sum(1 for *_, st in cp.steps(content_out) if re.match(r"(lab\b|lab \d|try|build|create|deploy|set up)", st["title"], re.I))
-    lvl = content_out["level"].lower()
+    lvl = cp.levels_of(content_out)[0].lower()
     finish(job, f"Planned {len(content_out['groups'])} {lvl}{'s' if len(content_out['groups']) != 1 else ''}, {n} steps"
            + (f", {labs} hands-on" if labs else "") + (f", {gates} gate{'s' if gates != 1 else ''}" if gates else ""))
 
@@ -288,12 +315,15 @@ def _scope(content: dict, scope: dict):
 def edit_draft(job: dict, llm: Gateway, content: dict, instruction: str, scope: dict) -> dict:
     content = cp.normalize(content)
     kind, where, part = _scope(content, scope)
-    lvl = content["level"]
+    lvl, sub = cp.levels_of(content)
     step(job, "Reading the draft…", done=True)
     step(job, "Writing the changes…")
     if kind == "path":
-        outline = json.dumps({k: content[k] for k in ("title", "blurb", "level", "useDays", "pace")} | {"groups": content["groups"]}, ensure_ascii=False)
-        ask = (f"Instruction: {instruction}\n\nThe whole path (top-level groups are called {lvl!r}):\n{outline}\n\n"
+        outline = json.dumps({k: content[k] for k in ("title", "blurb", "cadence", "levels")} | {"groups": content["groups"]}, ensure_ascii=False)
+        ask = (f"Instruction: {instruction}\n\nThe whole path (top-level groups are called {lvl!r}"
+               + (f", their days hold the second level, called {sub!r}" if sub else ", no second level: one untitled entry in days")
+               + '; "numbered": false marks a section shown by its title, such as Before you start'
+               + f"):\n{outline}\n\n"
                'Return JSON: {"title": str (only if it should change), "blurb": str (only if it should change), '
                '"groups": [only the groups you add or change, each complete with its days and steps], '
                '"order": [every group id in the new order, "new-1", "new-2"… for added groups in the same order as in "groups"]}. '
@@ -309,6 +339,8 @@ def edit_draft(job: dict, llm: Gateway, content: dict, instruction: str, scope: 
                 g = changed[gid]
                 if gid.startswith("new"):
                     g["id"] = "new"
+                elif gid in existing and "numbered" not in g:
+                    g["numbered"] = existing[gid].get("numbered", True)
                 groups.append(g)
             elif gid in existing:
                 groups.append(existing[gid])
@@ -320,8 +352,8 @@ def edit_draft(job: dict, llm: Gateway, content: dict, instruction: str, scope: 
             if raw.get(k):
                 new[k] = raw[k]
     else:
-        label = {"group": f"{lvl} {where[0] + 1}", "day": f"{lvl} {where[0] + 1}, Day {where[1] + 1}" if content['useDays'] else f"{lvl} {where[0] + 1}",
-                 "step": f"one step of {lvl} {where[0] + 1}"}[kind]
+        label = {"group": lambda: cp.section_label(content, where[0]), "day": lambda: cp.where_label(content, where[0], where[1]),
+                 "step": lambda: f"one step of {cp.section_label(content, where[0])}"}[kind]()
         shape = {"group": '{"id", "title", "days": [{"id", "title", "steps": [...]}]}',
                  "day": '{"id", "title", "steps": [...]}',
                  "step": '{"steps": [the step, rewritten; or several steps if the instruction asks to split it]}'}[kind]
@@ -332,6 +364,7 @@ def edit_draft(job: dict, llm: Gateway, content: dict, instruction: str, scope: 
         if kind == "group":
             if isinstance(raw, dict) and raw.get("days") is not None:
                 raw["id"] = content["groups"][where[0]]["id"]
+                raw["numbered"] = content["groups"][where[0]].get("numbered", True)
                 new["groups"][where[0]] = raw
         elif kind == "day":
             if isinstance(raw, dict) and raw.get("steps") is not None:

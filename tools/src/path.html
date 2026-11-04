@@ -83,6 +83,7 @@
     <b id="eb-title">Draft</b><span id="eb-note">Only owners and admins can see it.</span>
     <span style="flex:1"></span>
     <button class="btn" id="eb-settings" type="button">Settings</button>
+    <button class="btn" id="eb-report" type="button" hidden>Generation report</button>
     <button class="btn" id="eb-preview" type="button">Preview as learner</button>
     <button class="btn" id="eb-undo" type="button" disabled>Undo</button>
     <a class="btn" id="eb-xlsx" href="#">Download as .xlsx</a>
@@ -185,9 +186,23 @@
 
   /* ---------------------------------------------------------------- model helpers */
   var items = [], byId = {}, pages = {}, pageOrder = [], navItems = {}, boxes = {}, current = null;
-  function lvl() { return (C && C.level) || "Week"; }
-  function gLabel(gi) { return lvl() + " " + (gi + 1); }
-  function where(it) { return gLabel(it.gi) + (C.useDays ? " · Day " + (it.di + 1) : ""); }
+  // Structure (custom_paths.py): cadence, level names, and sections that show their title instead of a number.
+  // Content saved before cadence existed only has pace, level and useDays.
+  var DEF_LEVELS = { weeks: ["Week", "Day"], days: ["Day", ""], self: ["Module", ""] };
+  function cadence() { return C.cadence || (C.pace === "days" ? "days" : "weeks"); }
+  function levels() { return C.levels ? [C.levels.top || "Week", C.levels.sub || ""] : [C.level || "Week", C.useDays === false ? "" : "Day"]; }
+  function lvl() { return levels()[0]; }
+  function sub() { return levels()[1]; }
+  function numbered(g) { return g.numbered !== false; }
+  function gLabel(gi) {
+    var g = C.groups[gi];
+    if (!numbered(g)) return g.title || "Section";
+    var n = 0;
+    for (var i = 0; i <= gi; i++) if (numbered(C.groups[i])) n++;
+    return lvl() + " " + n;
+  }
+  function dLabel(di) { return sub() + " " + (di + 1); }
+  function where(it) { return gLabel(it.gi) + (sub() ? " · " + dLabel(it.di) : ""); }
   function indexItems() {
     items = []; byId = {};
     C.groups.forEach(function (g, gi) { g.days.forEach(function (d, di) { d.steps.forEach(function (st) { var it = { st: st, id: st.id, gi: gi, di: di, g: g, d: d }; items.push(it); byId[st.id] = it; }); }); });
@@ -266,17 +281,17 @@
     var gate = h("input", { type: "checkbox", checked: st.gate });
     gate.addEventListener("change", function () { snapshot(); st.gate = gate.checked; changed(true); });
     var days = [];
-    C.groups.forEach(function (g, gi) { g.days.forEach(function (dd, di) { days.push([gi + ":" + di, gLabel(gi) + (C.useDays ? " · Day " + (di + 1) : "")]); }); });
+    C.groups.forEach(function (g, gi) { g.days.forEach(function (dd, di) { days.push([gi + ":" + di, gLabel(gi) + (sub() ? " · " + dLabel(di) : "")]); }); });
     var up = h("button", { type: "button", title: "Move up" }, "↑"), down = h("button", { type: "button", title: "Move down" }, "↓");
     function mv(dir) { var i = d.steps.indexOf(st), j = i + dir; if (j < 0 || j >= d.steps.length) return; snapshot(); d.steps.splice(i, 1); d.steps.splice(j, 0, st); changed(true); focusStep(st.id); }
     up.addEventListener("click", function () { mv(-1); }); down.addEventListener("click", function () { mv(1); });
     var del = h("button", { type: "button", class: "danger" }, "Delete step");
     del.addEventListener("click", function () { snapshot(); d.steps.splice(d.steps.indexOf(st), 1); changed(true); });
     return h("div", { class: "onb-edittools" },
-      h("label", null, C.useDays ? "Day" : lvl(), sel(days, it.gi + ":" + it.di, function (v) {
+      h("label", null, sub() || "Section", sel(days, it.gi + ":" + it.di, function (v) {
         var p = v.split(":"), to = C.groups[+p[0]].days[+p[1]];
         d.steps.splice(d.steps.indexOf(st), 1); to.steps.push(st);
-      }, C.useDays ? "Day" : lvl())),
+      }, sub() || "Section")),
       h("label", null, "Type", sel([["Required", "Required"], ["Stretch", "Stretch"], ["Optional", "Optional"]], st.type, function (v) { st.type = v; }, "Type")),
       h("label", null, gate, "Gate"),
       h("label", { class: "grow" }, "Link", link),
@@ -298,45 +313,57 @@
     return sec;
   }
   function buildGroup(g, gi) {
-    var sec = page("g" + gi, g.title || gLabel(gi), gLabel(gi));
+    var num = numbered(g);
+    var sec = page("g" + gi, g.title || gLabel(gi), num ? gLabel(gi) : "");
+    var eyebrow = num ? gLabel(gi) : EDIT ? "Section without a number" : "";
     var head = h("div", { class: "page-head" },
-      h("div", { class: "grphead" }, h("span", { class: "eyebrow" }, gLabel(gi)), h("span", { class: "label", "data-gcount": gi }), EDIT ? sparkBtn("group", g.id, gLabel(gi)) : null, EDIT ? groupMenu(gi) : null),
-      h("h2", null, EDIT ? E(g, "title", { plain: true, ph: "Title for " + gLabel(gi) }) : (g.title || gLabel(gi))));
+      h("div", { class: "grphead" }, h("span", { class: "eyebrow" }, eyebrow), h("span", { class: "label", "data-gcount": gi }), EDIT ? sparkBtn("group", g.id, gLabel(gi)) : null, EDIT ? groupMenu(gi) : null),
+      h("h2", null, EDIT ? E(g, "title", { plain: true, ph: num ? "Title for " + gLabel(gi) : "Section title, for example Before you start" }) : (g.title || gLabel(gi))));
     add(sec, head);
     if (EDIT) add(sec, askBox());
     g.days.forEach(function (d, di) {
       var list = h("div", { class: "daylist" }, d.steps.map(function (st) { return stepRow(byId[st.id]); }), EDIT ? addStepBtn(d) : null);
-      if (C.useDays) {
+      if (sub()) {
         add(sec, h("div", { class: "sec", style: "margin-top:20px" },
-          h("div", { class: "dayhead" }, h("span", { class: "eyebrow" }, "Day " + (di + 1)), h("h3", null, EDIT ? E(d, "title", { plain: true, ph: "Day title (optional)" }) : (d.title || "")),
-            EDIT ? sparkBtn("day", d.id, gLabel(gi) + " · Day " + (di + 1)) : null, EDIT && g.days.length > 1 ? dayDelete(g, d) : null),
+          h("div", { class: "dayhead" }, h("span", { class: "eyebrow" }, dLabel(di)), h("h3", null, EDIT ? E(d, "title", { plain: true, ph: sub() + " title (optional)" }) : (d.title || "")),
+            EDIT ? sparkBtn("day", d.id, gLabel(gi) + " · " + dLabel(di)) : null, EDIT && g.days.length > 1 ? dayDelete(g, d) : null),
           list));
       } else add(sec, h("div", { class: "sec", style: "margin-top:20px" }, list));
     });
-    if (EDIT && C.useDays) {
-      var ad = h("button", { type: "button", class: "addrow", style: "margin-top:12px" }, "+ Add a day");
+    if (EDIT && sub()) {
+      var ad = h("button", { type: "button", class: "addrow", style: "margin-top:12px" }, "+ Add a " + sub().toLowerCase());
       ad.addEventListener("click", function () { snapshot(); g.days.push({ id: newId("d"), title: "", steps: [] }); changed(true); });
       add(sec, ad);
     }
   }
   function dayDelete(g, d) {
-    var b = h("button", { type: "button", class: "spark", title: "Delete this day" }, "Delete day");
-    b.addEventListener("click", function () { if (d.steps.length && !confirm("Delete this day and its " + d.steps.length + " steps?")) return; snapshot(); g.days.splice(g.days.indexOf(d), 1); changed(true); });
+    var name = sub().toLowerCase();
+    var b = h("button", { type: "button", class: "spark", title: "Delete this " + name }, "Delete " + name);
+    b.addEventListener("click", function () { if (d.steps.length && !confirm("Delete this " + name + " and its " + d.steps.length + " steps?")) return; snapshot(); g.days.splice(g.days.indexOf(d), 1); changed(true); });
     return b;
   }
   function groupMenu(gi) {
     var wrap = h("span", { class: "grp", style: "display:inline-flex;gap:4px" });
     var up = h("button", { type: "button", class: "spark", title: "Move earlier" }, "↑"), dn = h("button", { type: "button", class: "spark", title: "Move later" }, "↓");
     var del = h("button", { type: "button", class: "spark", title: "Delete " + gLabel(gi) }, "Delete");
+    var g = C.groups[gi];
+    var num = h("button", { type: "button", class: "spark", title: numbered(g) ? "Show this section by its title, without a number (for example Before you start)" : "Number this section like the others" },
+      numbered(g) ? "Remove number" : "Add number");
+    num.addEventListener("click", function () {
+      snapshot();
+      g.numbered = !numbered(g);
+      if (!g.numbered && !g.title) g.title = gi === 0 ? "Before you start" : "";
+      changed(true); show("g" + gi);
+    });
     function mv(dir) { var j = gi + dir; if (j < 0 || j >= C.groups.length) return; snapshot(); var g = C.groups.splice(gi, 1)[0]; C.groups.splice(j, 0, g); changed(true); show("g" + j); }
     up.addEventListener("click", function () { mv(-1); }); dn.addEventListener("click", function () { mv(1); });
     del.addEventListener("click", function () {
       var n = C.groups[gi].days.reduce(function (t, d) { return t + d.steps.length; }, 0);
-      if (C.groups.length === 1) { alert("A path needs at least one " + lvl().toLowerCase() + "."); return; }
+      if (C.groups.length === 1) { alert("A path needs at least one section."); return; }
       if (n && !confirm("Delete " + gLabel(gi) + " and its " + n + " steps?")) return;
       snapshot(); C.groups.splice(gi, 1); changed(true); show("g" + Math.max(0, gi - 1));
     });
-    add(wrap, [up, dn, del]);
+    add(wrap, [up, dn, num, del]);
     return wrap;
   }
 
@@ -594,6 +621,7 @@
     $("#eb-title").textContent = published ? "Editing" : "Draft";
     $("#eb-note").textContent = published ? "Learners see the published version until you publish." : "Only owners and admins can see it.";
     $("#eb-discard").hidden = !published;
+    $("#eb-report").hidden = published || !INFO.generation;
     $("#eb-xlsx").href = ROOT + "api/admin/paths/" + PID + "/export.xlsx";
   }
 
@@ -607,12 +635,31 @@
       opts.forEach(function (o) { var b = h("button", { type: "button", "aria-pressed": String(o[0] === val) }, o[1]); b.addEventListener("click", function () { box._v = o[0]; $$("button", box).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); if (box._on) box._on(o[0]); }); box.appendChild(b); });
       return box;
     }
-    var pace = seg([["weeks", "Calendar weeks"], ["days", "Working days"]], c.pace);
-    var std = ["Week", "Module", "Phase", "Day"];
-    var level = seg([["Week", "Week"], ["Module", "Module"], ["Phase", "Phase"], ["Day", "Day"], ["custom", "Custom…"]], std.indexOf(c.level) >= 0 ? c.level : "custom");
-    var custom = h("input", { value: std.indexOf(c.level) >= 0 ? "" : c.level, placeholder: "Name for the top level", hidden: std.indexOf(c.level) >= 0 });
-    level._on = function (v) { custom.hidden = v !== "custom"; if (v === "custom") custom.focus(); };
-    var days = seg([["yes", "Yes"], ["no", "No"]], c.useDays ? "yes" : "no");
+    // A name picker: preset buttons plus "Custom…" with a text box. get() and set() hide which one is used.
+    function names(presets, val) {
+      var all = presets.map(function (x) { return [x, x || "None"]; }).concat([["custom", "Custom…"]]);
+      var box = seg(all, presets.indexOf(val) >= 0 ? val : "custom");
+      var input = h("input", { value: presets.indexOf(val) >= 0 ? "" : val, placeholder: "Your own name", hidden: presets.indexOf(val) >= 0, style: "margin-top:8px" });
+      box._on = function (v) { input.hidden = v !== "custom"; if (v === "custom") input.focus(); };
+      return { el: [box, input],
+        get: function () { return box._v === "custom" ? (input.value.trim() || "Section") : box._v; },
+        set: function (v) { var b = $$("button", box).filter(function (x) { return x.textContent === (v || "None"); })[0]; if (b) b.click(); else { $$("button", box).pop().click(); input.value = v; } } };
+    }
+    var cur = levels();
+    var cad = seg([["weeks", "Calendar weeks"], ["days", "Working days"], ["self", "Self-paced"]], cadence());
+    var top = names(["Week", "Day", "Module", "Phase"], cur[0]);
+    var subN = names(["", "Day", "Module"], cur[1]);
+    var cadHelp = h("span", { class: "small" });
+    function helpText(v) { cadHelp.textContent = { weeks: "Each numbered section is one calendar week of the learner's schedule.", days: "Each " + (subN.get() ? subN.get().toLowerCase() : "numbered section") + " is one working day of the learner's schedule.", self: "No schedule: learners see their progress instead of on track or behind." }[v]; }
+    helpText(cadence());
+    // Changing the cadence also changes a level name that is still the old cadence's default.
+    var lastCad = cadence();
+    cad._on = function (v) {
+      var was = DEF_LEVELS[lastCad], now = DEF_LEVELS[v];
+      if (top.get() === was[0]) top.set(now[0]);
+      if (subN.get() === was[1]) subN.set(now[1]);
+      lastCad = v; helpText(v);
+    };
     var skill = seg([["now", "Add now"], ["later", "Decide later"]], c.skill && c.skill.enabled ? "now" : "later");
     var skillName = h("input", { value: (c.skill && c.skill.name) || "", placeholder: "Skill name, for example agent monitoring", hidden: !(c.skill && c.skill.enabled) });
     skill._on = function (v) { skillName.hidden = v !== "now"; };
@@ -625,9 +672,9 @@
       h("label", { class: "field" }, h("span", { class: "label" }, "Path name"), title),
       h("label", { class: "field" }, h("span", { class: "label" }, "Who it's for"), blurb),
       h("label", { class: "field" }, h("span", { class: "label" }, "Length"), length),
-      h("div", { class: "field" }, h("span", { class: "label" }, "Pace"), pace),
-      h("div", { class: "field" }, h("span", { class: "label" }, "Top level is called"), level, custom),
-      h("div", { class: "field" }, h("span", { class: "label" }, "Days inside each " + (lvl() === "Day" ? "group" : lvl().toLowerCase())), days),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Cadence"), cad, cadHelp),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Sections are called"), top.el),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Inside each section"), subN.el),
       h("div", { class: "field" }, h("span", { class: "label" }, "Skill growth"), skill, skillName),
       h("label", { class: "field" }, h("span", { class: "label" }, "Owners: they see this path's progress and problems"), owners),
       err, h("div", { class: "row" }, del, cancel, saveB));
@@ -638,18 +685,37 @@
       api(ROOT + "api/admin/paths/" + PID, { method: "DELETE" }).then(function () { location.href = ROOT + "admin/#content"; }, function (e) { err.textContent = e.message; err.hidden = false; });
     });
     saveB.addEventListener("click", function () {
+      var newSub = subN.get(), oldSub = sub();
+      var split = C.groups.filter(function (g) { return g.days.length > 1; }).length;
+      if (oldSub && !newSub && split && !confirm("Remove the " + oldSub.toLowerCase() + "s? The steps in each " + oldSub.toLowerCase() + " move into their section, in the same order. Learners keep their ticks.")) return;
       snapshot();
-      C.title = title.value.trim() || C.title; C.blurb = blurb.value.trim(); C.length = length.value.trim(); C.pace = pace._v;
-      C.level = level._v === "custom" ? (custom.value.trim() || "Section") : level._v;
-      var ud = days._v === "yes";
-      if (C.useDays && !ud) C.groups.forEach(function (g) { var all = []; g.days.forEach(function (d) { all = all.concat(d.steps); }); g.days = [{ id: g.days[0].id, title: "", steps: all }]; });
-      C.useDays = ud;
+      C.title = title.value.trim() || C.title; C.blurb = blurb.value.trim(); C.length = length.value.trim();
+      C.cadence = cad._v; C.levels = { top: top.get(), sub: newSub };
+      if (oldSub && !newSub) C.groups.forEach(function (g) { var all = []; g.days.forEach(function (d) { all = all.concat(d.steps); }); g.days = [{ id: g.days[0].id, title: "", steps: all }]; });
+      delete C.pace; delete C.level; delete C.useDays;
       C.skill = { enabled: skill._v === "now", name: skillName.value.trim() };
       saveB.disabled = true;
       api(ROOT + "api/admin/paths/" + PID + "/draft", jsonOpts("PUT", { content: C, owners: owners.value })).then(function (j) {
         INFO.owners = j.owners; C = j.draft; editDirty = false; m.close(); rebuild(); setState("draft");
       }, function (e) { saveB.disabled = false; err.textContent = e.message; err.hidden = false; });
     });
+  }
+  // What the LLM run reported (stored with a generated draft until it's published): sources used and not used,
+  // links that didn't open, warnings about what couldn't be read.
+  function reportDialog() {
+    var r = INFO.generation || {}, cov = r.coverage || {};
+    var close = h("button", { type: "button", class: "btn primary" }, "Close");
+    var unused = (cov.unused || []).map(function (u) { return h("li", null, u.title + (u.reason ? " (" + u.reason + ")" : "")); });
+    var dlg = h("div", { class: "onb-dialog wide2", role: "dialog", "aria-modal": "true", "aria-label": "Generation report" },
+      h("h2", null, "Generation report"),
+      h("p", { class: "small" }, "Generated " + (r.at ? new Date(r.at).toLocaleString() : "") + ". Every step lists the source it came from."),
+      h("p", null, h("b", null, "Coverage: "), (cov.used || 0) + " of " + (cov.total || 0) + " sources are used in at least one step."),
+      unused.length ? [h("p", null, h("b", null, "Not used")), h("ul", null, unused)] : null,
+      (r.broken || []).length ? [h("p", null, h("b", null, "Links that didn't open")), h("ul", null, r.broken.map(function (u) { return h("li", null, a(u)); }))] : null,
+      (r.warnings || []).length ? [h("p", null, h("b", null, "Warnings")), h("ul", null, r.warnings.map(function (w) { return h("li", null, w); }))] : null,
+      h("div", { class: "row" }, close));
+    var m = modalOpen(dlg);
+    close.addEventListener("click", m.close);
   }
   function modalOpen(dialog) {
     var wrap = h("div", { class: "onb-modal" }, dialog);
@@ -672,7 +738,7 @@
     var ok = h("button", { type: "button", class: "btn primary" }, "Publish now"), back = h("button", { type: "button", class: "btn ghost" }, "Keep editing");
     var m = modalOpen(h("div", { class: "onb-dialog", role: "dialog", "aria-modal": "true" },
       h("h2", null, INFO.status === "published" ? "Publish your changes?" : "Publish this path?"),
-      h("p", null, C.title + ": " + C.groups.length + " " + lvl().toLowerCase() + (C.groups.length === 1 ? "" : "s") + ", " + n + " steps." + (INFO.status === "published" ? "" : " It appears on the hub for everyone.")),
+      h("p", null, C.title + ": " + C.groups.length + " section" + (C.groups.length === 1 ? "" : "s") + ", " + n + " steps." + (INFO.status === "published" ? "" : " It appears on the hub for everyone.")),
       h("div", { class: "row" }, back, ok)));
     back.addEventListener("click", m.close);
     ok.addEventListener("click", function () { m.close(); go(); });
@@ -695,12 +761,12 @@
     $("#doc-title").appendChild(EDIT ? E(C, "title", { plain: true, ph: "Path name" }) : document.createTextNode(C.title));
     $("#doc-blurb").hidden = !C.blurb && !EDIT;
     $("#doc-blurb").textContent = ""; $("#doc-blurb").appendChild(EDIT ? E(C, "blurb", { plain: true, ph: "Who it's for (one sentence)" }) : document.createTextNode(C.blurb || ""));
-    var units = C.groups.length;
+    var units = C.groups.filter(numbered).length;
     $("#doc-length").textContent = C.length || (units + " " + lvl().toLowerCase() + (units === 1 ? "" : "s"));
     C.groups.forEach(buildGroup);
     if (EDIT) {
       var addG = h("button", { type: "button", class: "addrow", style: "margin-top:14px" }, "+ Add a " + lvl().toLowerCase());
-      addG.addEventListener("click", function () { snapshot(); C.groups.push({ id: newId("g"), title: "", days: [{ id: newId("d"), title: "", steps: [] }] }); changed(true); show("g" + (C.groups.length - 1)); });
+      addG.addEventListener("click", function () { snapshot(); C.groups.push({ id: newId("g"), title: "", numbered: true, days: [{ id: newId("d"), title: "", steps: [] }] }); changed(true); show("g" + (C.groups.length - 1)); });
       pages["g" + (C.groups.length - 1)].appendChild(addG);
     }
     if (!EDIT) buildStarred();
@@ -710,7 +776,10 @@
     if (pages.team) { side.appendChild(sep()); side.appendChild(navItem("team")); }
     var wb = $("#bricks");
     wb.style.gridTemplateColumns = "repeat(" + Math.min(Math.max(C.groups.length, 1), 14) + ",1fr)";
-    C.groups.forEach(function (g, gi) { wb.appendChild(h("a", { class: "daybrick", href: "#g" + gi, "data-page": "g" + gi, "aria-label": gLabel(gi) + (g.title ? ": " + g.title : "") }, h("div", { class: "b" }, h("i")), h("span", null, lvl().charAt(0) + (gi + 1)))); });
+    C.groups.forEach(function (g, gi) {
+      var short = numbered(g) ? lvl().charAt(0) + gLabel(gi).split(" ").pop() : "•";
+      wb.appendChild(h("a", { class: "daybrick", href: "#g" + gi, "data-page": "g" + gi, "aria-label": gLabel(gi) + (g.title && numbered(g) ? ": " + g.title : "") }, h("div", { class: "b" }, h("i")), h("span", null, short)));
+    });
     renderAsk();
   }
   function renderAll() { renderProgress(); renderStarred(); if (window.DROnb) DROnb.refreshStars(); if (teamData) renderTeam(teamData); }
@@ -733,6 +802,7 @@
   /* ---------------------------------------------------------------- boot */
   function start() {
     $("#eb-settings").addEventListener("click", settingsDialog);
+    $("#eb-report").addEventListener("click", reportDialog);
     $("#eb-preview").addEventListener("click", function () { clearTimeout(saveTimer); if (editDirty) saveDraft(); setMode("preview"); });
     $("#pv-back").addEventListener("click", function () { setMode("edit"); });
     $("#eb-undo").addEventListener("click", function () { var prev = history_.pop(); if (!prev) return; C = JSON.parse(prev); $("#eb-undo").disabled = !history_.length; changed(true); });
