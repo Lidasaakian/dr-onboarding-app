@@ -143,7 +143,12 @@ creating** after a refresh. Uploaded files are kept for 3 hours; after that, the
   **Preview as learner**, **Download as .xlsx**, **Settings** (name, who it's for, length, cadence, level names, skill
   growth, owners; delete a draft) and **Publish**. A published path is edited the same way: learners keep seeing the
   published version until you publish again (**Discard changes** goes back to it).
-- A published path can't be deleted in the app.
+- **Archive and restore:** a published path made in the app can be archived by its owners or an admin (Admin →
+  Content → **Archive**). It disappears from the hub and takes no new enrollments; learners already enrolled still see
+  it and their progress, badge and certificate, but can't tick steps. It's left out of the dashboard and marked in
+  Team progress. **Restore** publishes it again. Archived paths can't be edited until restored.
+- Drafts (and failed generations) can be deleted; published and archived paths can't, so learners' progress and
+  certificates stay valid. The built-in paths can't be archived.
 
 ### Path structure
 
@@ -200,7 +205,7 @@ initials show instead.
   DataRobot bugs also have **Mark resolved** / **Reopen**: once someone changes a bug's status by hand, the Jira sync
   leaves that status alone.
 - **Content:** every path you manage, built-in and app-made, in one list (status, steps, enrolled, owners) with
-  **Edit**, and **+ Create learning path**.
+  **Edit**, **Archive** / **Restore** for app-made paths, and **+ Create learning path**.
 - **Users** (admins): invite people and assign roles (above).
 - Authors and owners see the same tabs (except Users), limited to the paths they own.
 - **Slack (optional):** every report as it arrives, and every Monday from 09:00 Dublin time a summary of inactive

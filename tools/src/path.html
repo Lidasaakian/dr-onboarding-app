@@ -64,6 +64,7 @@
 .grphead h2{flex:1 1 auto}
 .settings{display:grid;gap:12px}
 .settings .field input,.settings .field textarea,.settings select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;width:100%}
+.archived-note{margin:10px 0 0;padding:8px 12px;border-radius:var(--r);background:var(--panel);font-size:15px;max-width:72ch}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
 .seg button{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:6px 12px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -144,7 +145,7 @@
   var S = blank(), store = null, earlyEdits = false;
   var C = null;            // content shown (live for learners, draft while editing)
   var LIVE = null, INFO = null, ME = null;
-  var EDIT = false, PREVIEW = false, canEdit = false;
+  var EDIT = false, PREVIEW = false, canEdit = false, ARCHIVED = false;  // archived: read-only for everyone
 
   function h(tag, attrs) {
     var el = document.createElement(tag);
@@ -228,7 +229,7 @@
 
   /* ---------------------------------------------------------------- checkboxes */
   function tick(it) {
-    var cb = h("input", { type: "checkbox", class: "tick", "aria-label": "Done: " + it.st.title.slice(0, 90), disabled: EDIT || PREVIEW || !LIVE ? true : null });
+    var cb = h("input", { type: "checkbox", class: "tick", "aria-label": "Done: " + it.st.title.slice(0, 90), disabled: EDIT || PREVIEW || !LIVE || ARCHIVED ? true : null });
     cb.addEventListener("change", function () {
       if (cb.checked && window.DROnb && !DROnb.isEnrolled()) { cb.checked = false; DROnb.ensureEnrolled().then(function (ok) { if (ok) setDone(it.id, true); }); return; }
       setDone(it.id, cb.checked);
@@ -820,7 +821,10 @@
     function boot(info) {
       INFO = info || {};
       LIVE = INFO.live || null;
-      canEdit = !!INFO.canEdit;
+      ARCHIVED = INFO.status === "archived";
+      canEdit = !!INFO.canEdit && !ARCHIVED;
+      if (ARCHIVED) $("#doc-blurb").insertAdjacentElement("afterend", h("p", { class: "archived-note" },
+        "This path is archived: you can see your progress, but steps can't be ticked any more."));
       C = LIVE || INFO.draft;
       if (!C) { $("#main").textContent = ""; $("#main").appendChild(h("div", { class: "empty" }, "This learning path isn't published yet.")); setState("local", "Not published"); return; }
       var cached = readCache();

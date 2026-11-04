@@ -125,7 +125,7 @@
       out.appendChild(h("a", { class: "path", href: BASE + p.id + "/" },
         sky,
         h("div", { class: "body" },
-          h("div", { class: "foot-row" }, h("span", { class: "label" }, p.length),
+          h("div", { class: "foot-row" }, h("span", { class: "label" }, p.length + (p.archived ? " · Archived" : "")),
             h("span", { class: "meta-r" }, DROnb.byline(p.author), earned ? h("span", { class: "mini-badge", title: "Completed", html: DROnb.badgeSvg() }) : null)),
           h("h2", null, p.title),
           p.blurb ? h("p", null, p.blurb) : null,

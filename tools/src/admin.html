@@ -130,6 +130,7 @@ label.check > span{display:grid;gap:2px}
 .callout{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:10px 12px;margin:12px 0;font-size:15px}
 .callout .sp{flex:1 1 auto}
 .pill.gen{background:var(--blue);border-color:var(--blue);color:#0B0B0B}
+.pill.arc{background:var(--panel);color:var(--muted)}
 .pill.fail{background:#FFD3D3;border-color:#FFD3D3;color:#0B0B0B}
 .form .field input,.form .field textarea,.form .field select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;width:100%;min-width:0}
 .form .field textarea{min-height:84px;resize:vertical}
@@ -619,11 +620,22 @@ label.check > span{display:grid;gap:2px}
       var tb = h("tbody");
       d.paths.forEach(function (p) {
         var st = { published: h("span", { class: "pill pub" }, "Published"), generating: h("span", { class: "pill gen" }, "Generating…"),
-          failed: h("span", { class: "pill fail" }, "Failed") }[p.status] || h("span", { class: "pill dr" }, "Draft");
+          failed: h("span", { class: "pill fail" }, "Failed"), archived: h("span", { class: "pill arc" }, "Archived") }[p.status] || h("span", { class: "pill dr" }, "Draft");
         var edit = p.custom ? h("a", { class: "btn ghost", href: ROOT + p.id + "/" + (p.status === "published" ? "#edit" : "") }, p.status === "published" ? "Edit" : "Open draft")
           : h("a", { class: "btn ghost", href: ROOT + p.id + "/#edit" }, "Edit");
         var note = p.unpublished ? h("div", { class: "small" }, "Unpublished changes") : null;
         if (p.status === "generating") { edit = null; note = h("div", { class: "small" }, "Started " + fmtWhen(p.createdAt) + ". You can leave this page."); }
+        // Published app-made paths can be archived (hidden from the hub, no new enrollments, read-only for enrolled
+        // learners) and restored again; built-in paths can't.
+        function lifecycle(action, question) {
+          return btn(action === "archive" ? "Archive" : "Restore", false, function () {
+            if (!confirm(question)) return;
+            api("api/admin/paths/" + p.id + "/" + action, { method: "POST" }).then(function () { loadContent(); loadDashboard(); loadTeam(); }, function (e) { alert(e.message); });
+          });
+        }
+        if (p.custom && p.status === "published") edit = h("span", { class: "row" }, edit, lifecycle("archive",
+          "Archive " + p.title + "? It disappears from the hub and takes no new enrollments. Learners already enrolled can still open it and see their progress, but can't tick steps. You can restore it any time."));
+        if (p.status === "archived") { edit = lifecycle("restore", "Restore " + p.title + "? It's published again, back on the hub, and enrolled learners can tick steps again."); note = h("div", { class: "small" }, "Archived. Restore it to edit."); }
         if (p.status === "failed") {
           note = h("div", { class: "small err" }, p.error || "Generating the draft failed.");
           var again = p.wizard ? btn("Try again", false, function () { startWizard({ settings: p.wizard.settings, links: p.wizard.links, uploads: p.wizard.uploads, retryOf: p.id }); }) : null;
@@ -634,7 +646,7 @@ label.check > span{display:grid;gap:2px}
           edit = h("span", { class: "row" }, again, del);
         }
         tb.appendChild(h("tr", null, h("td", null, p.status === "generating" || p.status === "failed" ? h("span", null, p.title) : h("a", { href: ROOT + p.id + "/", style: "color:var(--ink)" }, p.title), note),
-          h("td", null, st), h("td", { style: "font-variant-numeric:tabular-nums" }, String(p.steps)), h("td", { style: "font-variant-numeric:tabular-nums" }, p.status === "published" ? String(p.enrolled) : "–"),
+          h("td", null, st), h("td", { style: "font-variant-numeric:tabular-nums" }, String(p.steps)), h("td", { style: "font-variant-numeric:tabular-nums" }, p.status === "published" || p.status === "archived" ? String(p.enrolled) : "–"),
           h("td", { class: "small" }, p.custom ? (p.owners || []).join(", ") : "Built in"), h("td", null, edit)));
       });
       out.appendChild(h("div", { class: "tbl plist" }, h("table", null, h("thead", null, h("tr", null, ["Path", "Status", "Steps", "Enrolled", "Owners", ""].map(function (t) { return h("th", null, t); }))), tb)));
