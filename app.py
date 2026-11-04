@@ -1613,6 +1613,9 @@ async def api_put_progress(path_id: str, request: Request) -> dict:
     state = (await json_body(request)).get("state")
     if not isinstance(state, dict) or not isinstance(state.get("done", {}), dict):
         raise HTTPException(status_code=400, detail="state.done must be an object.")
+    checks = state.get("checks", {})  # checklist ticks inside steps: {step id: {item index: timestamp}}
+    if not isinstance(checks, dict) or not all(isinstance(v, dict) for v in checks.values()):
+        raise HTTPException(status_code=400, detail="state.checks must be an object of objects.")
     old = store.get(me["id"])
     old_view = learner_path_view(old, path_id)
     before, stage_before = old_view["badge"]["earned"], old_view["mascot"]
