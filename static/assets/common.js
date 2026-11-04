@@ -66,6 +66,10 @@
       setTimeout(function () { inp.focus(); }, 0);
       return;
     }
+    if (!status.enrolled && status.archived) {
+      paceEl.appendChild(h("span", null, "This path is archived: new enrollments are closed."));
+      return;
+    }
     if (!status.enrolled) {
       var eb = h("button", { type: "button", class: "btn primary", style: "padding:5px 14px" }, "Enroll in this path");
       eb.addEventListener("click", function () { ensureEnrolled(); });
@@ -79,7 +83,7 @@
     paceEl.appendChild(chip);
     if (status.start) paceEl.appendChild(h("span", null, "Start date " + fmtDate(status.start) + (status.cohort ? " · " + status.cohort + " cohort" : "")));
     else paceEl.appendChild(h("span", null, "Your start date is set when you tick your first step."));
-    paceEl.appendChild(change);
+    if (!status.archived) paceEl.appendChild(change);
     if (O && O.serverMode) {
       var leave = h("button", { type: "button", class: "onb-linkbtn" }, "Leave this path");
       leave.addEventListener("click", confirmLeave);

@@ -261,9 +261,10 @@ def activate_content() -> None:
     }
     new["ai-engineer"].content = ai_content
     for pid, doc in sorted(CUSTOM.items(), key=lambda kv: kv[1].get("publishedAt") or 0):
-        if doc.get("status") == "published" and doc.get("live"):
+        if doc.get("status") in ("published", "archived") and doc.get("live"):
             try:
                 new[pid] = cp.model(doc, doc["live"], custom_page(doc, doc["live"]))
+                new[pid].archived = doc["status"] == "archived"  # enrolled learners keep it, read-only
             except Exception:
                 log.exception("Couldn't load path %s", pid)
     with _paths_lock:
@@ -355,6 +356,7 @@ def learner_path_view(record: dict | None, pid: str) -> dict:
         "skill": p.skill,
         "skillEnabled": getattr(p, "skill_enabled", True),
         "custom": getattr(p, "custom", False),
+        "archived": getattr(p, "archived", False),
         "enrolled": enrolled,
         "start": start,
         "cohort": cohort_of(start),
@@ -520,7 +522,8 @@ def api_summary(request: Request) -> dict:
     rec = store.get(me["id"])
     out = {
         "me": me,
-        "paths": [{"id": pid, "title": p.title, "skill": p.skill, "blurb": p.blurb, "length": p.length, **learner_path_view(rec, pid)} for pid, p in PATHS.items()],
+        "paths": [{"id": pid, "title": p.title, "skill": p.skill, "blurb": p.blurb, "length": p.length, **learner_path_view(rec, pid)}
+                  for pid, p in PATHS.items() if not getattr(p, "archived", False) or is_enrolled(rec, pid)],
     }
     if me["canAdmin"]:
         out["openReports"] = sum(1 for r in visible_reports(me) if r.get("status") == "open")
@@ -582,7 +585,8 @@ def api_team_summary(request: Request) -> dict:
             for rec in store.all().values() for pid in pids
             for e in [((rec.get("enrolled") or {}).get(pid))] if isinstance(e, dict) and e.get("left")]
     left.sort(key=lambda x: x["at"] or 0, reverse=True)
-    return {"paths": [{"id": pid, "title": PATHS[pid].title, "unit": PATHS[pid].unit_name} for pid in pids],
+    return {"paths": [{"id": pid, "title": PATHS[pid].title, "unit": PATHS[pid].unit_name,
+                       "archived": getattr(PATHS[pid], "archived", False)} for pid in pids],
             "learners": rows, "cohorts": cohorts, "inactiveAfterDays": INACTIVE_DAYS, "left": left}
 
 
@@ -811,7 +815,7 @@ def week_start(d: dt.date) -> dt.date:
 def api_dashboard(request: Request, weeks: int = 12) -> dict:
     me = identify(request)
     require_admin_page(me)
-    pids = managed_paths(me)
+    pids = [pid for pid in managed_paths(me) if not getattr(PATHS[pid], "archived", False)]
     weeks = max(4, min(weeks, 52))
     now = now_ms()
     this_week = week_start(today())
@@ -1228,6 +1232,8 @@ def path_doc(pid: str, editable: bool = False) -> dict:
         raise HTTPException(status_code=404, detail="No such path.")
     if editable and doc.get("status") == "generating":
         raise HTTPException(status_code=409, detail="This draft is still being generated. Try again when it's ready.")
+    if editable and doc.get("status") == "archived":
+        raise HTTPException(status_code=409, detail="This path is archived. Restore it before editing.")
     if editable and doc.get("status") == "failed":
         raise HTTPException(status_code=409, detail="Generating this draft failed. Try again from Admin → Content, or delete it.")
     return doc
@@ -1475,13 +1481,39 @@ def api_path_publish(pid: str, request: Request) -> dict:
     return {"ok": True, "url": f"{pid}/", "learnersAffected": ticks_on(set(removed), pid) if removed else 0}
 
 
+@app.post("/api/admin/paths/{pid}/archive")
+def api_path_archive(pid: str, request: Request) -> dict:
+    """Published -> archived: hidden from the hub, no new enrollments, read-only for enrolled learners."""
+    return set_archived(pid, request, True)
+
+
+@app.post("/api/admin/paths/{pid}/restore")
+def api_path_restore(pid: str, request: Request) -> dict:
+    """Archived -> published again, with the same content."""
+    return set_archived(pid, request, False)
+
+
+def set_archived(pid: str, request: Request, archived: bool) -> dict:
+    me = identify(request)
+    require_manage(me, pid)
+    doc = path_doc(pid)
+    want_from = "published" if archived else "archived"
+    if doc.get("status") != want_from:
+        raise HTTPException(status_code=400, detail="Only a published path can be archived." if archived else "Only an archived path can be restored.")
+    doc["status"] = "archived" if archived else "published"
+    doc["archivedAt"], doc["archivedBy"] = (now_ms(), me["name"]) if archived else (None, None)
+    save_path(doc)
+    activate_content()
+    return {"ok": True, "status": doc["status"]}
+
+
 @app.delete("/api/admin/paths/{pid}")
 def api_path_delete(pid: str, request: Request) -> dict:
     me = identify(request)
     require_manage(me, pid)
     doc = path_doc(pid)
-    if doc.get("status") == "published":
-        raise HTTPException(status_code=400, detail="A published path can't be deleted.")
+    if doc.get("status") in ("published", "archived"):
+        raise HTTPException(status_code=400, detail="A published or archived path can't be deleted. Archive it instead.")
     docs.delete(f"path-{pid}")
     CUSTOM.pop(pid, None)
     return {"ok": True}
@@ -1575,6 +1607,8 @@ def api_get_progress(path_id: str, request: Request) -> dict:
 @app.put("/{path_id}/api/progress")
 async def api_put_progress(path_id: str, request: Request) -> dict:
     require_path(path_id)
+    if getattr(PATHS[path_id], "archived", False):
+        raise HTTPException(status_code=409, detail="This path is archived: progress can't be changed.")
     me = identify(request)
     state = (await json_body(request)).get("state")
     if not isinstance(state, dict) or not isinstance(state.get("done", {}), dict):
@@ -1609,7 +1643,7 @@ async def api_put_progress(path_id: str, request: Request) -> dict:
 
 
 def status_payload(view: dict) -> dict:
-    return {k: view[k] for k in ("skill", "skillEnabled", "enrolled", "start", "cohort", "pace", "badge", "mascot", "done", "total", "requiredDone", "requiredTotal",
+    return {k: view[k] for k in ("skill", "skillEnabled", "archived", "enrolled", "start", "cohort", "pace", "badge", "mascot", "done", "total", "requiredDone", "requiredTotal",
                                  "length", "author")}
 
 
@@ -1666,6 +1700,8 @@ async def api_enroll(path_id: str, request: Request) -> dict:
         require_manage(me, path_id)
         rec = store.update(key, lambda r: r.setdefault("enrolled", {}).__setitem__(path_id, {"removed": True, "at": now_ms(), "by": me["name"]}))
         return {"ok": True, "status": status_payload(learner_path_view(rec, path_id))}
+    if getattr(PATHS[path_id], "archived", False):
+        raise HTTPException(status_code=409, detail="This path is archived: new enrollments are closed.")
     try:
         date = dt.date.fromisoformat(str(data.get("date") or today().isoformat())).isoformat()
     except ValueError:
