@@ -214,8 +214,11 @@ initials show instead.
   leaves that status alone.
 - **Content:** every path you manage, built-in and app-made, in one list (status, steps, enrolled, owners) with
   **Edit**, **Archive** / **Restore** for app-made paths, and **+ Create learning path**.
-- **Users** (admins): invite people and assign roles (above).
+- **Users** (admins): invite people and assign roles (above). A search box finds people by name or email, and a
+  dropdown shows everyone, admins, authors or people without a role.
 - Authors and owners see the same tabs (except Users), limited to the paths they own.
+- A path opened from any Admin tab has a back link to that tab (for example **← Admin · Problem reports**), also on
+  the built-in paths. Edit mode still links back to Content.
 - **Slack (optional):** every report as it arrives, and every Monday from 09:00 Dublin time a summary of inactive
   learners, completions in the last week and open reports.
 
