@@ -339,6 +339,8 @@ td.tickcell .tick{display:inline-grid;vertical-align:middle;margin-right:8px}
 .fork b{font-weight:400;font-size:19px}
 .fork span{color:var(--muted);font-size:15px}
 .form{max-width:860px;display:grid;gap:14px}
+.usearch,.ufilter{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;min-width:0}
+.usearch{flex:0 1 240px}
 .leftlist{margin-top:22px;display:grid;gap:6px}
 .leftlist ul{margin:0;padding-left:18px;display:grid;gap:3px;font-size:15px}
 .wsteps{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
@@ -1158,7 +1160,7 @@ label.check > span{display:grid;gap:2px}
   /* ---------------------------------------------------------------- admin: users */
   var TIP = { admin: "Sees and manages every path, the dashboard and problem reports, and invites people.",
     author: "Creates learning paths and owns what they create. Sees only those paths' progress, problem reports and content." };
-  var usersData = null, uFilter = "all", justInvited = null, editing = null;
+  var usersData = null, uFilter = "all", uSearch = "", justInvited = null, editing = null;
   function roleChip(r, locked) { return h("span", { class: "onb-chip tip" + (locked ? " locked" : ""), tabindex: "0", "data-tip": TIP[r] }, r === "admin" ? "Admin" : "Author"); }
   function renderUsers() {
     var out = $("#users-out"); out.textContent = "";
@@ -1180,12 +1182,27 @@ label.check > span{display:grid;gap:2px}
     var U = usersData.users;
     var n = { all: U.length, admin: 0, author: 0, none: 0 };
     U.forEach(function (u) { if (u.roles.indexOf("admin") >= 0) n.admin++; if (u.roles.indexOf("author") >= 0) n.author++; if (!u.roles.length) n.none++; });
-    var filt = seg([["all", "All"], ["admin", "Admins " + n.admin], ["author", "Authors " + n.author], ["none", "No role " + n.none]], uFilter, function (v) { uFilter = v; renderUsers(); });
-    var table = h("div", { class: "ptable" }, h("div", { class: "pgh" }, h("h3", null, "Users"), h("span", { class: "small" }, String(U.length)), h("span", { class: "sp" }), filt),
-      h("div", { class: "prow phead" }, h("span", null, "User"), h("span", null, "Roles"), h("span", null, "Owns"), h("span", null, "Added"), h("span")));
-    var list = U.filter(function (u) { return uFilter === "all" || (uFilter === "none" ? !u.roles.length : u.roles.indexOf(uFilter) >= 0); });
-    list.sort(function (x, y) { return (y.email === justInvited) - (x.email === justInvited) || (y.system - x.system) || x.name.localeCompare(y.name); });
-    list.forEach(function (u) { table.appendChild(u.email === justInvited || u.email === editing ? pickRow(u) : userRow(u)); });
+    var filt = h("select", { "aria-label": "Show users with this role", class: "ufilter" },
+      [["all", "All (" + n.all + ")"], ["admin", "Admins (" + n.admin + ")"], ["author", "Authors (" + n.author + ")"], ["none", "No role (" + n.none + ")"]]
+        .map(function (o) { return h("option", { value: o[0], selected: o[0] === uFilter }, o[1]); }));
+    var search = h("input", { type: "search", class: "usearch", placeholder: "Search name or email", "aria-label": "Search users", value: uSearch });
+    var rows = h("div");
+    var table = h("div", { class: "ptable" }, h("div", { class: "pgh" }, h("h3", null, "Users"), h("span", { class: "small" }, String(U.length)), h("span", { class: "sp" }), search, filt),
+      h("div", { class: "prow phead" }, h("span", null, "User"), h("span", null, "Roles"), h("span", null, "Owns"), h("span", null, "Added"), h("span")), rows);
+    function drawRows() {
+      rows.textContent = "";
+      var q = uSearch.trim().toLowerCase();
+      var list = U.filter(function (u) {
+        return (uFilter === "all" || (uFilter === "none" ? !u.roles.length : u.roles.indexOf(uFilter) >= 0)) &&
+          (!q || (u.name || "").toLowerCase().indexOf(q) >= 0 || u.email.toLowerCase().indexOf(q) >= 0);
+      });
+      list.sort(function (x, y) { return (y.email === justInvited) - (x.email === justInvited) || (y.system - x.system) || x.name.localeCompare(y.name); });
+      list.forEach(function (u) { rows.appendChild(u.email === justInvited || u.email === editing ? pickRow(u) : userRow(u)); });
+      if (!list.length) rows.appendChild(h("div", { class: "empty" }, "No users match."));
+    }
+    filt.addEventListener("change", function () { uFilter = filt.value; drawRows(); });
+    search.addEventListener("input", function () { uSearch = search.value; drawRows(); });
+    drawRows();
     out.appendChild(table);
     out.appendChild(h("p", { class: "small" }, "Removing someone keeps their paths. An admin can give each path a new owner. System admins (set in the app's runtime parameters) can't lose the Admin role here, so nobody gets locked out."));
   }
@@ -1257,6 +1274,18 @@ label.check > span{display:grid;gap:2px}
     ta.focus();
   }
   function loadUsers() { return api("api/admin/users").then(function (j) { usersData = j; renderUsers(); }, function (e) { $("#users-out").textContent = e.message; }); }
+
+  /* ---------------------------------------------------------------- back from a path */
+  // Links from any tab to a path page: remember the tab, so the path's back link returns here (see common.js).
+  var TAB_NAMES = { dashboard: "Dashboard", team: "Team progress", reports: "Problem reports", content: "Content", users: "Users" };
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a[href]");
+    if (!a) return;
+    var u = new URL(a.href, location.href), here = new URL(ROOT, location.href);
+    if (u.origin !== location.origin || u.pathname.indexOf(here.pathname) !== 0 || /\/(admin|api|assets|verify)\//.test(u.pathname + "/")) return;
+    var tab = (location.hash.slice(1) || "dashboard").split(/[/?]/)[0];
+    try { sessionStorage.setItem("onb.from", JSON.stringify({ href: location.href.split("#")[0] + "#" + tab, label: TAB_NAMES[tab] || "Admin", at: Date.now() })); } catch (err) { /* storage blocked */ }
+  }, true);
 
   /* ---------------------------------------------------------------- boot */
   var ME = null;

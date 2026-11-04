@@ -715,12 +715,36 @@
     openDataRobot(a.href);
   }, true);
 
+  /* ---------------------------------------------------------------- back link */
+  // A path opened from an Admin tab links back to that tab. The Admin page records it in sessionStorage; it's used
+  // only when this page was reached from the Admin page (or reloaded), and only for a few hours.
+  var FROM = (function () {
+    try {
+      var f = JSON.parse(sessionStorage.getItem("onb.from") || "null");
+      var ref = document.referrer || "";
+      var fromAdmin = f && ref && (ref.split("#")[0] === f.href.split("#")[0] || ref.split("#")[0] === location.href.split("#")[0]);
+      return fromAdmin && Date.now() - f.at < 6 * 3600 * 1000 ? f : null;
+    } catch (e) { return null; }
+  })();
+  function backLink(root) {
+    return FROM ? { href: FROM.href, text: "\u2190 Admin \u00b7 " + FROM.label } : { href: root, text: "\u2190 All learning paths" };
+  }
+  function applyBack(root) {
+    var back = document.querySelector(".backlink"), b = backLink(root);
+    if (back) { back.href = b.href; back.textContent = b.text; }
+  }
+  if (FROM) document.addEventListener("DOMContentLoaded", function () {
+    var back = document.querySelector(".backlink");
+    if (back && !document.body.classList.contains("onb-editing")) applyBack(back.getAttribute("href"));
+  });
+
   /* ---------------------------------------------------------------- built-in paths: edit mode */
   // While the AI Engineer or Agentic path is in edit mode the back link returns to Admin -> Content, and when the
   // path has saved edits (an in-app edit or an old upload) admins can make the deployed files live again.
   function builtinEditing(on, root, pathId) {
     var back = document.querySelector(".backlink");
-    if (back) { back.href = on ? root + "admin/#content" : root; back.textContent = on ? "\u2190 Content" : "\u2190 All learning paths"; }
+    if (back && on) { back.href = root + "admin/#content"; back.textContent = "\u2190 Content"; }
+    else applyBack(root);
     var old = document.getElementById("ed-revert");
     if (old) old.remove();
     if (!on) return;
@@ -744,6 +768,7 @@
 
   window.DROnb = {
     builtinEditing: builtinEditing,
+    backLink: backLink,
     watchDrafts: watchDrafts,
     addGenerating: function (uid, id) { var ids = draftsOf(uid); if (ids.indexOf(id) < 0) ids.push(id); setDrafts(uid, ids); },
     toast: toast,
