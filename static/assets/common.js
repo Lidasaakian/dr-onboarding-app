@@ -48,6 +48,7 @@
   var paceEl, editing = false;
   function renderPace() {
     if (!paceEl) return;
+    setTimeout(placePanel, 0);  // the pace line can change the header's height
     paceEl.textContent = "";
     if (!status) return;
     var p = status.pace || {};
@@ -723,12 +724,17 @@
   }
 
   /* ---------------------------------------------------------------- DataRobot beside the path */
-  // "Open DataRobot" opens one window, named so the browser reuses it, placed beside the path where the browser
-  // allows. Links in steps to the DataRobot site open in that same window. The site is the one the app runs on
-  // (a DataRobot custom application), or app.datarobot.com when it runs elsewhere.
-  var DR_SITE = /(^|\.)datarobot\.com$/.test(location.hostname) && !/^(docs|www)\./.test(location.hostname) ? location.origin : "https://app.datarobot.com";
-  var drWin = null;
-  function openDataRobot(url) {
+  // "Open DataRobot" shows DataRobot in a panel on the right of the path page, when the app is served from the
+  // DataRobot site itself (both send X-Frame-Options: SAMEORIGIN, so only the same site can frame it) and the window
+  // is wide enough. Otherwise it opens one named window beside the path. Links in steps to the DataRobot site go to
+  // the same place. localStorage "onb.drSite" overrides the site (to try the panel locally against the app itself).
+  var DR_SITE = (function () {
+    try { var o = localStorage.getItem("onb.drSite"); if (o) return o.replace(/\/$/, ""); } catch (e) { /* storage blocked */ }
+    return /(^|\.)datarobot\.com$/.test(location.hostname) && !/^(docs|www)\./.test(location.hostname) ? location.origin : "https://app.datarobot.com";
+  })();
+  var APP_PREFIX = (location.pathname.match(/^\/custom_applications\/[^/]+\//) || ["/"])[0];  // this app's own pages
+  var drWin = null, panelReady = false, panel = null, frame = null, drMsg = null, drBtn = null, loadTimer = null;
+  function openWindow(url) {
     var sw = screen.availWidth || 1440, shh = screen.availHeight || 900;
     var x = window.screenX || 0, w = window.outerWidth || sw;
     var width, left;
@@ -738,16 +744,133 @@
     drWin = window.open(url || DR_SITE + "/", "datarobot", features) || drWin;
     if (drWin) try { drWin.focus(); } catch (e) { /* another site: focus may be refused */ }
   }
+  function panelUsable() { return panelReady && DR_SITE === location.origin && window.innerWidth >= 900; }
+  function drState() { try { return JSON.parse(localStorage.getItem("onb.drPanel") || "{}") || {}; } catch (e) { return {}; } }
+  function saveDr(p) { try { localStorage.setItem("onb.drPanel", JSON.stringify(Object.assign(drState(), p))); } catch (e) { /* storage blocked */ } }
+  function onDrSite(u) { try { return new URL(u, location.href).origin === DR_SITE; } catch (e) { return false; } }
+  function setDrWidth(w) {
+    w = Math.max(360, Math.min(Math.round(window.innerWidth * 0.75), Math.round(w)));
+    document.documentElement.style.setProperty("--onb-dr-w", w + "px");
+    document.body.classList.toggle("onb-dr-narrow", window.innerWidth - w < 1000);  // section list goes above the steps
+    return w;
+  }
+  var ICON = {
+    panel: '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="3.5" width="15" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12.5 3.5v13M7 8l2 2-2 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    back: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H4m5-5-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    fwd: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    reload: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 10a5.5 5.5 0 1 1-1.6-3.9M15.5 3.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  function frameUrl() {
+    try { var u = frame.contentWindow.location.href; if (onDrSite(u)) return u; } catch (e) { /* not readable */ }
+    return drState().url || DR_SITE + "/";
+  }
+  function drFailed() {
+    drMsg.hidden = false;
+  }
+  function buildPanel() {
+    frame = h("iframe", { class: "onb-dr-frame", title: "DataRobot",
+      sandbox: "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads",
+      allow: "clipboard-read; clipboard-write" });
+    var pop = h("button", { type: "button", class: "onb-linkbtn" }, "Open in new window");
+    pop.addEventListener("click", function () { openWindow(frameUrl()); });
+    var popMsg = h("button", { type: "button", class: "btn primary" }, "Open DataRobot in a new window");
+    popMsg.addEventListener("click", function () { openWindow(frameUrl()); });
+    drMsg = h("div", { class: "onb-dr-msg", hidden: true }, h("b", null, "DataRobot didn't load here."), h("span", null, "It may not allow being shown inside another page."), popMsg);
+    function btn(label, icon, fn) { var b = h("button", { type: "button", class: "onb-dr-btn", title: label, "aria-label": label, html: icon }); b.addEventListener("click", fn); return b; }
+    function nav(fn) { return function () { try { fn(frame.contentWindow); } catch (e) { /* not readable */ } }; }
+    var handle = h("div", { class: "onb-dr-handle", role: "separator", "aria-orientation": "vertical", "aria-label": "Resize the DataRobot panel", tabindex: "0" });
+    handle.addEventListener("pointerdown", function (e) {
+      e.preventDefault(); handle.setPointerCapture(e.pointerId); frame.style.pointerEvents = "none";
+      function move(ev) { setDrWidth(window.innerWidth - ev.clientX); }
+      function up() { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up); frame.style.pointerEvents = "";
+        saveDr({ width: parseInt(getComputedStyle(document.documentElement).getPropertyValue("--onb-dr-w"), 10) }); }
+      handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up);
+    });
+    handle.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      var w = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--onb-dr-w"), 10) || 600;
+      saveDr({ width: setDrWidth(w + (e.key === "ArrowLeft" ? 40 : -40)) });
+    });
+    panel = h("aside", { class: "onb-dr", "aria-label": "DataRobot" }, handle,
+      h("div", { class: "onb-dr-bar" }, btn("Collapse DataRobot", ICON.panel, closePanel), h("span", { class: "onb-dr-sep" }),
+        btn("Back", ICON.back, nav(function (w) { w.history.back(); })), btn("Forward", ICON.fwd, nav(function (w) { w.history.forward(); })),
+        btn("Reload", ICON.reload, function () { try { frame.contentWindow.location.reload(); } catch (e) { frame.src = frameUrl(); } }),
+        h("span", { style: "flex:1" }), pop),
+      h("div", { class: "onb-dr-body" }, frame, drMsg));
+    frame.addEventListener("load", function () {
+      clearTimeout(loadTimer);
+      var href = "";
+      try { href = frame.contentWindow.location.href; } catch (e) { href = ""; }
+      if (!href || href === "about:blank") { drFailed(); return; }  // refused, or another site
+      drMsg.hidden = true;
+      if (onDrSite(href)) saveDr({ url: href });
+    });
+    document.body.appendChild(panel);
+    var hd = document.querySelector("header.top");
+    if (hd && window.ResizeObserver) new ResizeObserver(placePanel).observe(hd);
+  }
+  // The panel starts under the page header (and under the edit bar while editing), and rises to the top of the
+  // window once the header has scrolled away.
+  var lastTop = -1;
+  function placePanel() {
+    if (!panel || panel.hidden) return;
+    var top = 0, hd = document.querySelector("header.top"), bar = document.querySelector(".onb-editbar:not([hidden])");
+    if (hd) top = Math.max(top, hd.getBoundingClientRect().bottom);
+    if (bar) top = Math.max(top, bar.getBoundingClientRect().bottom);
+    top = Math.max(0, Math.round(top));
+    if (top !== lastTop) { lastTop = top; document.documentElement.style.setProperty("--onb-dr-top", top + "px"); }
+  }
+  window.addEventListener("scroll", placePanel, { passive: true });
+  window.addEventListener("load", placePanel);  // fonts and images can still change the header's height
+  function openPanel(url) {
+    if (!panel) buildPanel();
+    var st = drState();
+    setDrWidth(st.width || window.innerWidth * 0.45);
+    panel.hidden = false;
+    document.body.classList.add("onb-dr-open");
+    if (url || !frame.getAttribute("src")) {
+      drMsg.hidden = true;
+      frame.src = url || (st.url && onDrSite(st.url) ? st.url : DR_SITE + "/");
+      clearTimeout(loadTimer);
+      loadTimer = setTimeout(function () {
+        try { var d = frame.contentDocument; if (!d || !d.body || !d.body.childElementCount) drFailed(); } catch (e) { drFailed(); }
+      }, 15000);
+    }
+    saveDr({ open: true });
+    placePanel();
+    if (drBtn) drBtn.textContent = "Hide DataRobot";
+  }
+  function closePanel() {
+    document.body.classList.remove("onb-dr-open");
+    if (panel) panel.hidden = true;
+    saveDr({ open: false });
+    if (drBtn) drBtn.textContent = "Open DataRobot";
+  }
+  function openDataRobot(url) { if (panelUsable()) openPanel(url); else openWindow(url); }
+  function toggleDataRobot() {
+    if (panelUsable() && document.body.classList.contains("onb-dr-open")) closePanel();
+    else openDataRobot();
+  }
   function isDataRobotLink(a) {
-    try { var u = new URL(a.href, location.href); return (u.protocol === "https:" || u.protocol === "http:") && u.origin === DR_SITE && !/\/custom_applications\//.test(u.pathname); } catch (e) { return false; }
+    try {
+      var u = new URL(a.href, location.href);
+      if ((u.protocol !== "https:" && u.protocol !== "http:") || u.origin !== DR_SITE) return false;
+      return !(u.origin === location.origin && u.pathname.indexOf(APP_PREFIX) === 0);  // this app's own pages stay here
+    } catch (e) { return false; }
   }
   document.addEventListener("click", function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var a = e.target.closest && e.target.closest("a[href]");
-    if (!a || a.closest(".onb-editing [contenteditable]") || !isDataRobotLink(a)) return;
+    if (!a || a.closest(".onb-editing [contenteditable]") || a.closest(".onb-dr") || !isDataRobotLink(a)) return;
     e.preventDefault();
     openDataRobot(a.href);
   }, true);
+  window.addEventListener("resize", function () {
+    if (!panel || panel.hidden) return;
+    if (window.innerWidth < 900) { document.body.classList.remove("onb-dr-open"); panel.hidden = true; if (drBtn) drBtn.textContent = "Open DataRobot"; }
+    else { setDrWidth(drState().width || window.innerWidth * 0.45); placePanel(); }
+  });
 
   /* ---------------------------------------------------------------- back link */
   // A path opened from an Admin tab links back to that tab. The Admin page records it in sessionStorage; it's used
@@ -755,9 +878,14 @@
   var FROM = (function () {
     try {
       var f = JSON.parse(sessionStorage.getItem("onb.from") || "null");
-      var ref = document.referrer || "";
-      var fromAdmin = f && ref && (ref.split("#")[0] === f.href.split("#")[0] || ref.split("#")[0] === location.href.split("#")[0]);
-      return fromAdmin && Date.now() - f.at < 6 * 3600 * 1000 ? f : null;
+      if (!f || Date.now() - f.at > 6 * 3600 * 1000) return null;
+      var ref = (document.referrer || "").split("#")[0];
+      if (ref && ref === f.href.split("#")[0]) {  // just came from the Admin page: this page owns the entry now
+        f.page = location.pathname;
+        sessionStorage.setItem("onb.from", JSON.stringify(f));
+        return f;
+      }
+      return f.page === location.pathname && ref === location.href.split("#")[0] ? f : null;  // the same page, reloaded
     } catch (e) { return null; }
   })();
   function backLink(root) {
@@ -815,9 +943,11 @@
         var tools = h("div", { class: "onb-tools" });
         opts.toolsMount.appendChild(tools);
         buildSearch(tools);
-        var drb = h("button", { type: "button", class: "btn ghost", title: "Open DataRobot in a window beside this path" }, "Open DataRobot");
-        drb.addEventListener("click", function () { openDataRobot(); });
-        tools.appendChild(drb);
+        drBtn = h("button", { type: "button", class: "btn ghost", title: "Show DataRobot next to this path" }, "Open DataRobot");
+        drBtn.addEventListener("click", toggleDataRobot);
+        tools.appendChild(drBtn);
+        panelReady = true;
+        if (drState().open && panelUsable()) openPanel();  // it was open last time
         var rb = h("button", { type: "button", class: "btn ghost", html: FLAG.replace("viewBox", 'style="width:12px;height:12px" viewBox') + "<span>Report a problem</span>" });
         rb.addEventListener("click", function () { openReport(); });
         tools.appendChild(rb);
@@ -825,6 +955,7 @@
       (opts.rows ? opts.rows() : []).forEach(function (r) { r.mount.appendChild(reportButton(r)); });
       if (opts.server) { O.serverMode = true; api("status").then(function (j) {
         status = j; renderPace(); renderBadge(); renderMascot(false); renderAuthor();
+        placePanel();  // the header just grew
         if (location.hash === "#certificate" && status.badge && status.badge.earned) {  // "View certificate" on the dashboard
           history.replaceState(null, "", location.pathname);
           openCertificate();
