@@ -357,7 +357,8 @@ TEMPLATE_HEADERS = ["Group", "Group title", "Day", "Day title", "Step", "Details
 TEMPLATE_NOTE = ("One row per step. Group = the section's position (1, 2, 3…), counting every section. Day = the "
                  "second-level section inside it, such as the day or module (leave empty if the path has no second level). "
                  "Type = Required, Stretch or Optional. Gate = yes for a checkpoint that has to be passed. Group title and Day "
-                 "title only need to be on the first row of each section. On the Path sheet, Cadence is Calendar weeks, Working "
+                 "title only need to be on the first row of each section. Details can use \"- \" bullets, \"1. \" numbered lines, "
+                 "\"- [ ] \" checklists, **bold**, *italic* and [text](https://…) links. On the Path sheet, Cadence is Calendar weeks, Working "
                  "days or Self-paced; leave \"Second level is called\" empty for no second level; \"Unnumbered sections\" lists the "
                  "Group numbers of sections shown by their title instead of a number, such as a Before you start section.")
 CADENCE_NAMES = {"weeks": "Calendar weeks", "days": "Working days", "self": "Self-paced"}

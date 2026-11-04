@@ -31,7 +31,17 @@
 .item .ititle{font-size:18px;line-height:1.3}
 .item .ititle a{color:inherit;text-decoration-color:var(--link)}
 .item .ititle a:hover{color:var(--link)}
-.item .dt{font-size:15px;max-width:72ch;white-space:pre-line}
+.item .dt{font-size:15px;max-width:72ch}
+.item .dt.edblock-wrap{white-space:pre-line}
+.dt p{margin:0 0 6px}
+.dt ul,.dt ol{margin:0 0 6px;padding-left:22px;display:grid;gap:2px}
+.dt ul.checklist{list-style:none;padding-left:0}
+.dt ul.checklist label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.dt ul.checklist input{margin-top:4px}
+.dt ul.checklist input:checked + span{color:var(--muted);text-decoration:line-through}
+.fmtbar{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 4px}
+.fmtbar button{font:inherit;font-size:13px;line-height:1;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:4px 8px;cursor:pointer}
+.fmtbar button:hover{border-color:var(--ink)}
 .item .src{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--panel);border-radius:3px;padding:2px 6px;justify-self:start}
 .tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);white-space:nowrap}
 .tag.req{border-color:var(--ink);color:var(--ink)}
@@ -77,6 +87,7 @@
 </style>
 <link rel="stylesheet" href="../assets/common.css">
 <script src="../assets/common.js"></script>
+<script src="../assets/format.js"></script>
 </head>
 <body>
 <div class="onb-editbar" id="editbar" hidden>
@@ -166,16 +177,47 @@
     el.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
   }
   function a(url, label) { return h("a", { href: url, target: "_blank", rel: "noopener" }, label || url); }
-  function rich(s) {
+  // Step details: DRFormat (assets/format.js) parses the text; this turns the tree into DOM nodes, never HTML.
+  function inlineNodes(nodes) {
     var frag = document.createDocumentFragment();
-    if (!s) return frag;
-    String(s).split(/(`[^`]+`)/).forEach(function (part) {
-      if (/^`[^`]+`$/.test(part)) { frag.appendChild(h("code", null, part.slice(1, -1))); return; }
-      part.split(/(https?:\/\/[^\s)]+[^\s).,;:])/).forEach(function (p) {
-        if (/^https?:\/\//.test(p)) frag.appendChild(a(p)); else if (p) frag.appendChild(document.createTextNode(p));
-      });
+    nodes.forEach(function (n) {
+      if (n.t === "text") frag.appendChild(document.createTextNode(n.v));
+      else if (n.t === "code") frag.appendChild(h("code", null, n.v));
+      else if (n.t === "a") frag.appendChild(h("a", { href: n.href, target: "_blank", rel: "noopener" }, inlineNodes(n.c)));
+      else frag.appendChild(h(n.t === "b" ? "strong" : "em", null, inlineNodes(n.c)));
     });
     return frag;
+  }
+  function rich(s, stepId) {
+    var frag = document.createDocumentFragment();
+    DRFormat.parse(s).forEach(function (bl) {
+      if (bl.type === "p") {
+        var p = h("p");
+        bl.lines.forEach(function (ln, i) { if (i) p.appendChild(h("br")); p.appendChild(inlineNodes(ln)); });
+        frag.appendChild(p);
+      } else if (bl.type === "check") {
+        frag.appendChild(h("ul", { class: "checklist" }, bl.items.map(function (it) { return h("li", null, checkItem(stepId, it)); })));
+      } else {
+        frag.appendChild(h(bl.type, null, bl.items.map(function (it) { return h("li", null, inlineNodes(it)); })));
+      }
+    });
+    return frag;
+  }
+  // A checklist item's tick is kept per learner in S.checks[step id][item index]; it never counts toward progress.
+  function checkItem(stepId, it) {
+    var saved = stepId && S.checks && S.checks[stepId] && S.checks[stepId][it.index];
+    var on = stepId ? !!saved : it.checked;
+    var cb = h("input", { type: "checkbox", checked: on || null, disabled: !stepId || EDIT || PREVIEW || !LIVE || ARCHIVED ? true : null });
+    cb.addEventListener("change", function () {
+      if (cb.checked && window.DROnb && !DROnb.isEnrolled()) { cb.checked = false; DROnb.ensureEnrolled(); return; }
+      S.checks = S.checks || {};
+      var m = S.checks[stepId] = S.checks[stepId] || {};
+      if (cb.checked) m[it.index] = Date.now(); else delete m[it.index];
+      if (!Object.keys(m).length) delete S.checks[stepId];
+      if (!store) earlyEdits = true;
+      save();
+    });
+    return h("label", null, cb, h("span", null, inlineNodes(it.content)));
   }
   function api(path, opts) {
     return fetch(path, opts).then(function (r) {
@@ -227,6 +269,56 @@
     return sp;
   }
 
+  // A step's details in edit mode, with buttons that add the formatting syntax (assets/format.js) to the selection.
+  function detailsEditor(st) {
+    var sp = E(st, "details", { block: true, ph: "Details: how to do it and how you know it's done" });
+    function sel() {  // the selection as offsets in the field's text (the end of the text when nothing is selected)
+      var t = sp.textContent, s = window.getSelection(), start = t.length, end = t.length;
+      if (s.rangeCount && sp.contains(s.anchorNode)) {
+        var r = s.getRangeAt(0), pre = r.cloneRange();
+        pre.selectNodeContents(sp); pre.setEnd(r.startContainer, r.startOffset);
+        start = pre.toString().length; end = start + r.toString().length;
+      }
+      return { t: t, start: start, end: end };
+    }
+    function put(text, caret) {
+      snapshot(); st.details = text; sp.textContent = text; changed(false);
+      sp.focus();
+      var n = sp.firstChild;
+      if (n) { var r = document.createRange(); r.setStart(n, Math.min(caret, text.length)); r.collapse(true); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+    }
+    function lines(prefix) {  // turn the selected lines (or the cursor's line) into list items
+      var x = sel(), a = x.t.lastIndexOf("\n", x.start - 1) + 1, b = x.t.indexOf("\n", x.end);
+      if (b < 0) b = x.t.length;
+      var block = x.t.slice(a, b).split("\n").map(function (ln, i) { return prefix(ln.replace(/^\s*(?:[-*]\s+\[[ xX]\]\s+|[-*]\s+|\d{1,3}[.)]\s+)/, ""), i); }).join("\n");
+      put(x.t.slice(0, a) + block + x.t.slice(b), a + block.length);
+    }
+    function wrap(l, r, ph) {
+      var x = sel(), inner = x.t.slice(x.start, x.end) || ph;
+      put(x.t.slice(0, x.start) + l + inner + r + x.t.slice(x.end), x.start + l.length + inner.length + r.length);
+    }
+    function link() {
+      var x = sel(), url = (prompt("Link address (https://…)") || "").trim();
+      if (!url) return;
+      if (!/^https?:\/\/\S+$/i.test(url)) { alert("Use a web address that starts with https://"); return; }
+      var md = "[" + (x.t.slice(x.start, x.end) || "link text") + "](" + url + ")";
+      put(x.t.slice(0, x.start) + md + x.t.slice(x.end), x.start + md.length);
+    }
+    var bar = h("div", { class: "fmtbar", role: "toolbar", "aria-label": "Formatting" });
+    [["• List", "Bulleted list", function () { lines(function (l) { return "- " + l; }); }],
+     ["1. List", "Numbered list", function () { lines(function (l, i) { return (i + 1) + ". " + l; }); }],
+     ["☐ Checklist", "Checklist", function () { lines(function (l) { return "- [ ] " + l; }); }],
+     ["B", "Bold", function () { wrap("**", "**", "bold text"); }],
+     ["I", "Italic", function () { wrap("*", "*", "italic text"); }],
+     ["Link", "Link", link]].forEach(function (b) {
+      var btn = h("button", { type: "button", title: b[1], "aria-label": b[1], style: b[0] === "B" ? "font-weight:700" : b[0] === "I" ? "font-style:italic" : null }, b[0]);
+      btn.addEventListener("mousedown", function (e) { e.preventDefault(); });  // keep the selection in the field
+      btn.addEventListener("click", b[2]);
+      bar.appendChild(btn);
+    });
+    return [bar, sp];
+  }
+
   /* ---------------------------------------------------------------- checkboxes */
   function tick(it) {
     var cb = h("input", { type: "checkbox", class: "tick", "aria-label": "Done: " + it.st.title.slice(0, 90), disabled: EDIT || PREVIEW || !LIVE || ARCHIVED ? true : null });
@@ -261,11 +353,11 @@
     var body = h("div", { class: "ib" },
       h("div", { class: "ihead" }, tags),
       h("p", { class: "ititle" }, title),
-      EDIT ? h("p", { class: "dt" }, E(st, "details", { block: true, ph: "Details: how to do it and how you know it's done" })) : st.details ? h("p", { class: "dt" }, rich(st.details)) : null,
+      EDIT ? h("div", { class: "dt edblock-wrap" }, detailsEditor(st)) : st.details ? h("div", { class: "dt" }, rich(st.details, st.id)) : null,
       EDIT ? stepTools(it) : null,
       EDIT && st.source ? h("span", { class: "src" }, "From: " + st.source) : null,
       !EDIT && window.DROnb ? h("div", { class: "onb-rowtools" }, DROnb.starButton(it.id, st.title),
-        DROnb.reportButton({ itemId: it.id, label: where(it) + ": " + st.title, anchor: "s-" + it.id, text: st.title + "\n" + (st.details || "") })) : null);
+        DROnb.reportButton({ itemId: it.id, label: where(it) + ": " + st.title, anchor: "s-" + it.id, text: st.title + "\n" + DRFormat.plain(st.details || "") })) : null);
     return h("div", { class: "item" + (st.gate ? " gate" : "") + (EDIT ? " editing" : ""), id: "s-" + it.id, "data-id": it.id }, tick(it), body);
   }
   function stepTools(it) {
@@ -747,7 +839,7 @@
 
   /* ---------------------------------------------------------------- search and report context */
   function searchEntries() {
-    return items.map(function (it) { return { title: it.st.title, text: [it.st.details, it.st.type].join(" "), where: where(it), go: function () { goTo(it); } }; });
+    return items.map(function (it) { return { title: it.st.title, text: [DRFormat.plain(it.st.details || ""), it.st.type].join(" "), where: where(it), go: function () { goTo(it); } }; });
   }
   function reportContext() { var p = pages[current]; return { label: p ? (/^g\d+$/.test(current) ? gLabel(+current.slice(1)) + ": " : "") + p.dataset.title : "", anchor: current || "" }; }
 

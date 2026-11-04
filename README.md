@@ -138,7 +138,12 @@ creating** after a refresh. Uploaded files are kept for 3 hours; after that, the
 - **Skill growth:** "Add now" with a skill name, or "Decide later" and turn it on in Settings any time. Progress is
   tracked from the start, so the right stage shows straight away.
 - **Editing a draft:** click any text; each step has Day (or your second-level name), Type, Gate and Link controls, move up and down, delete;
-  add steps and sections; a section's menu can remove its number. **Ask the LLM to change the draft** works on the whole path, or on one group, day or step
+  add steps and sections; a section's menu can remove its number.
+- **Formatting step details:** the buttons above a step's details add bullet lists, numbered lists, checklists,
+  **bold**, *italic* and links. They write a small syntax you can also type, or use in the .xlsx and in notes for the
+  LLM: lines starting `- `, `1. ` or `- [ ] `, `**bold**`, `*italic*`, `[text](https://…)` and `` `code` ``. Learners
+  can tick checklist items; those ticks are saved with their progress but don't count toward progress or badges
+  (only the step's own tick does). HTML is never run; only https links become links. **Ask the LLM to change the draft** works on the whole path, or on one group, day or step
   (the ✦ buttons). It shows the suggested changes; **Apply** or **Discard**. **Undo** covers both kinds of edit.
   **Preview as learner**, **Download as .xlsx**, **Settings** (name, who it's for, length, cadence, level names, skill
   growth, owners; delete a draft) and **Publish**. A published path is edited the same way: learners keep seeing the

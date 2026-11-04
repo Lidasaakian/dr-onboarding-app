@@ -109,7 +109,9 @@ Rules:
   parameters, limits or URLs. If the sources don't say how to do something, leave it out.
 - Every step is one concrete thing the learner does (read, watch, try, build, check), 15-45 minutes.
   "title": a short imperative sentence (max 140 characters). "details": how to do it and how they know it's done,
-  with the exact names from the sources (2-5 sentences, plain text; "- " bullets allowed).
+  with the exact names from the sources (2-5 sentences). Formatting you may use in "details": "- " bullet lines,
+  "1. " numbered lines, "- [ ] " checklist lines for things to set up or check, **bold**, *italic*, `code` for
+  commands and names, and [text](https://…) links whose address appears in the sources. No HTML.
 - Prefer hands-on labs in the product over reading. Add a few "Check yourself:" questions.
 - "type": "Required" for the core, "Stretch" for deeper material, "Optional" for nice-to-have extras.
 - "gate": true only for checkpoints the learner must pass (for example the end of a week); at most one per group.
@@ -294,8 +296,10 @@ def check_links(urls: list[str]) -> list[str]:
 SYSTEM_EDIT = """You edit an onboarding learning path for DataRobot employees, following the author's instruction exactly.
 Keep everything the instruction doesn't ask you to change exactly as it is, including ids. Give new items the id "new".
 Keep the step style: "title" a short imperative sentence, "details" how to do it and how they know it's done, "type"
-Required/Stretch/Optional, "gate" true only for must-pass checkpoints, "link" {"url", "label"} or null. Don't invent product
-facts or URLs that aren't already in the path or in the instruction. Plain American English."""
+Required/Stretch/Optional, "gate" true only for must-pass checkpoints, "link" {"url", "label"} or null. In "details" you may
+use "- " bullets, "1. " numbered lines, "- [ ] " checklists, **bold**, *italic*, `code` and [text](https://…) links; no HTML.
+Keep formatting that's already there. Don't invent product facts or URLs that aren't already in the path or in the
+instruction. Plain American English."""
 
 
 def _scope(content: dict, scope: dict):
