@@ -52,8 +52,10 @@ straight to Jira.
 ## Features in every path
 
 - **Enroll.** Anyone can browse a path. The first tick (or the **Enroll in this path** button) asks them to enroll and
-  pick a start date. Only enrolled learners count in team views and the dashboard. Learners can't leave a path;
-  admins can remove someone (Admin → Team progress → Remove), which keeps their ticks for if they enroll again.
+  pick a start date. Only enrolled learners count in team views and the dashboard. Learners can **Leave this path**
+  (next to their start date, after a confirmation), and admins can remove someone (Admin → Team progress → Remove).
+  Either way their ticks, stars, badge and certificate are kept and come back if they enroll again. Team progress
+  lists the learners who left by themselves under the table.
   Everyone who had ticks before enrollment existed is enrolled automatically.
 - **Skill growth.** Each path has a skill ("AI Engineering", "agentic") that grows through 10 stages: one stage per
   10% of the path's required steps. The card shows in the path header and on the hub. Before enrolling it says

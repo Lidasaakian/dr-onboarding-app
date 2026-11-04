@@ -80,6 +80,28 @@
     if (status.start) paceEl.appendChild(h("span", null, "Start date " + fmtDate(status.start) + (status.cohort ? " · " + status.cohort + " cohort" : "")));
     else paceEl.appendChild(h("span", null, "Your start date is set when you tick your first step."));
     paceEl.appendChild(change);
+    if (O && O.serverMode) {
+      var leave = h("button", { type: "button", class: "onb-linkbtn" }, "Leave this path");
+      leave.addEventListener("click", confirmLeave);
+      paceEl.appendChild(leave);
+    }
+  }
+  // Leaving drops the learner out of the team views; their ticks, badge and certificate stay for if they come back.
+  function confirmLeave() {
+    var stay = h("button", { type: "button", class: "btn ghost" }, "Stay enrolled");
+    var go = h("button", { type: "button", class: "btn primary" }, "Leave this path");
+    var err = h("p", { class: "err", hidden: true });
+    var m = modal(h("div", { class: "onb-dialog", role: "dialog", "aria-modal": "true", "aria-label": "Leave this path" },
+      h("h2", null, "Leave the " + O.title + "?"),
+      h("p", null, "You'll no longer show up in the team view or count toward this path's pace. Your ticks, stars, badge and certificate are kept, and come back if you enroll again."),
+      err, h("div", { class: "row" }, stay, go)));
+    stay.addEventListener("click", m.close);
+    go.addEventListener("click", function () {
+      go.disabled = true; go.textContent = "Leaving…";
+      api("enroll", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ leave: true }) })
+        .then(function (j) { status = j.status; m.close(); renderPace(); renderMascot(false); renderBadge(); },
+          function (e) { go.disabled = false; go.textContent = "Leave this path"; err.textContent = e.message; err.hidden = false; });
+    });
   }
   function alertIn(el, msg) { el.appendChild(h("span", { style: "color:#B00020" }, " " + msg)); }
 
