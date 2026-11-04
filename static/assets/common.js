@@ -723,17 +723,21 @@
     setTimeout(check, 20000);
   }
 
-  /* ---------------------------------------------------------------- DataRobot beside the path */
-  // "Open DataRobot" shows DataRobot in a panel on the right of the path page, when the app is served from the
-  // DataRobot site itself (both send X-Frame-Options: SAMEORIGIN, so only the same site can frame it) and the window
-  // is wide enough. Otherwise it opens one named window beside the path. Links in steps to the DataRobot site go to
-  // the same place. localStorage "onb.drSite" overrides the site (to try the panel locally against the app itself).
+  /* ---------------------------------------------------------------- the working area beside the steps */
+  // A panel on the right of the path's working area (under the header) that shows DataRobot and any other link from
+  // the path whose site allows being shown inside another page. DataRobot can only be shown when the app is served
+  // from the DataRobot site itself (it sends X-Frame-Options: SAMEORIGIN); other sites are checked by the server
+  // (api/frameable) right after the page loads, so a click opens the panel or a new tab without waiting. YouTube and
+  // Vimeo links play in their own players. localStorage "onb.drSite" overrides the DataRobot site, to try the panel
+  // locally against the app itself.
   var DR_SITE = (function () {
     try { var o = localStorage.getItem("onb.drSite"); if (o) return o.replace(/\/$/, ""); } catch (e) { /* storage blocked */ }
     return /(^|\.)datarobot\.com$/.test(location.hostname) && !/^(docs|www)\./.test(location.hostname) ? location.origin : "https://app.datarobot.com";
   })();
   var APP_PREFIX = (location.pathname.match(/^\/custom_applications\/[^/]+\//) || ["/"])[0];  // this app's own pages
   var drWin = null, panelReady = false, panel = null, frame = null, drMsg = null, drBtn = null, loadTimer = null;
+  var panelKind = "datarobot", siteLabel = null, navBtns = [];
+  var FRAMEABLE = {};  // link -> {frame, embed}, from api/frameable
   function openWindow(url) {
     var sw = screen.availWidth || 1440, shh = screen.availHeight || 900;
     var x = window.screenX || 0, w = window.outerWidth || sw;
@@ -744,10 +748,13 @@
     drWin = window.open(url || DR_SITE + "/", "datarobot", features) || drWin;
     if (drWin) try { drWin.focus(); } catch (e) { /* another site: focus may be refused */ }
   }
-  function panelUsable() { return panelReady && DR_SITE === location.origin && window.innerWidth >= 900; }
+  function canPanel() { return panelReady && window.innerWidth >= 900; }
+  function drSameSite() { return DR_SITE === location.origin; }
+  function panelUsable() { return canPanel() && drSameSite(); }  // DataRobot in the panel
   function drState() { try { return JSON.parse(localStorage.getItem("onb.drPanel") || "{}") || {}; } catch (e) { return {}; } }
   function saveDr(p) { try { localStorage.setItem("onb.drPanel", JSON.stringify(Object.assign(drState(), p))); } catch (e) { /* storage blocked */ } }
   function onDrSite(u) { try { return new URL(u, location.href).origin === DR_SITE; } catch (e) { return false; } }
+  function hostOf(u) { try { return new URL(u, location.href).hostname.replace(/^www\./, ""); } catch (e) { return ""; } }
   function setDrWidth(w) {
     w = Math.max(360, Math.min(Math.round(window.innerWidth * 0.75), Math.round(w)));
     document.documentElement.style.setProperty("--onb-dr-w", w + "px");
@@ -761,24 +768,24 @@
     reload: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 10a5.5 5.5 0 1 1-1.6-3.9M15.5 3.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
   function frameUrl() {
-    try { var u = frame.contentWindow.location.href; if (onDrSite(u)) return u; } catch (e) { /* not readable */ }
-    return drState().url || DR_SITE + "/";
+    if (panelKind === "datarobot") {
+      try { var u = frame.contentWindow.location.href; if (onDrSite(u)) return u; } catch (e) { /* not readable */ }
+    }
+    return frame.getAttribute("src") || drState().url || DR_SITE + "/";
   }
-  function drFailed() {
-    drMsg.hidden = false;
-  }
+  function drFailed() { drMsg.hidden = false; }
   function buildPanel() {
-    frame = h("iframe", { class: "onb-dr-frame", title: "DataRobot",
-      sandbox: "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads",
-      allow: "clipboard-read; clipboard-write" });
+    frame = h("iframe", { class: "onb-dr-frame", title: "Working area",
+      sandbox: "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads allow-presentation",
+      allow: "clipboard-read; clipboard-write; fullscreen; autoplay; encrypted-media; picture-in-picture", allowfullscreen: true });
     var pop = h("button", { type: "button", class: "onb-linkbtn" }, "Open in new window");
-    pop.addEventListener("click", function () { openWindow(frameUrl()); });
+    pop.addEventListener("click", function () { panelKind === "datarobot" ? openWindow(frameUrl()) : window.open(drState().link || frameUrl(), "_blank", "noopener"); });
     var popMsg = h("button", { type: "button", class: "btn primary" }, "Open DataRobot in a new window");
     popMsg.addEventListener("click", function () { openWindow(frameUrl()); });
     drMsg = h("div", { class: "onb-dr-msg", hidden: true }, h("b", null, "DataRobot didn't load here."), h("span", null, "It may not allow being shown inside another page."), popMsg);
     function btn(label, icon, fn) { var b = h("button", { type: "button", class: "onb-dr-btn", title: label, "aria-label": label, html: icon }); b.addEventListener("click", fn); return b; }
     function nav(fn) { return function () { try { fn(frame.contentWindow); } catch (e) { /* not readable */ } }; }
-    var handle = h("div", { class: "onb-dr-handle", role: "separator", "aria-orientation": "vertical", "aria-label": "Resize the DataRobot panel", tabindex: "0" });
+    var handle = h("div", { class: "onb-dr-handle", role: "separator", "aria-orientation": "vertical", "aria-label": "Resize the working area", tabindex: "0" });
     handle.addEventListener("pointerdown", function (e) {
       e.preventDefault(); handle.setPointerCapture(e.pointerId); frame.style.pointerEvents = "none";
       function move(ev) { setDrWidth(window.innerWidth - ev.clientX); }
@@ -792,19 +799,21 @@
       var w = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--onb-dr-w"), 10) || 600;
       saveDr({ width: setDrWidth(w + (e.key === "ArrowLeft" ? 40 : -40)) });
     });
-    panel = h("aside", { class: "onb-dr", "aria-label": "DataRobot" }, handle,
-      h("div", { class: "onb-dr-bar" }, btn("Collapse DataRobot", ICON.panel, closePanel), h("span", { class: "onb-dr-sep" }),
-        btn("Back", ICON.back, nav(function (w) { w.history.back(); })), btn("Forward", ICON.fwd, nav(function (w) { w.history.forward(); })),
-        btn("Reload", ICON.reload, function () { try { frame.contentWindow.location.reload(); } catch (e) { frame.src = frameUrl(); } }),
-        h("span", { style: "flex:1" }), pop),
+    navBtns = [btn("Back", ICON.back, nav(function (w) { w.history.back(); })), btn("Forward", ICON.fwd, nav(function (w) { w.history.forward(); }))];
+    siteLabel = h("span", { class: "onb-dr-site" });
+    panel = h("aside", { class: "onb-dr", "aria-label": "Working area" }, handle,
+      h("div", { class: "onb-dr-bar" }, btn("Collapse the working area", ICON.panel, closePanel), h("span", { class: "onb-dr-sep" }),
+        navBtns, btn("Reload", ICON.reload, function () { try { frame.contentWindow.location.reload(); } catch (e) { frame.src = frameUrl(); } }),
+        siteLabel, h("span", { style: "flex:1" }), pop),
       h("div", { class: "onb-dr-body" }, frame, drMsg));
     frame.addEventListener("load", function () {
       clearTimeout(loadTimer);
+      if (panelKind !== "datarobot") { drMsg.hidden = true; return; }  // another site: its page can't be read from here
       var href = "";
       try { href = frame.contentWindow.location.href; } catch (e) { href = ""; }
       if (!href || href === "about:blank") { drFailed(); return; }  // refused, or another site
       drMsg.hidden = true;
-      if (onDrSite(href)) saveDr({ url: href });
+      if (onDrSite(href)) saveDr({ url: href, kind: "datarobot", link: href });
     });
     document.body.appendChild(panel);
     var hd = document.querySelector("header.top");
@@ -823,23 +832,29 @@
   }
   window.addEventListener("scroll", placePanel, { passive: true });
   window.addEventListener("load", placePanel);  // fonts and images can still change the header's height
-  function openPanel(url) {
+  // kind "datarobot": a page of the DataRobot site (back, forward, load check); "web": another site's page or player.
+  function openPanel(url, kind, link) {
     if (!panel) buildPanel();
     var st = drState();
     setDrWidth(st.width || window.innerWidth * 0.45);
     panel.hidden = false;
     document.body.classList.add("onb-dr-open");
     if (url || !frame.getAttribute("src")) {
+      if (!url) { kind = st.url && st.kind === "web" ? "web" : "datarobot"; url = st.url && (kind === "web" || onDrSite(st.url)) ? st.url : DR_SITE + "/"; link = st.link; }
+      panelKind = kind || "datarobot";
       drMsg.hidden = true;
-      frame.src = url || (st.url && onDrSite(st.url) ? st.url : DR_SITE + "/");
+      frame.src = url;
       clearTimeout(loadTimer);
-      loadTimer = setTimeout(function () {
+      if (panelKind === "datarobot") loadTimer = setTimeout(function () {
         try { var d = frame.contentDocument; if (!d || !d.body || !d.body.childElementCount) drFailed(); } catch (e) { drFailed(); }
       }, 15000);
+      saveDr({ url: url, kind: panelKind, link: link || url });
     }
+    navBtns.forEach(function (b) { b.hidden = panelKind !== "datarobot"; });
+    siteLabel.textContent = panelKind === "datarobot" ? "DataRobot" : hostOf(drState().link || url);
     saveDr({ open: true });
     placePanel();
-    if (drBtn) drBtn.textContent = "Hide DataRobot";
+    if (drBtn) drBtn.textContent = "Hide working area";
   }
   function closePanel() {
     document.body.classList.remove("onb-dr-open");
@@ -847,24 +862,57 @@
     saveDr({ open: false });
     if (drBtn) drBtn.textContent = "Open DataRobot";
   }
-  function openDataRobot(url) { if (panelUsable()) openPanel(url); else openWindow(url); }
+  function openDataRobot(url) { if (panelUsable()) openPanel(url || DR_SITE + "/", "datarobot"); else openWindow(url); }
   function toggleDataRobot() {
-    if (panelUsable() && document.body.classList.contains("onb-dr-open")) closePanel();
+    if (canPanel() && document.body.classList.contains("onb-dr-open")) closePanel();
     else openDataRobot();
   }
-  function isDataRobotLink(a) {
-    try {
-      var u = new URL(a.href, location.href);
-      if ((u.protocol !== "https:" && u.protocol !== "http:") || u.origin !== DR_SITE) return false;
-      return !(u.origin === location.origin && u.pathname.indexOf(APP_PREFIX) === 0);  // this app's own pages stay here
-    } catch (e) { return false; }
+  function restorePanel() {
+    var st = drState();
+    if (st.open && canPanel() && (st.kind === "web" || drSameSite())) openPanel();
   }
+  function linkUrl(a) { try { return new URL(a.href, location.href); } catch (e) { return null; } }
+  function isOwnPage(u) { return u.origin === location.origin && u.pathname.indexOf(APP_PREFIX) === 0; }
+  function isDataRobotLink(a) {
+    var u = linkUrl(a);
+    return !!u && /^https?:$/.test(u.protocol) && u.origin === DR_SITE && !isOwnPage(u);
+  }
+  // Links in the path's content that may open in the working area: other sites (not this app's own pages).
+  function contentLink(a) {
+    var u = linkUrl(a);
+    return !!u && /^https?:$/.test(u.protocol) && !isOwnPage(u) && !!a.closest("#main") && !a.closest(".onb-dr");
+  }
+  var asking = null;
+  function askFrameable() {  // ask once for every content link we don't know yet
+    if (!panelReady) return;
+    var urls = [];
+    document.querySelectorAll("#main a[href]").forEach(function (a) {
+      if (!contentLink(a) || isDataRobotLink(a)) return;
+      var u = linkUrl(a).href;
+      if (!(u in FRAMEABLE) && urls.indexOf(u) < 0) urls.push(u);
+    });
+    if (!urls.length) return;
+    urls.forEach(function (u) { FRAMEABLE[u] = null; });  // asked; no answer yet
+    fetch(location.origin + APP_PREFIX + "api/frameable", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ urls: urls.slice(0, 300), origin: location.origin }) })
+      .then(function (r) { return r.ok ? r.json() : { links: {} }; })
+      .then(function (j) { Object.keys(j.links || {}).forEach(function (u) { FRAMEABLE[u] = j.links[u]; }); }, function () {});
+  }
+  function askSoon() { clearTimeout(asking); asking = setTimeout(askFrameable, 400); }
+  var noted = {};
   document.addEventListener("click", function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var a = e.target.closest && e.target.closest("a[href]");
-    if (!a || a.closest(".onb-editing [contenteditable]") || a.closest(".onb-dr") || !isDataRobotLink(a)) return;
-    e.preventDefault();
-    openDataRobot(a.href);
+    if (!a || a.closest(".onb-editing [contenteditable]") || a.closest(".onb-dr")) return;
+    if (isDataRobotLink(a)) { e.preventDefault(); openDataRobot(a.href); return; }
+    if (!contentLink(a) || !canPanel()) return;
+    var u = linkUrl(a).href, known = FRAMEABLE[u];
+    if (known && known.frame) { e.preventDefault(); openPanel(known.embed, "web", u); return; }
+    if (known && !known.frame) {  // the site refuses: a new tab, as before, and say why once per site
+      e.preventDefault();
+      window.open(u, "_blank", "noopener");
+      var host = hostOf(u);
+      if (!noted[host]) { noted[host] = true; toast(host + " can't be shown inside the path, so it opened in a new tab."); }
+    }
   }, true);
   window.addEventListener("resize", function () {
     if (!panel || panel.hidden) return;
@@ -947,7 +995,10 @@
         drBtn.addEventListener("click", toggleDataRobot);
         tools.appendChild(drBtn);
         panelReady = true;
-        if (drState().open && panelUsable()) openPanel();  // it was open last time
+        restorePanel();  // it was open last time
+        askFrameable();  // which content links can open in the working area
+        var main = document.getElementById("main");
+        if (main && window.MutationObserver) new MutationObserver(askSoon).observe(main, { childList: true, subtree: true });
         var rb = h("button", { type: "button", class: "btn ghost", html: FLAG.replace("viewBox", 'style="width:12px;height:12px" viewBox') + "<span>Report a problem</span>" });
         rb.addEventListener("click", function () { openReport(); });
         tools.appendChild(rb);

@@ -28,6 +28,7 @@ starred steps, and the problems they reported with their status and Jira key. Pa
 | `app.py` | Serves the pages and the API (see the docstring for every route). |
 | `paths.py` | What counts in each path: required steps, pace, completion badge, cohorts, inactivity. |
 | `storage.py` | Where data lives (DataRobot Files item, or `./data` locally). |
+| `framing.py` | Which links can open in the working area (site headers, YouTube/Vimeo players), checked and cached. |
 | `streaks.py` | Learning streaks: working days in a row with a tick, from the learner's activity dates and tick times. |
 | `notify.py` | Slack messages (problem reports, Monday summary). |
 | `roles.py` | Users and roles: system admins (MANAGER_EMAILS), admins and authors invited in the app. |
@@ -81,14 +82,18 @@ starred steps, and the problems they reported with their status and Jira key. Pa
 - **Share my progress** (next to the start date, off by default): learners enrolled in the same path then see the
   learner's name, progress, current streak, whether they finished and the section they're in, under **Others on this
   path**. Only enrolled learners see that list, and it never shows emails. Unticking stops sharing straight away.
-- **Open DataRobot** (next to search) shows DataRobot in the path's working area: the header (title, name, progress)
-  stays at the top across the page, and below it DataRobot sits on the right of the steps (filling that side from the
-  top once you scroll past the header), with buttons to collapse it, go back, forward, reload and open the page in a new window; drag its left edge to
-  resize it. Step links to DataRobot pages open in the panel. The panel remembers whether it was open, its width and
-  the last page, in this browser. It needs the app to be served from the DataRobot site itself (as a custom
-  application is), since DataRobot only allows framing from the same site; elsewhere, on screens narrower than 900
-  pixels, or if DataRobot doesn't load in the panel, DataRobot opens in a separate window instead. To try the panel
-  locally, set `localStorage["onb.drSite"]` to the local app's address in the browser console.
+- **The working area** beside the steps: **Open DataRobot** (next to search) shows DataRobot there, and links in a
+  path's steps open there too when their site allows being shown inside another page (for example DataRobot docs,
+  Python docs, CodingBat). YouTube and Vimeo links play in their own players there. Sites that refuse (for example
+  Anthropic Academy, Anthropic docs, GitHub, Confluence, Coursera, most Google Docs) open in a new tab as before, with a
+  short note; Ctrl/Cmd-click always opens a new tab. The path header (title, name, progress) stays across the top,
+  and the working area fills the right side below it (from the top of the window once you scroll past the header).
+  Its toolbar shows the site, back and forward for DataRobot pages, reload, Open in new window, and collapse; drag its
+  left edge to resize. It remembers whether it was open, its width and the last page, in this browser. The server
+  decides which sites allow it from their response headers (only public addresses, each redirect checked; answers kept
+  a day; `framing.py`). DataRobot itself can only be shown when the app is served from the DataRobot site, as a
+  custom application is; elsewhere and on screens narrower than 900 pixels, DataRobot opens in a separate window. To
+  try the DataRobot panel locally, set `localStorage["onb.drSite"]` to the local app's address in the browser console.
 - **Report a problem**, on every step and in the header. The learner picks what kind of problem it is:
   - **Something is wrong in this learning path** (a broken link, an unclear step, stuck): goes to Admin → Problem reports
     for the path's owners and the admins, and to Slack if it's set up. Admins and owners mark it resolved.

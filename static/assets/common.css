@@ -234,3 +234,5 @@ body.onb-dr-open .onb-toasts{right:calc(var(--onb-dr-w,45vw) + 16px)}
 .onb-dr-handle{position:absolute;top:0;bottom:0;left:-4px;width:8px;cursor:col-resize;z-index:1}
 .onb-dr-handle:hover,.onb-dr-handle:focus-visible{background:color-mix(in srgb,var(--link) 30%,transparent);outline:none}
 @media (max-width:899px){body.onb-dr-open .wrap.frame{padding-right:16px}.onb-dr{display:none}}
+.onb-dr-site{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.onb-dr-bar .onb-dr-btn[hidden]{display:none}
