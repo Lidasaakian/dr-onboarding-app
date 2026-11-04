@@ -577,8 +577,13 @@ def api_team_summary(request: Request) -> dict:
     pids = managed_paths(me)
     rows = team_rows(pids)
     cohorts = sorted({r["cohort"] for r in rows if r["cohort"]}, key=cohort_sort_key, reverse=True)
+    left = [{"name": rec.get("name") or rec.get("email") or "", "email": rec.get("email") or "", "path": pid,
+             "pathTitle": PATHS[pid].title, "at": e.get("at")}
+            for rec in store.all().values() for pid in pids
+            for e in [((rec.get("enrolled") or {}).get(pid))] if isinstance(e, dict) and e.get("left")]
+    left.sort(key=lambda x: x["at"] or 0, reverse=True)
     return {"paths": [{"id": pid, "title": PATHS[pid].title, "unit": PATHS[pid].unit_name} for pid in pids],
-            "learners": rows, "cohorts": cohorts, "inactiveAfterDays": INACTIVE_DAYS}
+            "learners": rows, "cohorts": cohorts, "inactiveAfterDays": INACTIVE_DAYS, "left": left}
 
 
 @app.get("/api/export.csv")
@@ -1638,8 +1643,9 @@ async def api_set_start(path_id: str, request: Request) -> dict:
 
 @app.put("/{path_id}/api/enroll")
 async def api_enroll(path_id: str, request: Request) -> dict:
-    """Learners enroll themselves (optionally with a start date). Admins can remove a learner from a path
-    ({"learner": id, "remove": true}); their ticks are kept and come back if they enroll again."""
+    """Learners enroll themselves (optionally with a start date) and can leave ({"leave": true}). Admins can remove a
+    learner from a path ({"learner": id, "remove": true}). Either way their ticks are kept and come back if they
+    enroll again."""
     require_path(path_id)
     me = identify(request)
     data = await json_body(request)
@@ -1649,6 +1655,13 @@ async def api_enroll(path_id: str, request: Request) -> dict:
         key = data["learner"]
         if not store.exists(key):
             raise HTTPException(status_code=404, detail="No such learner.")
+    if data.get("leave"):
+        rec = store.get(me["id"])
+        if not is_enrolled(rec, path_id):
+            raise HTTPException(status_code=400, detail="You aren't enrolled in this path.")
+        rec = store.update(me["id"], lambda r: r.setdefault("enrolled", {}).__setitem__(
+            path_id, {"removed": True, "left": True, "at": now_ms(), "by": me["name"]}))
+        return {"ok": True, "status": status_payload(learner_path_view(rec, path_id))}
     if data.get("remove"):
         require_manage(me, path_id)
         rec = store.update(key, lambda r: r.setdefault("enrolled", {}).__setitem__(path_id, {"removed": True, "at": now_ms(), "by": me["name"]}))

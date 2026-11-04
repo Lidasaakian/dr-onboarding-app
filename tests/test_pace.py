@@ -45,7 +45,7 @@ def test_team_views_show_self_paced_label(client):
     pid = make_path(client, "Self paced team", cadence="self", steps=3)
     client.put(f"/{pid}/api/enroll", json={"date": "2025-01-01"})
     rows = client.get("/api/team-summary").json()["learners"]
-    me = next(r for r in rows if pid in r["paths"])
+    me = next(r for r in rows if r["paths"].get(pid, {}).get("enrolled"))
     assert me["paths"][pid]["pace"] == {"status": "self_paced", "label": "0 of 3 steps"}
     csv = client.get("/api/export.csv").text
     assert "0 of 3 steps" in csv

@@ -115,6 +115,8 @@
 .fork b{font-weight:400;font-size:19px}
 .fork span{color:var(--muted);font-size:15px}
 .form{max-width:860px;display:grid;gap:14px}
+.leftlist{margin-top:22px;display:grid;gap:6px}
+.leftlist ul{margin:0;padding-left:18px;display:grid;gap:3px;font-size:15px}
 .wsteps{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
 .wsteps li{display:flex;align-items:center;gap:6px}
 .wsteps .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:999px;border:1px solid var(--line);font-family:var(--mono);font-size:11px}
@@ -424,8 +426,8 @@ label.check > span{display:grid;gap:2px}
     out.appendChild(h("div", { class: "filters" }, sel, h("label", null, ina, "Only inactive for " + team.inactiveAfterDays + "+ days"),
       h("a", { class: "btn ghost", href: ROOT + "api/export.csv" + (fCohort ? "?cohort=" + encodeURIComponent(fCohort) : "") }, "Export CSV")));
     var list = team.learners.filter(function (l) { return (!fCohort || l.cohort === fCohort) && (!fInactive || l.inactiveDays); });
-    if (!team.learners.length) { out.appendChild(h("div", { class: "empty" }, "No one has enrolled in a path yet.")); return; }
-    if (!list.length) { out.appendChild(h("div", { class: "empty" }, "No learners match these filters.")); return; }
+    if (!team.learners.length) { out.appendChild(h("div", { class: "empty" }, "No one has enrolled in a path yet.")); leftList(out); return; }
+    if (!list.length) { out.appendChild(h("div", { class: "empty" }, "No learners match these filters.")); leftList(out); return; }
     var tb = h("tbody");
     list.forEach(function (l) {
       tb.appendChild(h("tr", null,
@@ -449,6 +451,15 @@ label.check > span{display:grid;gap:2px}
     out.appendChild(h("div", { class: "tbl" }, h("table", null,
       h("thead", null, h("tr", null, h("th", null, "Learner"), h("th", null, "Cohort"), team.paths.map(function (p) { return h("th", null, p.title); }), h("th", null, "Last active"))), tb)));
     out.appendChild(h("p", { class: "foot" }, "Cohort = the month a learner started their first path. Start dates can be changed in each path's Team progress page. Pace compares the first open required step with where the learner should be by now."));
+    leftList(out);
+  }
+  // Learners who left a path themselves (not the ones an admin removed): their progress is kept.
+  function leftList(out) {
+    var left = team.left || [];
+    if (!left.length) return;
+    out.appendChild(h("div", { class: "leftlist" }, h("h3", null, "Left by themselves"),
+      h("p", { class: "small" }, "They no longer count in the table or the dashboard. Their ticks are kept and come back if they enroll again."),
+      h("ul", null, left.map(function (x) { return h("li", null, h("b", null, x.name || x.email), " left the ", x.pathTitle, x.at ? ", " + fmtWhen(x.at) : ""); }))));
   }
   function loadTeam() { return api("api/team-summary").then(function (j) { team = j; renderTeam(); }, function (e) { $("#team-out").textContent = e.message; }); }
 
