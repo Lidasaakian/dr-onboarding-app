@@ -62,6 +62,7 @@ from notify import Slack, SlackBot, link as slack_link, welcome_text
 from paths import INACTIVE_DAYS, agentic_model, ai_engineer_model, cohort_of, inactive_days, validate_agentic_page
 from roles import Users
 from storage import DocStore, ProgressStore, make_storage
+import framing
 import streaks
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -1709,6 +1710,22 @@ async def api_set_start(path_id: str, request: Request) -> dict:
     if key == me["id"]:
         store.update(key, lambda r: (r.__setitem__("name", me["name"]), r.__setitem__("email", me["email"])))
     return {"ok": True, "status": status_payload(learner_path_view(rec, path_id))}
+
+
+frame_checker = framing.Checker()
+
+
+@app.post("/api/frameable")
+async def api_frameable(request: Request) -> dict:
+    """Which of these links can open in a path's working area (an iframe on the page at `origin`), and the URL to
+    put in the frame. Path pages ask for the links in their content right after loading."""
+    identify(request)
+    d = await json_body(request, 200_000)
+    urls = [str(u)[:2000] for u in (d.get("urls") or []) if isinstance(u, str)][:300]
+    origin = str(d.get("origin") or "")
+    if not re.match(r"^https?://[^/\s]+$", origin):
+        raise HTTPException(status_code=400, detail="origin must be the page's origin, like https://app.datarobot.com")
+    return {"links": frame_checker.check(urls, origin)}
 
 
 @app.put("/{path_id}/api/sharing")
