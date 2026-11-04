@@ -82,13 +82,15 @@ starred steps, and the problems they reported with their status and Jira key. Pa
 - **Share my progress** (next to the start date, off by default): learners enrolled in the same path then see the
   learner's name, progress, current streak, whether they finished and the section they're in, under **Others on this
   path**. Only enrolled learners see that list, and it never shows emails. Unticking stops sharing straight away.
-- **The working area** beside the steps: **Open DataRobot** (next to search) shows DataRobot there, and links in a
+- **The working area** beside the steps opens from the icon on the right edge of the path (a slim rail) and shows
+  DataRobot, or the page it showed last; the highlighted first button of its toolbar closes it. Links in a
   path's steps open there too when their site allows being shown inside another page (for example DataRobot docs,
   Python docs, CodingBat). YouTube and Vimeo links play in their own players there. Sites that refuse (for example
   Anthropic Academy, Anthropic docs, GitHub, Confluence, Coursera, most Google Docs) open in a new tab as before, with a
   short note; Ctrl/Cmd-click always opens a new tab. The path header (title, name, progress) stays across the top,
   and the working area fills the right side below it (from the top of the window once you scroll past the header).
-  Its toolbar shows the site, back and forward for DataRobot pages, reload, Open in new window, and collapse; drag its
+  Its toolbar has close, back and forward (DataRobot pages), reload, the site's name for other sites, and an Open in
+  new window icon; drag the divider on its
   left edge to resize. It remembers whether it was open, its width and the last page, in this browser. The server
   decides which sites allow it from their response headers (only public addresses, each redirect checked; answers kept
   a day; `framing.py`). DataRobot itself can only be shown when the app is served from the DataRobot site, as a

@@ -42,3 +42,24 @@ redirects, and SHALL treat anything else as "open in a new tab". The answer for 
 #### Scenario: A link to a private address
 - **WHEN** a step links to http://10.0.0.5/admin
 - **THEN** the app doesn't contact it, and the link opens in a new tab
+
+### Requirement: Open the working area from the rail
+The working area SHALL open from a single icon button on a slim rail at the right edge of the path's working area,
+not from an "Open DataRobot" button among the page's tools. It SHALL open on the page it showed last, or DataRobot the
+first time. While it's open, its toolbar's first, highlighted button SHALL close it and bring the rail back.
+
+#### Scenario: Opening and closing
+- **WHEN** a learner clicks the rail's button, then the highlighted first button of the toolbar
+- **THEN** the working area opens on the page it showed last, then closes and the rail is shown again
+
+#### Scenario: No text button
+- **WHEN** a learner looks at a path's top tools
+- **THEN** there is no "Open DataRobot" button; the rail's icon opens the working area
+
+### Requirement: Working area toolbar and frame
+The working area's toolbar SHALL use icon buttons: close, back and forward (DataRobot pages), reload, and Open in a
+new window on the far right. The page SHALL be shown in a bordered, rounded area.
+
+#### Scenario: Toolbar on a DataRobot page
+- **WHEN** the working area shows a DataRobot page
+- **THEN** the toolbar shows close, back, forward and reload icons on the left and an open-in-new-window icon on the right
