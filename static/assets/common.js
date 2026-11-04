@@ -727,13 +727,13 @@
     } catch (e) { return null; }
   })();
   function backLink(root) {
-    return FROM ? { href: FROM.href, text: "\u2190 Admin \u00b7 " + FROM.label } : { href: root, text: "\u2190 All learning paths" };
+    return FROM ? { href: FROM.href, text: "\u2190 Admin \u00b7 " + FROM.label } : { href: root, text: "\u2190 Home" };
   }
   function applyBack(root) {
     var back = document.querySelector(".backlink"), b = backLink(root);
     if (back) { back.href = b.href; back.textContent = b.text; }
   }
-  if (FROM) document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
     var back = document.querySelector(".backlink");
     if (back && !document.body.classList.contains("onb-editing")) applyBack(back.getAttribute("href"));
   });
@@ -789,7 +789,13 @@
         tools.appendChild(rb);
       }
       (opts.rows ? opts.rows() : []).forEach(function (r) { r.mount.appendChild(reportButton(r)); });
-      if (opts.server) { O.serverMode = true; api("status").then(function (j) { status = j; renderPace(); renderBadge(); renderMascot(false); renderAuthor(); }, function () { /* offline: no pace line */ }); }
+      if (opts.server) { O.serverMode = true; api("status").then(function (j) {
+        status = j; renderPace(); renderBadge(); renderMascot(false); renderAuthor();
+        if (location.hash === "#certificate" && status.badge && status.badge.earned) {  // "View certificate" on the dashboard
+          history.replaceState(null, "", location.pathname);
+          openCertificate();
+        }
+      }, function () { /* offline: no pace line */ }); }
     },
     onSaved: function (resp) {
       if (!resp || !resp.status) return;
