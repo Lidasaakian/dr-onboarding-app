@@ -40,7 +40,33 @@
 .path .foot-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .mini-badge svg{width:30px;height:30px}
 .path .meta-r{display:flex;align-items:center;gap:12px;min-width:0}
-.starred h2{font-size:28px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-top:14px;flex-wrap:wrap}
+.tabs a{font-size:16px;color:var(--muted);text-decoration:none;padding:10px 14px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tabs .count{font-family:var(--mono);font-size:11px;background:var(--yellow);color:#0B0B0B;border-radius:999px;padding:1px 7px;margin-left:6px}
+.dash{display:grid;gap:40px}
+.dash > section{display:grid;gap:12px;min-width:0}
+.dash h2{font-size:26px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px}
+.tile{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:4px;align-content:start}
+.tile .label{color:var(--muted)}
+.tile .v{font-size:34px;line-height:1.05;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.tile .small{color:var(--muted);font-size:14px}
+.tile.streak{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--bg))}
+.rows{display:grid;gap:10px}
+.prog{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center}
+.prog h3{font-size:20px;font-weight:400}
+.prog .bar{height:8px;background:var(--brick-empty);position:relative;overflow:hidden;grid-column:1/-1}
+.prog .bar i{position:absolute;inset:0 auto 0 0;background:var(--green)}
+.prog .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:14px;grid-column:1/-1}
+.cert{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:var(--r);padding:12px 16px}
+.cert b{font-weight:400;font-size:18px;flex:1 1 220px}
+.myrep{border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;display:grid;gap:6px}
+.myrep .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--muted)}
+.myrep p{max-width:80ch}
+.onb-chip[data-s="resolved"]{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.empty{color:var(--muted)}
+.starred h2{font-size:26px}
 .stargroups{display:grid;gap:8px;margin-top:12px;max-width:860px}
 .stargroup{border:1px solid var(--line);border-radius:var(--r)}
 .stargroup > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:18px}
@@ -66,21 +92,33 @@
     <div class="top-row">
       <div class="title-block">
         <span class="eyebrow">DataRobot onboarding</span>
-        <h1>Learning paths</h1>
+        <h1 id="page-title">My dashboard</h1>
         <div class="who"><span id="who-name"></span><span class="save-state" id="who-state" data-s="init">Loading</span></div>
       </div>
       <nav class="topnav" id="topnav" aria-label="Sections"></nav>
     </div>
     <section class="onb-welcome" id="welcome" aria-labelledby="welcome-h" hidden></section>
+    <nav class="tabs" id="tabs" aria-label="Home">
+      <a href="#dashboard" data-tab="dashboard">My dashboard</a>
+      <a href="#paths" data-tab="paths">Learning paths</a>
+    </nav>
   </div>
 </header>
 <main class="wrap hub">
-  <section class="paths" id="paths" aria-label="Learning paths"></section>
-  <section class="starred" id="starred" hidden>
-    <h2>Your starred steps</h2>
-    <div class="stargroups" id="starred-out"></div>
-  </section>
-  <p class="foot">Enroll in a path to track your progress.</p>
+  <div class="dash" data-panel="dashboard">
+    <section aria-label="Your progress"><div class="tiles" id="tiles"></div></section>
+    <section><h2>Continue learning</h2><div class="rows" id="inprogress"></div></section>
+    <section id="certs-sec" hidden><h2>Certificates</h2><div class="rows" id="certs"></div></section>
+    <section class="starred" id="starred" hidden>
+      <h2>Your starred steps</h2>
+      <div class="stargroups" id="starred-out"></div>
+    </section>
+    <section><h2>Problems you reported</h2><div class="rows" id="myreports"></div></section>
+  </div>
+  <div data-panel="paths" hidden>
+    <section class="paths" id="paths" aria-label="Learning paths"></section>
+    <p class="foot">Enroll in a path to track your progress.</p>
+  </div>
 </main>
 <script>
 (function () {
@@ -153,6 +191,63 @@
     });
   }
 
+  /* ---------- tabs: My dashboard (default) and Learning paths; Admin is a link ---------- */
+  var TITLES = { dashboard: "My dashboard", paths: "Learning paths" };
+  function showTab() {
+    var t = location.hash.slice(1);
+    if (!TITLES[t]) t = "dashboard";
+    document.querySelectorAll("[data-panel]").forEach(function (p) { p.hidden = p.dataset.panel !== t; });
+    document.querySelectorAll("#tabs a[data-tab]").forEach(function (a) { if (a.dataset.tab === t) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    $("#page-title").textContent = TITLES[t];
+  }
+  window.addEventListener("hashchange", showTab);
+  showTab();
+
+  /* ---------- My dashboard ---------- */
+  function fmtDay(ts) { return ts ? new Date(ts).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : ""; }
+  function renderDashboard(j) {
+    var paths = j.paths || [], s = j.streak || { current: 0, best: 0 };
+    var done = paths.filter(function (p) { return p.badge && p.badge.earned; });
+    var going = paths.filter(function (p) { return p.enrolled && !(p.badge && p.badge.earned); });
+    var tiles = $("#tiles"); tiles.textContent = "";
+    function tile(label, v, sub, cls) { tiles.appendChild(h("div", { class: "tile" + (cls ? " " + cls : "") }, h("span", { class: "label" }, label), h("span", { class: "v" }, String(v)), sub ? h("span", { class: "small" }, sub) : null)); }
+    tile("Streak", s.current + (s.current === 1 ? " day" : " days"), s.current ? "Working days in a row. Best: " + s.best + "." : s.best ? "Tick a step to start a new one. Best: " + s.best + "." : "Tick a step to start your streak.", "streak");
+    tile("Paths completed", done.length, null);
+    tile("Certificates earned", done.length, null);
+    tile("In progress", going.length, null);
+
+    var ip = $("#inprogress"); ip.textContent = "";
+    if (!going.length) ip.appendChild(h("p", { class: "empty" }, "You're not working on a path right now. ", h("a", { href: "#paths" }, "Browse learning paths"), "."));
+    going.forEach(function (p) {
+      ip.appendChild(h("div", { class: "prog" },
+        h("div", null, h("h3", null, p.title), p.nowOn ? h("span", { class: "small" }, "Now on: " + p.nowOn.replace(/^[^:]{1,40}: /, "")) : null),
+        h("a", { class: "btn primary", href: BASE + p.id + "/" }, "Continue"),
+        h("div", { class: "bar" }, h("i", { style: "width:" + pct(p.done, p.total) + "%" })),
+        h("div", { class: "meta" }, h("span", null, pct(p.done, p.total) + "% · " + p.done + " of " + p.total + " steps"), p.pace ? h("span", { class: "onb-chip", "data-s": p.pace.status }, p.pace.label) : null,
+          p.archived ? h("span", null, "Archived") : null)));
+    });
+
+    var certs = $("#certs"); certs.textContent = "";
+    $("#certs-sec").hidden = !done.length;
+    done.forEach(function (p) {
+      certs.appendChild(h("div", { class: "cert" }, h("span", { class: "mini-badge", html: DROnb.badgeSvg() }), h("b", null, p.title),
+        p.badge.at ? h("span", { class: "small" }, "Completed " + fmtDay(p.badge.at + "T12:00:00")) : null,
+        h("a", { class: "btn", href: BASE + p.id + "/#certificate" }, "View certificate"), h("a", { class: "btn ghost", href: BASE + p.id + "/" }, "Review")));
+    });
+
+    var mr = $("#myreports"); mr.textContent = "";
+    var reps = j.myReports || [];
+    if (!reps.length) mr.appendChild(h("p", { class: "empty" }, "You haven't reported any problems. Use “Report a problem” on any path when something's wrong."));
+    reps.forEach(function (r) {
+      var kind = { bug: "DataRobot bug", system: "To the admins" }[r.kind] || "Learning path";
+      mr.appendChild(h("article", { class: "myrep" },
+        h("div", { class: "meta" }, h("span", { class: "onb-chip" }, kind), h("span", null, [r.pathTitle, r.itemLabel].filter(Boolean).join(" · ")), h("span", null, fmtDay(r.createdAt)),
+          h("span", { class: "onb-chip", "data-s": r.status === "resolved" ? "resolved" : "behind" }, r.status === "resolved" ? "Resolved" : "Open"),
+          r.jira ? h("a", { href: r.jira.url, target: "_blank", rel: "noopener" }, r.jira.key + (r.jira.status ? " · " + r.jira.status : "") + " ↗") : null),
+        h("p", null, r.message)));
+    });
+  }
+
   function renderWelcome(w) {
     var box = $("#welcome"); box.textContent = "";
     if (!w) { box.hidden = true; return; }
@@ -177,10 +272,11 @@
       renderWelcome(j.me.welcome);
       renderPaths(j.paths);
       renderStarred(j.paths);
-      if (j.me.canAdmin) {
+      renderDashboard(j);
+      if (j.me.canAdmin) {  // admins and authors
         DROnb.watchDrafts(BASE, j.me.id);
         var n = j.openReports || 0;
-        $("#topnav").appendChild(h("a", { class: "btn ghost", href: BASE + "admin/" }, "Admin", n ? h("span", { class: "onb-chip", "data-s": "behind", style: "margin-left:6px", title: n + " open problem reports" }, String(n)) : null));
+        $("#tabs").appendChild(h("a", { href: BASE + "admin/" }, "Admin", n ? h("span", { class: "count", title: n + " open problem reports" }, String(n)) : null));
       }
     })
     .catch(function (e) {

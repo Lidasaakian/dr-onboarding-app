@@ -62,6 +62,7 @@ from notify import Slack, SlackBot, link as slack_link, welcome_text
 from paths import INACTIVE_DAYS, agentic_model, ai_engineer_model, cohort_of, inactive_days, validate_agentic_page
 from roles import Users
 from storage import DocStore, ProgressStore, make_storage
+import streaks
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("onboarding")
@@ -525,6 +526,8 @@ def api_summary(request: Request) -> dict:
         "paths": [{"id": pid, "title": p.title, "skill": p.skill, "blurb": p.blurb, "length": p.length, **learner_path_view(rec, pid)}
                   for pid, p in PATHS.items() if not getattr(p, "archived", False) or is_enrolled(rec, pid)],
     }
+    out["streak"] = streaks.streak(streaks.learning_days(rec, TZ), today())
+    out["myReports"] = my_reports(me)
     if me["canAdmin"]:
         out["openReports"] = sum(1 for r in visible_reports(me) if r.get("status") == "open")
     return out
@@ -1622,6 +1625,13 @@ async def api_put_progress(path_id: str, request: Request) -> dict:
 
     def apply(rec):
         rec["name"], rec["email"] = me["name"], me["email"]
+        prev = path_state(rec, path_id) or {}
+        if learned_something(prev, state):  # a learning day for streaks; unticking later doesn't take it back
+            act = rec.setdefault("activity", [])
+            day = today().isoformat()
+            if day not in act:
+                act.append(day)
+                del act[:-400]
         if path_id == "agentic":
             rec["state"] = state
         else:
@@ -1643,6 +1653,28 @@ async def api_put_progress(path_id: str, request: Request) -> dict:
         rec = store.update(me["id"], keep)
     return {"ok": True, "status": status_payload(view), "newBadge": view["badge"]["earned"] and not before,
             "levelUp": view["mascot"] > stage_before}
+
+
+def learned_something(prev: dict, state: dict) -> bool:
+    """True when the new state ticks a step or a checklist item the previous one didn't."""
+    if set(state.get("done") or {}) - set(prev.get("done") or {}):
+        return True
+    old = prev.get("checks") or {}
+    return any(set(items) - set(old.get(sid) or {}) for sid, items in (state.get("checks") or {}).items() if isinstance(items, dict))
+
+
+def my_reports(me: dict) -> list[dict]:
+    """The learner's own problem reports and bugs, for their dashboard: display fields only."""
+    mine = [r for r in docs.get("reports", []) if r.get("learnerId") == me["id"] or (r.get("email") or "").lower() == me["email"].lower()]
+    mine.sort(key=lambda r: r.get("createdAt") or 0, reverse=True)
+    out = []
+    for r in mine[:50]:
+        j = r.get("jira") or {}
+        out.append({"id": r["id"], "kind": r.get("kind") or "path", "path": r.get("path"), "pathTitle": r.get("pathTitle") or "",
+                    "itemLabel": r.get("itemLabel") or "", "message": (r.get("message") or "")[:240], "createdAt": r.get("createdAt"),
+                    "status": r.get("status") or "open", "resolvedAt": r.get("resolvedAt"),
+                    "jira": {k: j.get(k) for k in ("key", "url", "status") if j.get(k)} if j.get("key") else None})
+    return out
 
 
 def status_payload(view: dict) -> dict:

@@ -6,9 +6,15 @@ to **Continue where I left off**, while their **skill growth** card grows strong
 can **create new paths**: by hand, or from links and files with the LLM. Learners can report a **DataRobot bug**
 straight to Jira.
 
+The home page has three tabs: **My dashboard** (the default), **Learning paths** (every path, to browse and enroll)
+and **Admin** (admins and authors only). My dashboard shows the learner's **streak** (working days in a row on which
+they ticked a step or a checklist item; weekends neither count nor break it, and the best streak is kept), paths
+completed, certificates earned (each opens its certificate), the paths in progress with where they left off, their
+starred steps, and the problems they reported with their status and Jira key. Path pages link back with **← Home**.
+
 | Path | URL | Content source |
 | --- | --- | --- |
-| Hub | `/` | `static/index.html` (built from `tools/src/hub.html`) |
+| Home (dashboard and path catalog) | `/` | `static/index.html` (built from `tools/src/hub.html`) |
 | Admin | `/admin/` | `static/admin.html` (built from `tools/src/admin.html`) |
 | AI Engineer Learning Plan | `/ai-engineer/` | Edited in the app; first imported from the Google Sheet "AI Engineer Learning Plan" (`static/ai-engineer/content.json`) |
 | Agentic AI Learning Path | `/agentic/` | `static/agentic/index.html` (text from the Google Doc) |
@@ -22,6 +28,7 @@ straight to Jira.
 | `app.py` | Serves the pages and the API (see the docstring for every route). |
 | `paths.py` | What counts in each path: required steps, pace, completion badge, cohorts, inactivity. |
 | `storage.py` | Where data lives (DataRobot Files item, or `./data` locally). |
+| `streaks.py` | Learning streaks: working days in a row with a tick, from the learner's activity dates and tick times. |
 | `notify.py` | Slack messages (problem reports, Monday summary). |
 | `roles.py` | Users and roles: system admins (MANAGER_EMAILS), admins and authors invited in the app. |
 | `custom_paths.py` | Paths created in the app: content format, ids, the .xlsx template (import and export), change lists. |
