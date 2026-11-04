@@ -200,3 +200,12 @@ body.onb-editing [contenteditable="true"]:focus{outline:2px solid var(--link);ba
 .onb-toast{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--ink);color:var(--bg);border-radius:var(--r);padding:10px 12px;font-size:15px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 .onb-toast a{color:var(--bg);text-decoration:underline;text-underline-offset:3px}
 .onb-toast .x{margin-left:auto;border:0;background:none;color:inherit;font-size:18px;cursor:pointer}
+
+/* sharing progress with others on the path */
+.onb-share{display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap}
+.onb-share label{display:inline-flex;gap:6px;align-items:center;cursor:pointer;color:var(--ink)}
+.onb-peers{display:grid;gap:10px;max-height:min(60vh,520px);overflow:auto}
+.onb-peer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.onb-peer b{font-weight:500}
+.onb-peer-bar{grid-column:1/-1;height:6px;background:var(--brick-empty,#E7EAE8);position:relative;overflow:hidden}
+.onb-peer-bar i{position:absolute;inset:0 auto 0 0;background:var(--green)}

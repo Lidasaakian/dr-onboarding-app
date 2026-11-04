@@ -359,6 +359,7 @@ def learner_path_view(record: dict | None, pid: str) -> dict:
         "custom": getattr(p, "custom", False),
         "archived": getattr(p, "archived", False),
         "enrolled": enrolled,
+        "sharing": bool(((record or {}).get("sharing") or {}).get(pid)),
         "start": start,
         "cohort": cohort_of(start),
         "pace": p.pace(st, start, today()) if enrolled else {"status": "not_enrolled", "label": "Not enrolled"},
@@ -1678,7 +1679,7 @@ def my_reports(me: dict) -> list[dict]:
 
 
 def status_payload(view: dict) -> dict:
-    return {k: view[k] for k in ("skill", "skillEnabled", "archived", "enrolled", "start", "cohort", "pace", "badge", "mascot", "done", "total", "requiredDone", "requiredTotal",
+    return {k: view[k] for k in ("skill", "skillEnabled", "archived", "enrolled", "sharing", "start", "cohort", "pace", "badge", "mascot", "done", "total", "requiredDone", "requiredTotal",
                                  "length", "author")}
 
 
@@ -1708,6 +1709,44 @@ async def api_set_start(path_id: str, request: Request) -> dict:
     if key == me["id"]:
         store.update(key, lambda r: (r.__setitem__("name", me["name"]), r.__setitem__("email", me["email"])))
     return {"ok": True, "status": status_payload(learner_path_view(rec, path_id))}
+
+
+@app.put("/{path_id}/api/sharing")
+async def api_sharing(path_id: str, request: Request) -> dict:
+    """An enrolled learner shares (or stops sharing) their stats with others enrolled in the path."""
+    require_path(path_id)
+    me = identify(request)
+    if not is_enrolled(store.get(me["id"]), path_id):
+        raise HTTPException(status_code=400, detail="Enroll in this path to share your progress.")
+    share = bool((await json_body(request)).get("share"))
+
+    def apply(r):
+        s = r.setdefault("sharing", {})
+        if share:
+            s[path_id] = True
+        else:
+            s.pop(path_id, None)
+    rec = store.update(me["id"], apply)
+    return {"ok": True, "status": status_payload(learner_path_view(rec, path_id))}
+
+
+@app.get("/{path_id}/api/peers")
+def api_peers(path_id: str, request: Request) -> dict:
+    """Others enrolled in the path who chose to share: name, progress, streak, finished, section. Enrolled only."""
+    require_path(path_id)
+    me = identify(request)
+    if not is_enrolled(store.get(me["id"]), path_id):
+        raise HTTPException(status_code=403, detail="Enroll in this path to see who's sharing their progress.")
+    out = []
+    for key, rec in store.all().items():
+        if key == me["id"] or not (rec.get("sharing") or {}).get(path_id) or not is_enrolled(rec, path_id):
+            continue
+        v = learner_path_view(rec, path_id)
+        out.append({"name": rec.get("name") or "A learner", "done": v["done"], "total": v["total"],
+                    "streak": streaks.streak(streaks.learning_days(rec, TZ), today())["current"],
+                    "finished": v["badge"]["earned"], "section": "" if v["badge"]["earned"] else (v["nowOn"] or "").split(":")[0][:60]})
+    out.sort(key=lambda x: (-(x["done"] / x["total"] if x["total"] else 0), x["name"]))
+    return {"peers": out, "sharing": bool(((store.get(me["id"]) or {}).get("sharing") or {}).get(path_id))}
 
 
 @app.put("/{path_id}/api/enroll")

@@ -88,7 +88,41 @@
       var leave = h("button", { type: "button", class: "onb-linkbtn" }, "Leave this path");
       leave.addEventListener("click", confirmLeave);
       paceEl.appendChild(leave);
+      // Sharing: off until the learner switches it on; others enrolled in the path then see their stats.
+      var share = h("input", { type: "checkbox", checked: status.sharing || null });
+      share.addEventListener("change", function () {
+        share.disabled = true;
+        api("sharing", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ share: share.checked }) })
+          .then(function (j) { status = j.status; renderPace(); }, function (e) { share.checked = !share.checked; share.disabled = false; alert(e.message); });
+      });
+      var others = h("button", { type: "button", class: "onb-linkbtn" }, "Others on this path");
+      others.addEventListener("click", openPeers);
+      paceEl.appendChild(h("span", { class: "onb-share" },
+        h("label", { title: "Learners enrolled in this path see your name, progress, streak, whether you finished and the section you're in." }, share, " Share my progress"),
+        others));
     }
+  }
+  function openPeers() {
+    var list = h("div", { class: "onb-peers" }, h("p", { class: "small" }, "Loading…"));
+    var close = h("button", { type: "button", class: "btn primary" }, "Close");
+    var m = modal(h("div", { class: "onb-dialog", role: "dialog", "aria-modal": "true", "aria-label": "Others on this path" },
+      h("h2", null, "Others on this path"),
+      h("p", null, "Learners enrolled in the " + O.title + " who chose to share their progress." + (status && status.sharing ? " You're sharing yours." : " Tick \u201cShare my progress\u201d to show yours too.")),
+      list, h("div", { class: "row" }, close)));
+    close.addEventListener("click", m.close);
+    api("peers").then(function (j) {
+      list.textContent = "";
+      if (!j.peers.length) { list.appendChild(h("p", { class: "small" }, "Nobody else is sharing yet.")); return; }
+      j.peers.forEach(function (p) {
+        var pc = p.total ? Math.round(100 * p.done / p.total) : 0;
+        list.appendChild(h("div", { class: "onb-peer" },
+          h("b", null, p.name),
+          h("span", { class: "onb-peer-bar" }, h("i", { style: "width:" + pc + "%" })),
+          h("span", { class: "small" }, pc + "% \u00b7 " + p.done + " of " + p.total + " steps"),
+          h("span", { class: "small" }, p.finished ? "Finished" : p.section || "Not started"),
+          h("span", { class: "small" }, p.streak ? p.streak + "-day streak" : "No streak right now")));
+      });
+    }, function (e) { list.textContent = ""; list.appendChild(h("p", { class: "err" }, e.message)); });
   }
   // Leaving drops the learner out of the team views; their ticks, badge and certificate stay for if they come back.
   function confirmLeave() {

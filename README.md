@@ -78,6 +78,9 @@ starred steps, and the problems they reported with their status and Jira key. Pa
   - AI Engineer: 10 calendar weeks. Week 0 is done during the first week, together with Week 1.
   - Agentic: 7 working days (Monday to Friday).
 - **Search** across the path (press `/`). Results jump straight to the step.
+- **Share my progress** (next to the start date, off by default): learners enrolled in the same path then see the
+  learner's name, progress, current streak, whether they finished and the section they're in, under **Others on this
+  path**. Only enrolled learners see that list, and it never shows emails. Unticking stops sharing straight away.
 - **Open DataRobot** (next to search) opens DataRobot in one window beside the path, and brings it back to the
   front on later clicks. Step links to DataRobot pages open in that window too; docs links still open in a new tab.
   Browsers may ignore the placement (on phones it opens as a tab).
