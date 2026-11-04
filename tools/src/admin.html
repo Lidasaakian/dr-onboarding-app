@@ -45,13 +45,6 @@
 .seg button{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:6px 12px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 
-.content-card{border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:12px}
-.content-card h3{font-size:22px}
-.content-card .src{color:var(--muted);font-size:15px}
-.content-card .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.diff{border-radius:var(--r);background:var(--panel);padding:14px 16px;display:grid;gap:10px}
-.diff ul{margin:0;padding-left:18px;display:grid;gap:3px;font-size:14px;max-height:240px;overflow:auto}
-.diff .warn{background:var(--yellow);color:#0B0B0B;border-radius:var(--r);padding:8px 10px;font-size:15px}
 .err{color:#B00020}
 
 /* dashboard: chart roles (validated: blue/orange, light on #fff, dark on #0b0b0b) */
@@ -501,18 +494,16 @@ label.check > span{display:grid;gap:2px}
     if (!list.length) { out.appendChild(h("div", { class: "empty" }, rFilter === "open" ? "No open reports." : "Nothing here yet.")); return; }
     list.forEach(function (r) {
       var kind = r.kind || "path";
-      var actions = null;
-      if (kind !== "bug" || !(r.jira && r.jira.key)) {
-        var btn = h("button", { type: "button", class: "btn ghost" }, r.status === "open" ? "Mark resolved" : "Reopen");
-        btn.addEventListener("click", function () {
-          btn.disabled = true;
-          api("api/reports/" + r.id, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: r.status === "open" ? "resolved" : "open" }) })
-            .then(function (j) { Object.assign(r, j.report); renderReports(); }, function (e) { btn.disabled = false; alert(e.message); });
-        });
-        var edit = kind === "path" && r.path !== "admin" ? h("a", { class: "btn ghost", href: ROOT + r.path + "/#" + (r.anchor || "") }, "Edit this step") : null;
-        var mail = r.email ? h("a", { class: "btn ghost", href: "mailto:" + r.email + "?subject=" + encodeURIComponent("Your onboarding report: " + (r.itemLabel || r.pathTitle)) }, "Reply by email") : null;
-        actions = h("div", { class: "row" }, btn, edit, mail);
-      }
+      // Every report can be resolved or reopened by hand, Jira bugs too; after that the Jira sync leaves it alone.
+      var btn = h("button", { type: "button", class: "btn ghost" }, r.status === "open" ? "Mark resolved" : "Reopen");
+      btn.addEventListener("click", function () {
+        btn.disabled = true;
+        api("api/reports/" + r.id, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: r.status === "open" ? "resolved" : "open" }) })
+          .then(function (j) { Object.assign(r, j.report); renderReports(); }, function (e) { btn.disabled = false; alert(e.message); });
+      });
+      var edit = kind === "path" && r.path !== "admin" ? h("a", { class: "btn ghost", href: ROOT + r.path + "/#" + (r.anchor || "") }, "Edit this step") : null;
+      var mail = r.email && !(r.jira && r.jira.key) ? h("a", { class: "btn ghost", href: "mailto:" + r.email + "?subject=" + encodeURIComponent("Your onboarding report: " + (r.itemLabel || r.pathTitle)) }, "Reply by email") : null;
+      var actions = h("div", { class: "row" }, btn, edit, mail);
       var files = (r.files || []).length && !(r.jira && r.jira.key) ? h("div", { class: "files" }, r.files.map(function (f, i) { return h("a", { href: ROOT + "api/reports/" + r.id + "/files/" + i }, f.name); })) : null;
       out.appendChild(h("article", { class: "report" + (r.status === "resolved" ? " resolved" : "") },
         h("div", { class: "meta" }, h("span", { class: "onb-chip" }, KIND[kind] || kind), h("b", null, r.name || r.email),
@@ -596,11 +587,6 @@ label.check > span{display:grid;gap:2px}
 
   /* ---------------------------------------------------------------- admin: content */
   var contentView = "list", contentData = null;
-  function srcText(s) {
-    if (!s) return "";
-    if (s.kind === "uploaded") return "Live: uploaded " + new Date(s.at).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) + " by " + s.by + (s.file ? " (" + s.file + ")" : "") + ".";
-    return "Live: the version deployed with the app" + (s.at ? " (sheet read " + s.at + ")" : "") + "." + (s.note ? " " + s.note : "");
-  }
   function contentHome() {
     var out = $("#content-out"); out.textContent = "";
     var d = contentData;
@@ -642,58 +628,7 @@ label.check > span{display:grid;gap:2px}
       });
       out.appendChild(h("div", { class: "tbl plist" }, h("table", null, h("thead", null, h("tr", null, ["Path", "Status", "Steps", "Enrolled", "Owners", ""].map(function (t) { return h("th", null, t); }))), tb)));
     }
-    if (ME.isManager) api("api/admin/content").then(function (j) { builtinCards(j.paths, out); }, function () {});
   }
-  function builtinCards(paths, out) {
-    paths.forEach(function (p) {
-      var isAi = p.id === "ai-engineer";
-      var file = h("input", { type: "file", accept: isAi ? ".xlsx" : ".html,.htm", hidden: true });
-      var up = h("button", { type: "button", class: "btn ghost" }, isAi ? "Upload a sheet (.xlsx)" : "Upload an edited page (.html)");
-      var revert = p.source.kind === "uploaded" ? h("button", { type: "button", class: "btn ghost" }, "Go back to the deployed version") : null;
-      var dl = !isAi ? h("a", { class: "btn ghost", href: ROOT + "api/admin/content/agentic/page" }, "Download the live page")
-        : h("a", { class: "btn ghost", href: ROOT + "api/admin/content/ai-engineer/export.xlsx" }, "Download as .xlsx");
-      var ed = h("a", { class: "btn primary", href: ROOT + p.id + "/#edit" }, "Edit in the app");
-      var diffBox = h("div");
-      var card = h("article", { class: "content-card" },
-        h("h3", null, p.title), h("p", { class: "src" }, srcText(p.source) + " " + p.steps + " steps that count."),
-        h("div", { class: "actions" }, ed, dl, up, revert, file), diffBox);
-      up.addEventListener("click", function () { file.click(); });
-      file.addEventListener("change", function () {
-        var f = file.files[0]; if (!f) return;
-        diffBox.textContent = ""; diffBox.appendChild(h("p", null, "Reading " + f.name + "…"));
-        f.arrayBuffer().then(function (buf) {
-          return api("api/admin/content/" + p.id + "/preview", { method: "POST", headers: { "content-type": "application/octet-stream", "x-file-name": f.name }, body: buf });
-        }).then(function (j) { showDiff(p, j, diffBox); }, function (e) { diffBox.textContent = ""; diffBox.appendChild(h("p", { class: "err" }, e.message)); })
-          .then(function () { file.value = ""; });
-      });
-      if (revert) revert.addEventListener("click", function () {
-        if (!confirm("Go back to the content deployed with the app? The uploaded version stops being live.")) return;
-        api("api/admin/content/" + p.id + "/revert", { method: "POST" }).then(loadContent, function (e) { alert(e.message); });
-      });
-      out.appendChild(card);
-    });
-  }
-  function showDiff(p, j, box) {
-    var s = j.summary;
-    box.textContent = "";
-    var pub = h("button", { type: "button", class: "btn primary" }, "Publish");
-    var cancel = h("button", { type: "button", class: "btn ghost" }, "Cancel");
-    function list(title, rows) { return rows.length ? [h("b", null, title + " (" + rows.length + ")"), h("ul", null, rows.map(function (r) { return h("li", null, r.label); }))] : null; }
-    box.appendChild(h("div", { class: "diff" },
-      h("b", null, "Ready to publish: " + s.counts + "."),
-      h("p", null, "Steps that count: " + s.stepsBefore + " now → " + s.stepsAfter + " after publishing."),
-      !s.added.length && !s.removed.length ? h("p", null, "No steps added or removed; only wording or links may have changed.") : null,
-      list("New steps", s.added), list("Removed steps", s.removed),
-      s.learnersAffected ? h("div", { class: "warn" }, s.learnersAffected + " learner(s) ticked a step that will be removed. Their ticks stay saved but stop counting.") : null,
-      h("div", { class: "actions", style: "display:flex;gap:8px" }, pub, cancel)));
-    cancel.addEventListener("click", function () { box.textContent = ""; });
-    pub.addEventListener("click", function () {
-      pub.disabled = true; pub.textContent = "Publishing…";
-      api("api/admin/content/" + p.id + "/publish", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ token: j.token }) })
-        .then(function () { loadContent(); loadTeam(); loadDashboard(); }, function (e) { pub.disabled = false; pub.textContent = "Publish"; box.appendChild(h("p", { class: "err" }, e.message)); });
-    });
-  }
-
   /* ---------- create: the wizard ---------- */
   // One flow for every new path: Basics -> Structure -> Sources -> Review -> Generate. The answers are kept in
   // localStorage (per user), so a refresh or a visit elsewhere can continue; the GitHub token stays in memory only.

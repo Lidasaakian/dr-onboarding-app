@@ -225,10 +225,29 @@ def _live_ai() -> tuple[dict, dict]:
     return DEPLOYED_AI, {"kind": "deployed", "at": DEPLOYED_AI["meta"]["generatedAt"], "note": note}
 
 
+_MAIN = re.compile(r'(<main id="main">)(.*?)(</main>)', re.S)
+
+
+def splice_main(page: str, main: str) -> str:
+    if not _MAIN.search(page):
+        raise ValueError("The live page has no <main> section to update.")
+    main = re.sub(r"<script\b.*?</script>", "", main, flags=re.S | re.I)  # never accept scripts from the editor
+    return _MAIN.sub(lambda m: m.group(1) + "\n" + main + "\n  " + m.group(3), page, count=1)
+
+
 def _live_agentic() -> tuple[str, dict]:
+    """The Agentic page learners see. Saved edits keep only their <main> content: it goes into the page deployed with
+    the app, so fixes to the page's scripts and styles reach learners even while edits are live."""
     ov = docs.get("content-agentic")
     if ov and not ov.get("reverted"):
-        return ov["html"], {"kind": "uploaded", "at": ov["publishedAt"], "by": ov["publishedBy"], "file": ov.get("file", "")}
+        src = {"kind": "uploaded", "at": ov["publishedAt"], "by": ov["publishedBy"], "file": ov.get("file", "")}
+        m = _MAIN.search(ov["html"])
+        if m:
+            try:
+                return splice_main(DEPLOYED_AGENTIC, m.group(2)), src
+            except ValueError:
+                log.warning("The deployed Agentic page has no <main>; serving the saved page as it is")
+        return ov["html"], src
     return DEPLOYED_AGENTIC, {"kind": "deployed"}
 
 
@@ -619,6 +638,7 @@ async def api_report_status(report_id: str, request: Request) -> dict:
                 r["status"] = status
                 r["resolvedBy"] = me["name"] if status == "resolved" else ""
                 r["resolvedAt"] = now_ms() if status == "resolved" else None
+                r["manualStatus"], r["autoResolved"] = True, False  # from now on the Jira sync leaves the status alone
                 return r
         return None
 
@@ -647,16 +667,6 @@ def ticks_on(item_ids: set[str], pid: str) -> int:
 def api_content_status(request: Request) -> dict:
     require_manager(identify(request))
     return {"paths": [{"id": pid, "title": p.title, "steps": len(p.items), "source": p.source} for pid, p in PATHS.items() if not is_custom(pid)]}
-
-
-_MAIN = re.compile(r'(<main id="main">)(.*?)(</main>)', re.S)
-
-
-def splice_main(page: str, main: str) -> str:
-    if not _MAIN.search(page):
-        raise ValueError("The live page has no <main> section to update.")
-    main = re.sub(r"<script\b.*?</script>", "", main, flags=re.S | re.I)  # never accept scripts from the editor
-    return _MAIN.sub(lambda m: m.group(1) + "\n" + main + "\n  " + m.group(3), page, count=1)
 
 
 def dedupe_steps(page: str) -> str:
@@ -1082,7 +1092,9 @@ def sync_jira() -> dict:
             n += 1
             j.update(info, visible=True)
             done = info["category"] == "done"
-            if done and r.get("status") != "resolved":
+            if r.get("manualStatus"):
+                pass  # resolved or reopened by hand: keep it that way
+            elif done and r.get("status") != "resolved":
                 r["status"], r["resolvedBy"], r["resolvedAt"], r["autoResolved"] = "resolved", "Jira", now_ms(), True
             elif not done and r.get("status") == "resolved" and r.get("autoResolved"):
                 r["status"], r["resolvedBy"], r["resolvedAt"], r["autoResolved"] = "open", "", None, False

@@ -908,6 +908,7 @@ dr assist --help</code></pre></div></div></li></ol><ol class="tasks"><li data-t=
     document.body.classList.add("onb-editing");
     $("#editbar").hidden = false;
     var b = $("#btn-edit"); if (b) { b.textContent = "Editing…"; b.disabled = true; }
+    DROnb.builtinEditing(true, location.pathname.replace(/\/?$/, "/") + "../", "agentic");
     var h = location.hash.slice(1); var sec0 = h && $('#main [data-page="' + h + '"]'); if (sec0) sec0.scrollIntoView({ block: "start" });
   }
   function leaveEdit() {
@@ -918,6 +919,7 @@ dr assist --help</code></pre></div></div></li></ol><ol class="tasks"><li data-t=
     document.body.classList.remove("onb-editing");
     $("#editbar").hidden = true;
     var b = $("#btn-edit"); if (b) { b.textContent = "Edit content"; b.disabled = false; }
+    DROnb.builtinEditing(false, location.pathname.replace(/\/?$/, "/") + "../", "agentic");
     if (location.hash === "#edit") history.replaceState(null, "", "#start");
     show(current || "start");
   }

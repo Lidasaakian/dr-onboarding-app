@@ -662,7 +662,35 @@
     setTimeout(check, 20000);
   }
 
+  /* ---------------------------------------------------------------- built-in paths: edit mode */
+  // While the AI Engineer or Agentic path is in edit mode the back link returns to Admin -> Content, and when the
+  // path has saved edits (an in-app edit or an old upload) admins can make the deployed files live again.
+  function builtinEditing(on, root, pathId) {
+    var back = document.querySelector(".backlink");
+    if (back) { back.href = on ? root + "admin/#content" : root; back.textContent = on ? "\u2190 Content" : "\u2190 All learning paths"; }
+    var old = document.getElementById("ed-revert");
+    if (old) old.remove();
+    if (!on) return;
+    fetch(root + "api/admin/content").then(function (r) { return r.ok ? r.json() : { paths: [] }; }).then(function (j) {
+      var p = (j.paths || []).filter(function (x) { return x.id === pathId; })[0];
+      var discard = document.getElementById("ed-discard");
+      if (!p || !p.source || p.source.kind !== "uploaded" || !discard || document.getElementById("ed-revert")) return;
+      var b = h("button", { type: "button", class: "btn", id: "ed-revert" }, "Go back to the deployed version");
+      b.addEventListener("click", function () {
+        if (!confirm("Go back to the content deployed with the app? Every edit made in the app to this path stops being live, for learners too.")) return;
+        b.disabled = true;
+        fetch(root + "api/admin/content/" + pathId + "/revert", { method: "POST" }).then(function (r) {
+          if (!r.ok) throw new Error("Request failed (" + r.status + ")");
+          history.replaceState(null, "", location.pathname);
+          location.reload();
+        }).catch(function (e) { b.disabled = false; alert("Couldn't go back: " + e.message); });
+      });
+      discard.parentNode.insertBefore(b, discard);
+    }, function () {});
+  }
+
   window.DROnb = {
+    builtinEditing: builtinEditing,
     watchDrafts: watchDrafts,
     addGenerating: function (uid, id) { var ids = draftsOf(uid); if (ids.indexOf(id) < 0) ids.push(id); setDrafts(uid, ids); },
     toast: toast,

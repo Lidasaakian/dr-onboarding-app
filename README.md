@@ -195,8 +195,10 @@ initials show instead.
   email. DataRobot bugs show the Jira key and status (assignee, resolution, fix version, "Duplicate of …"). The app
   reads every linked issue's status every 15 minutes (and on **Sync now**): resolved in Jira moves the report to
   Resolved, reopened moves it back to Open. Issues the service account can't see show "Can't see this issue in Jira".
-- **Content:** every path you manage (status, steps, enrolled, owners), **+ Create learning path**, and for the
-  built-in paths the upload and download tools (next section).
+  DataRobot bugs also have **Mark resolved** / **Reopen**: once someone changes a bug's status by hand, the Jira sync
+  leaves that status alone.
+- **Content:** every path you manage, built-in and app-made, in one list (status, steps, enrolled, owners) with
+  **Edit**, and **+ Create learning path**.
 - **Users** (admins): invite people and assign roles (above).
 - Authors and owners see the same tabs (except Users), limited to the paths they own.
 - **Slack (optional):** every report as it arrives, and every Monday from 09:00 Dublin time a summary of inactive
@@ -205,20 +207,22 @@ initials show instead.
 ## Editing content in the app
 
 The app is the source of truth for content. Admins see **Edit content** on each path page (or Admin → Content →
-**Edit in the app**). A yellow bar shows you're editing; nothing is live until **Review and publish**, which lists the
-steps added or removed and how many learners ticked a removed step.
+**Edit**). A yellow bar shows you're editing; nothing is live until **Review and publish**, which lists the
+steps added or removed and how many learners ticked a removed step. While editing, the back link at the top reads
+**← Content** and returns to Admin → Content.
 
 - **AI Engineer Learning Plan:** click any text to change it (every tab: overview, weeks, capstone pages,
   certifications); change links in the small link fields; add steps (**+ Add a Required step** / **+ Add a Stretch step**),
   delete them, move them up and down, and change their day, path, type and gate flag.
-  **Download as .xlsx** gives the current content in the sheet's layout, to share or to edit offline; uploading
-  that file again (Admin → Content → Upload a sheet) works too.
+  **Download as .xlsx** (in the edit bar) gives the current content in the sheet's layout, to share or to read
+  offline. Uploading a sheet or page from Admin → Content is no longer offered: edit in the app instead.
 - **Agentic AI Learning Path:** click any text to change it; click a link to change or remove it. Each step keeps its
-  checkbox, so ticks carry over. For bigger changes you can still **Download the live page**, edit the HTML and upload
-  it (keep each step's `data-t="..."` attribute).
-- **Go back to the deployed version** (Admin → Content) undoes all in-app edits and uploads for that path.
+  checkbox, so ticks carry over. Saved edits keep only the page's text: it's shown inside the page deployed with the
+  app, so fixes to the page's code still reach learners.
+- **Go back to the deployed version** (in the edit bar, shown when the path has saved edits) undoes all in-app edits
+  and earlier uploads for that path, after a confirmation.
 
-Edits and uploads are stored with the progress data, so they survive restarts and redeploys. For the AI Engineer plan,
+Edits are stored with the progress data, so they survive restarts and redeploys. For the AI Engineer plan,
 a later deploy whose `content.json` is newer than the last edit wins; to keep in-app edits, don't run
 `tools/refresh_ai_engineer.py` and redeploy.
 
