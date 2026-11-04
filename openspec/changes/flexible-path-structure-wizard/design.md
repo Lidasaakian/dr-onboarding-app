@@ -136,6 +136,12 @@ read from old files. The Steps sheet's columns don't change, so old templates st
 
 ## Risks / Trade-offs
 
+- [A deploy is a rolling restart: for a minute the old and new instance both run. A path still generating on the old
+  instance is marked "failed" by the new one at startup, then saved as a draft by the old one, while the new instance
+  keeps showing "failed"] → found on staging (check 8.3). Decided not to change the code: the README's deploy steps
+  say to deploy only when nothing is generating, and to restart once more (not delete or retry) if a path shows as
+  interrupted after a deploy. A heartbeat on generating paths would fix it if this becomes a problem.
+
 - [A "generating" or "failed" path leaks to learners through a view that only checks for "draft"] → audit every
   `status` check in `app.py`; add a test that a generating path is invisible on the hub, summary, path page and verify.
 - [Unnumbered sections shift the meaning of `Item.unit` and pace for existing learners] → existing paths have no

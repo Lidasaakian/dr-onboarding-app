@@ -275,6 +275,21 @@ The app is deployed as custom application `6ac78331b1de870be92e2341` on app.data
 4. **Share:** Applications → actions menu → **Share**. For anyone with a datarobot.com email, turn on external
    sharing and allow the `datarobot.com` domain.
 
+### Deploy when nothing is generating
+
+A rebuild or version switch is a rolling restart: the old instance keeps serving until the new one is ready, so for
+a minute or two both run on the same Files item. Each keeps its own copy of the data in memory, so:
+
+- **Before deploying,** check Admin → Content: no path should show **Generating…**. A path still generating when the
+  new instance starts shows there as **Failed: interrupted by an app restart**, even if the old instance finishes it a
+  moment later and saves the draft. If that happens, don't delete it or click **Try again**: restart the app once more
+  (Applications → actions menu → pause, then start) and it shows the saved draft.
+- **Deploy at a quiet time.** Ticks a learner makes on the old instance in that minute can be overwritten by the new
+  one.
+- **Only one app may use the Files item.** Never point a staging or test app's `PROGRESS_FILES_ID` at production's
+  Files item: two running apps overwrite each other's progress. A staging app gets its own Files item (a copy of
+  production's, if it needs real data).
+
 ## Setting up Slack
 
 1. In Slack, create an incoming webhook for the channel that should receive the messages

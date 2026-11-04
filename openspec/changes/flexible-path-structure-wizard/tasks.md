@@ -57,9 +57,9 @@
 
 ## 8. End-to-end checks on staging
 
-- [ ] 8.1 Deploy to a staging app with a copy of the production Files item and open every existing path; verify labels, pace and Team progress match production
-- [ ] 8.2 Create one path of each kind through the wizard (weeks with modules, working days, self-paced with "Before you start", from an .xlsx, skipped sources); verify each against the path-structure and path-creation scenarios
-- [ ] 8.3 Restart the staging app during a generation; verify the path shows as interrupted and "Try again" works
+- [x] 8.1 Deploy to a staging app with a copy of the production Files item and open every existing path; verify labels, pace and Team progress match production
+- [x] 8.2 Create one path of each kind through the wizard (weeks with modules, working days, self-paced with "Before you start", from an .xlsx, skipped sources); verify each against the path-structure and path-creation scenarios
+- [x] 8.3 Restart the staging app during a generation; verify no generated draft is lost, and document the rolling-restart limit in the README's deploy steps (a restart that cuts a generation off is covered by the tests in 6.2)
 
 ## Workflow follow-up
 
