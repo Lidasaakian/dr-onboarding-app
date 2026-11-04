@@ -48,6 +48,7 @@
   var paceEl, editing = false;
   function renderPace() {
     if (!paceEl) return;
+    setTimeout(placePanel, 0);  // the pace line can change the header's height
     paceEl.textContent = "";
     if (!status) return;
     var p = status.pace || {};
@@ -750,6 +751,7 @@
   function setDrWidth(w) {
     w = Math.max(360, Math.min(Math.round(window.innerWidth * 0.75), Math.round(w)));
     document.documentElement.style.setProperty("--onb-dr-w", w + "px");
+    document.body.classList.toggle("onb-dr-narrow", window.innerWidth - w < 1000);  // section list goes above the steps
     return w;
   }
   var ICON = {
@@ -805,7 +807,22 @@
       if (onDrSite(href)) saveDr({ url: href });
     });
     document.body.appendChild(panel);
+    var hd = document.querySelector("header.top");
+    if (hd && window.ResizeObserver) new ResizeObserver(placePanel).observe(hd);
   }
+  // The panel starts under the page header (and under the edit bar while editing), and rises to the top of the
+  // window once the header has scrolled away.
+  var lastTop = -1;
+  function placePanel() {
+    if (!panel || panel.hidden) return;
+    var top = 0, hd = document.querySelector("header.top"), bar = document.querySelector(".onb-editbar:not([hidden])");
+    if (hd) top = Math.max(top, hd.getBoundingClientRect().bottom);
+    if (bar) top = Math.max(top, bar.getBoundingClientRect().bottom);
+    top = Math.max(0, Math.round(top));
+    if (top !== lastTop) { lastTop = top; document.documentElement.style.setProperty("--onb-dr-top", top + "px"); }
+  }
+  window.addEventListener("scroll", placePanel, { passive: true });
+  window.addEventListener("load", placePanel);  // fonts and images can still change the header's height
   function openPanel(url) {
     if (!panel) buildPanel();
     var st = drState();
@@ -821,6 +838,7 @@
       }, 15000);
     }
     saveDr({ open: true });
+    placePanel();
     if (drBtn) drBtn.textContent = "Hide DataRobot";
   }
   function closePanel() {
@@ -851,7 +869,7 @@
   window.addEventListener("resize", function () {
     if (!panel || panel.hidden) return;
     if (window.innerWidth < 900) { document.body.classList.remove("onb-dr-open"); panel.hidden = true; if (drBtn) drBtn.textContent = "Open DataRobot"; }
-    else setDrWidth(drState().width || window.innerWidth * 0.45);
+    else { setDrWidth(drState().width || window.innerWidth * 0.45); placePanel(); }
   });
 
   /* ---------------------------------------------------------------- back link */
@@ -937,6 +955,7 @@
       (opts.rows ? opts.rows() : []).forEach(function (r) { r.mount.appendChild(reportButton(r)); });
       if (opts.server) { O.serverMode = true; api("status").then(function (j) {
         status = j; renderPace(); renderBadge(); renderMascot(false); renderAuthor();
+        placePanel();  // the header just grew
         if (location.hash === "#certificate" && status.badge && status.badge.earned) {  // "View certificate" on the dashboard
           history.replaceState(null, "", location.pathname);
           openCertificate();

@@ -81,8 +81,9 @@ starred steps, and the problems they reported with their status and Jira key. Pa
 - **Share my progress** (next to the start date, off by default): learners enrolled in the same path then see the
   learner's name, progress, current streak, whether they finished and the section they're in, under **Others on this
   path**. Only enrolled learners see that list, and it never shows emails. Unticking stops sharing straight away.
-- **Open DataRobot** (next to search) shows DataRobot in a panel on the right of the path page, next to the steps,
-  with buttons to collapse it, go back, forward, reload and open the page in a new window; drag its left edge to
+- **Open DataRobot** (next to search) shows DataRobot in the path's working area: the header (title, name, progress)
+  stays at the top across the page, and below it DataRobot sits on the right of the steps (filling that side from the
+  top once you scroll past the header), with buttons to collapse it, go back, forward, reload and open the page in a new window; drag its left edge to
   resize it. Step links to DataRobot pages open in the panel. The panel remembers whether it was open, its width and
   the last page, in this browser. It needs the app to be served from the DataRobot site itself (as a custom
   application is), since DataRobot only allows framing from the same site; elsewhere, on screens narrower than 900

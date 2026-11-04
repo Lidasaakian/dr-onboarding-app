@@ -210,10 +210,16 @@ body.onb-editing [contenteditable="true"]:focus{outline:2px solid var(--link);ba
 .onb-peer-bar{grid-column:1/-1;height:6px;background:var(--brick-empty,#E7EAE8);position:relative;overflow:hidden}
 .onb-peer-bar i{position:absolute;inset:0 auto 0 0;background:var(--green)}
 
-/* DataRobot panel on the right of a path page */
-body.onb-dr-open{padding-right:var(--onb-dr-w,45vw)}
+/* DataRobot panel in the path's working area: the header (title, name, progress) stays full width above it, the
+   steps keep the left side, and the panel fills the right from under the header (or the top, once scrolled past) */
+body.onb-dr-open .wrap.frame{max-width:none;margin:0;padding-right:calc(var(--onb-dr-w,45vw) + 24px)}
+body.onb-dr-open.onb-dr-narrow .wrap.frame{grid-template-columns:minmax(0,1fr);gap:20px}
+body.onb-dr-open.onb-dr-narrow .side{position:static;max-height:none;display:flex;overflow-x:auto;gap:6px;padding-bottom:6px}
+body.onb-dr-open.onb-dr-narrow .side .nav-item{flex:0 0 auto;width:180px}
+body.onb-dr-open.onb-dr-narrow .side .nav-item .nt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.onb-dr-open.onb-dr-narrow .side .sep{display:none}
 body.onb-dr-open .onb-toasts{right:calc(var(--onb-dr-w,45vw) + 16px)}
-.onb-dr{position:fixed;top:0;right:0;bottom:0;width:var(--onb-dr-w,45vw);z-index:40;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--bg);border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(0,0,0,.06)}
+.onb-dr{position:fixed;top:var(--onb-dr-top,0px);right:0;bottom:0;width:var(--onb-dr-w,45vw);z-index:40;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--bg);border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(0,0,0,.06)}
 .onb-dr[hidden]{display:none}
 .onb-dr-bar{display:flex;align-items:center;gap:4px;padding:8px 10px;border-bottom:1px solid var(--line)}
 .onb-dr-btn{display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid transparent;border-radius:8px;background:none;color:var(--ink);cursor:pointer}
@@ -227,4 +233,4 @@ body.onb-dr-open .onb-toasts{right:calc(var(--onb-dr-w,45vw) + 16px)}
 .onb-dr-msg[hidden]{display:none}
 .onb-dr-handle{position:absolute;top:0;bottom:0;left:-4px;width:8px;cursor:col-resize;z-index:1}
 .onb-dr-handle:hover,.onb-dr-handle:focus-visible{background:color-mix(in srgb,var(--link) 30%,transparent);outline:none}
-@media (max-width:899px){body.onb-dr-open{padding-right:0}.onb-dr{display:none}}
+@media (max-width:899px){body.onb-dr-open .wrap.frame{padding-right:16px}.onb-dr{display:none}}

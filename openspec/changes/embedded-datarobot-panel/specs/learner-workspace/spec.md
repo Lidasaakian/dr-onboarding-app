@@ -3,12 +3,21 @@
 ## ADDED Requirements
 
 ### Requirement: DataRobot panel in the path page
-On a wide screen, when the app is served from the DataRobot site, **Open DataRobot** SHALL open a DataRobot panel on
-the right of the path page, with the steps still visible on the left.
+On a wide screen, when the app is served from the DataRobot site, **Open DataRobot** SHALL open DataRobot in the
+path's working area: the page header (path title, the learner's name, progress and pace) SHALL stay across the full
+width at the top, and below it the steps SHALL be on the left and DataRobot on the right.
 
 #### Scenario: Opening the panel
 - **WHEN** a learner on a laptop clicks Open DataRobot on a path page served from app.datarobot.com
-- **THEN** DataRobot appears in a panel on the right and the steps stay on the left
+- **THEN** the header stays at the top at full width, and below it DataRobot appears on the right of the steps
+
+#### Scenario: Scrolling the steps
+- **WHEN** the learner scrolls down past the header
+- **THEN** DataRobot fills the right side from the top of the window, and the steps scroll on the left
+
+#### Scenario: Narrow working area
+- **WHEN** less than 1000 pixels are left beside the panel
+- **THEN** the list of sections moves above the steps so the steps keep a readable width
 
 ### Requirement: Panel controls
 The panel SHALL have buttons to collapse it, go back, go forward, reload, and open the current DataRobot page in a new
