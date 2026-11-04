@@ -998,6 +998,7 @@ tr.clickable:hover td{background:var(--panel)}
     document.body.classList.add("onb-editing");
     $("#editbar").hidden = false;
     $("#btn-edit").textContent = "Editing…"; $("#btn-edit").disabled = true;
+    DROnb.builtinEditing(true, BASE + "../", "ai-engineer");
     rebuild();
   }
   function leaveEdit() {
@@ -1006,6 +1007,7 @@ tr.clickable:hover td{background:var(--panel)}
     document.body.classList.remove("onb-editing");
     $("#editbar").hidden = true;
     $("#btn-edit").textContent = "Edit content"; $("#btn-edit").disabled = false;
+    DROnb.builtinEditing(false, BASE + "../", "ai-engineer");
     if (location.hash === "#edit") history.replaceState(null, "", "#overview");
     rebuild();
   }

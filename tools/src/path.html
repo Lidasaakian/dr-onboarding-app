@@ -788,6 +788,9 @@
 
   function setMode(mode) {
     EDIT = mode === "edit"; PREVIEW = mode === "preview";
+    // In edit mode the back link returns to Admin -> Content; learners and preview go back to the hub.
+    $("#hub-link").href = EDIT ? ROOT + "admin/#content" : ROOT;
+    $("#hub-link").textContent = EDIT ? "← Content" : "← All learning paths";
     document.body.classList.toggle("onb-editing", EDIT);
     $("#editbar").hidden = !EDIT; $("#previewbar").hidden = !PREVIEW;
     $("#top-actions").hidden = EDIT;
